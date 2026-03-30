@@ -3,998 +3,1689 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Producción · CEVIL</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>CEVIL · Sistema de Control de Producción</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  :root {
-    --bg: #0e0f11;
-    --bg2: #14161a;
-    --bg3: #1c1f25;
-    --bg4: #23272f;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.13);
-    --text: #e8eaf0;
-    --text2: #8b90a0;
-    --text3: #555a68;
-    --accent: #e8b84b;
-    --accent2: #c99a2e;
-    --green: #4caf7d;
-    --green-bg: rgba(76,175,125,0.1);
-    --amber: #e8a020;
-    --amber-bg: rgba(232,160,32,0.1);
-    --red: #e05252;
-    --red-bg: rgba(224,82,82,0.1);
-    --blue: #5b9cf6;
-    --blue-bg: rgba(91,156,246,0.1);
-    --teal: #3fc9a0;
-    --teal-bg: rgba(63,201,160,0.1);
-    --font-head: 'Barlow Condensed', sans-serif;
-    --font-body: 'Barlow', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-    --radius: 6px;
-    --radius-lg: 10px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+/* ════════════════════════════════════════════════════
+   DESIGN TOKENS — Industrial Dark High-Contrast
+════════════════════════════════════════════════════ */
+:root {
+  --bg0:       #080a0d;
+  --bg1:       #0d1017;
+  --bg2:       #131720;
+  --bg3:       #1a2030;
+  --bg4:       #232c3d;
+  --bg5:       #2d3a50;
 
-  /* ── HEADER ── */
-  .header {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: center; gap: 16px; }
-  .logo-mark {
-    width: 32px; height: 32px;
-    background: var(--accent);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-head);
-    font-weight: 700;
-    font-size: 14px;
-    color: #0e0f11;
-    letter-spacing: 0.02em;
-    flex-shrink: 0;
-  }
-  .header-title {
-    font-family: var(--font-head);
-    font-weight: 600;
-    font-size: 17px;
-    letter-spacing: 0.04em;
-    color: var(--text);
-  }
-  .header-sub {
-    font-size: 12px;
-    color: var(--text3);
-    font-family: var(--font-mono);
-    letter-spacing: 0.04em;
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text3);
-  }
-  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); position: relative; }
-  .pulse::after {
-    content: ''; position: absolute; inset: -3px;
-    border-radius: 50%; border: 1px solid var(--green);
-    animation: pulse 2s ease-out infinite;
-  }
-  @keyframes pulse { 0%{opacity:.8;transform:scale(1)} 100%{opacity:0;transform:scale(2)} }
+  --border0:   rgba(255,255,255,0.04);
+  --border1:   rgba(255,255,255,0.08);
+  --border2:   rgba(255,255,255,0.15);
+  --border3:   rgba(255,255,255,0.25);
 
-  /* ── NAV TABS ── */
-  .nav {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    display: flex;
-    gap: 0;
-  }
-  .nav-tab {
-    padding: 14px 22px;
-    font-family: var(--font-head);
-    font-weight: 500;
-    font-size: 13px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text3);
-    cursor: pointer;
-    border: none;
-    background: none;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    position: relative;
-    top: 1px;
-  }
-  .nav-tab:hover { color: var(--text2); }
-  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  --text0:     #f0f4ff;
+  --text1:     #b8c4d8;
+  --text2:     #6e7d96;
+  --text3:     #3d4f6a;
 
-  /* ── LAYOUT ── */
-  .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
-  .section { display: none; }
-  .section.active { display: block; }
+  --amber:     #f5a623;
+  --amber-dim: rgba(245,166,35,0.12);
+  --amber-bd:  rgba(245,166,35,0.3);
 
-  /* ── SECTION HEADER ── */
-  .section-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .section-head-title {
-    font-family: var(--font-head);
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    color: var(--text);
-  }
-  .section-head-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
-  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .filter-btn {
-    padding: 5px 14px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    border: 1px solid var(--border2);
-    background: transparent;
-    color: var(--text3);
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .filter-btn:hover { color: var(--text); border-color: var(--border2); }
-  .filter-btn.active { background: var(--accent); color: #0e0f11; border-color: var(--accent); font-weight: 500; }
+  --green:     #3dd68c;
+  --green-dim: rgba(61,214,140,0.1);
+  --green-bd:  rgba(61,214,140,0.3);
 
-  /* ── KPI CARDS ── */
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
-  @media(max-width:900px){ .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  @media(max-width:500px){ .kpi-grid { grid-template-columns: 1fr; } }
-  .kpi {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .kpi:hover { border-color: var(--border2); }
-  .kpi-accent {
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  }
-  .kpi-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 8px;
-  }
-  .kpi-value {
-    font-family: var(--font-head);
-    font-size: 30px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 5px;
-  }
-  .kpi-meta { font-size: 11px; color: var(--text3); }
-  .kpi-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 10px;
-    font-family: var(--font-mono);
-    margin-top: 6px;
-  }
+  --red:       #f05252;
+  --red-dim:   rgba(240,82,82,0.1);
+  --red-bd:    rgba(240,82,82,0.3);
 
-  /* ── CHART CARDS ── */
-  .chart-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 20px 22px;
-    margin-bottom: 16px;
-  }
-  .chart-card:hover { border-color: var(--border2); }
-  .chart-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .chart-title {
-    font-family: var(--font-head);
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text);
-  }
-  .chart-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
-  .leg { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
-  .leg-sq { width: 10px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+  --blue:      #60a5fa;
+  --blue-dim:  rgba(96,165,250,0.1);
+  --blue-bd:   rgba(96,165,250,0.3);
 
-  /* ── GRID LAYOUTS ── */
-  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
-  @media(max-width:800px){ .grid-2 { grid-template-columns: 1fr; } }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
-  @media(max-width:900px){ .grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  @media(max-width:560px){ .grid-3 { grid-template-columns: 1fr; } }
+  --teal:      #2dd4bf;
+  --teal-dim:  rgba(45,212,191,0.1);
 
-  /* ── TABLE ── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  thead th {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text3);
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-    white-space: nowrap;
-  }
-  tbody td {
-    padding: 9px 12px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text2);
-    vertical-align: top;
-  }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: var(--bg4); }
-  .td-date { font-family: var(--font-mono); color: var(--text3); white-space: nowrap; }
-  .td-num { font-family: var(--font-mono); text-align: right; }
-  .td-obs { color: var(--text2); font-size: 11px; max-width: 260px; }
+  --orange:    #fb923c;
 
-  /* ── STATUS BADGES ── */
-  .badge {
-    display: inline-block;
-    padding: 2px 9px;
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.04em;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .badge-green { background: var(--green-bg); color: var(--green); }
-  .badge-amber { background: var(--amber-bg); color: var(--amber); }
-  .badge-red { background: var(--red-bg); color: var(--red); }
-  .badge-blue { background: var(--blue-bg); color: var(--blue); }
-  .badge-teal { background: var(--teal-bg); color: var(--teal); }
-  .badge-gray { background: rgba(139,144,160,0.1); color: var(--text3); }
+  --font-head: 'IBM Plex Sans Condensed', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
 
-  /* ── MOLDE CARDS ── */
-  .molde-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-    margin-top: 4px;
-  }
-  .molde-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 16px 18px;
-    transition: border-color 0.2s;
-  }
-  .molde-card:hover { border-color: var(--border2); }
-  .molde-card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-  .molde-name { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--text); line-height: 1; }
-  .molde-num { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-top: 2px; }
-  .molde-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
-  .molde-row-label { color: var(--text3); }
-  .molde-row-val { font-family: var(--font-mono); color: var(--text); }
-  .weight-bar { margin: 10px 0 6px; }
-  .weight-bar-track { background: var(--bg4); border-radius: 3px; height: 4px; margin-top: 5px; overflow: hidden; }
-  .weight-bar-fill { height: 4px; border-radius: 3px; transition: width 0.6s ease; }
-  .weight-bar-label { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
-  .molde-obs { font-size: 11px; color: var(--text3); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
-  .molde-date { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-top: 6px; }
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+}
 
-  /* ── STAT INLINE ── */
-  .stat-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; }
-  .stat-inline { display: flex; flex-direction: column; }
-  .stat-inline-val { font-family: var(--font-head); font-size: 20px; font-weight: 700; }
-  .stat-inline-label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); letter-spacing: 0.06em; }
+/* ════════════════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 14px; }
+body {
+  background: var(--bg0);
+  color: var(--text0);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+select { font-family: var(--font-mono); }
 
-  /* ── DIVIDER ── */
-  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+/* ════════════════════════════════════════════════════
+   SCANLINE TEXTURE OVERLAY
+════════════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
 
-  /* ── ALERT BOX ── */
-  .alert {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 12px 16px;
-    border-radius: var(--radius);
-    border: 1px solid;
-    margin-bottom: 16px;
-    font-size: 13px;
-  }
-  .alert-amber { background: rgba(232,160,32,0.06); border-color: rgba(232,160,32,0.25); color: var(--amber); }
-  .alert-red { background: rgba(224,82,82,0.06); border-color: rgba(224,82,82,0.25); color: var(--red); }
-  .alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-  .alert-text { color: var(--text2); line-height: 1.5; }
-  .alert-text strong { color: var(--text); }
+/* ════════════════════════════════════════════════════
+   TOPBAR
+════════════════════════════════════════════════════ */
+.topbar {
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border1);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 34px; height: 34px;
+  background: var(--amber);
+  border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  font-family: var(--font-head);
+  font-weight: 700; font-size: 13px;
+  color: var(--bg0);
+  letter-spacing: .02em;
+  flex-shrink: 0;
+}
+.logo-text {
+  display: flex; flex-direction: column;
+  gap: 1px;
+}
+.logo-main {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--text0);
+  text-transform: uppercase;
+}
+.logo-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--text2);
+  letter-spacing: .08em;
+}
+.topbar-divider {
+  width: 1px; height: 28px;
+  background: var(--border1);
+}
+.topbar-right {
+  display: flex; align-items: center; gap: 16px;
+}
+.system-status {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--text2);
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: blink 3s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100%{opacity:1} 50%{opacity:.4}
+}
+#clock {
+  font-family: var(--font-mono);
+  font-size: 12px; color: var(--text1);
+  letter-spacing: .04em;
+}
 
-  /* ── FOOTER ── */
-  .footer {
-    text-align: center;
-    padding: 28px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text3);
-    border-top: 1px solid var(--border);
-    margin-top: 40px;
-  }
+/* ════════════════════════════════════════════════════
+   GLOBAL FILTER BAR
+════════════════════════════════════════════════════ */
+.filterbar {
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border0);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filterbar-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.filter-chips {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.chip {
+  padding: 4px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  background: transparent;
+  transition: all .15s;
+  letter-spacing: .04em;
+}
+.chip:hover { color: var(--text1); border-color: var(--border3); }
+.chip.active {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--bg0);
+  font-weight: 600;
+}
 
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg2); }
-  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+/* ════════════════════════════════════════════════════
+   NAV TABS
+════════════════════════════════════════════════════ */
+.navtabs {
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border1);
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+.navtabs::-webkit-scrollbar { display: none; }
+.navtab {
+  padding: 14px 20px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+  position: relative;
+  top: 1px;
+  display: flex; align-items: center; gap: 8px;
+}
+.navtab:hover { color: var(--text1); }
+.navtab.active { color: var(--amber); border-bottom-color: var(--amber); }
+.tab-num {
+  background: var(--bg4);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+.navtab.active .tab-num { background: var(--amber-dim); color: var(--amber); }
 
-  /* ── ANIMATIONS ── */
-  .fade-in { animation: fadeIn 0.35s ease both; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+/* ════════════════════════════════════════════════════
+   MAIN LAYOUT
+════════════════════════════════════════════════════ */
+.main { padding: 24px; max-width: 1600px; margin: 0 auto; }
+.tab-section { display: none; }
+.tab-section.active { display: block; animation: fadeUp .3s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ════════════════════════════════════════════════════
+   SECTION HEADER
+════════════════════════════════════════════════════ */
+.sec-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border0);
+  flex-wrap: wrap; gap: 10px;
+}
+.sec-title {
+  font-family: var(--font-head);
+  font-size: 20px; font-weight: 700;
+  letter-spacing: .04em; color: var(--text0);
+}
+.sec-sub {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--text2);
+  margin-top: 3px; letter-spacing: .04em;
+}
+
+/* ════════════════════════════════════════════════════
+   CARD SYSTEM
+════════════════════════════════════════════════════ */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  transition: border-color .2s;
+}
+.card:hover { border-color: var(--border2); }
+.card-title {
+  font-family: var(--font-head);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text2); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════
+   KPI CARDS
+════════════════════════════════════════════════════ */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.kpi-row{grid-template-columns:1fr}}
+.kpi-card {
+  background: var(--bg2);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.kpi-card.amber::before { background: var(--amber); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-card.red::before { background: var(--red); }
+.kpi-card.blue::before { background: var(--blue); }
+.kpi-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text2);
+  margin-bottom: 10px;
+}
+.kpi-val {
+  font-family: var(--font-head);
+  font-size: 36px; font-weight: 700;
+  line-height: 1; margin-bottom: 6px;
+}
+.kpi-meta { font-size: 11px; color: var(--text2); }
+
+/* ════════════════════════════════════════════════════
+   GRID HELPERS
+════════════════════════════════════════════════════ */
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
+.grid-70-30 { display: grid; grid-template-columns: 1fr 340px; gap: 16px; margin-bottom: 16px; }
+@media(max-width:1100px){.grid-70-30{grid-template-columns:1fr}}
+@media(max-width:800px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* ════════════════════════════════════════════════════
+   BADGES & CHIPS
+════════════════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: .04em; white-space: nowrap;
+}
+.badge-green { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-bd); }
+.badge-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-bd); }
+.badge-red   { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red-bd); }
+.badge-blue  { background: var(--blue-dim);  color: var(--blue);  border: 1px solid var(--blue-bd); }
+.badge-gray  { background: var(--bg4); color: var(--text2); border: 1px solid var(--border1); }
+
+/* ════════════════════════════════════════════════════
+   ALERT PANEL
+════════════════════════════════════════════════════ */
+.alert-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid;
+  margin-bottom: 8px;
+  font-size: 12px; line-height: 1.5;
+}
+.alert-item:last-child { margin-bottom: 0; }
+.alert-crit { background: var(--red-dim); border-color: var(--red-bd); }
+.alert-warn { background: var(--amber-dim); border-color: var(--amber-bd); }
+.alert-info { background: var(--blue-dim); border-color: var(--blue-bd); }
+.alert-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.alert-body { flex: 1; }
+.alert-title { font-weight: 600; color: var(--text0); margin-bottom: 2px; }
+.alert-desc { color: var(--text1); font-size: 11px; }
+
+/* ════════════════════════════════════════════════════
+   MOLDE CARDS (Tab 1)
+════════════════════════════════════════════════════ */
+.molde-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.molde-mini {
+  background: var(--bg3);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  transition: all .2s;
+}
+.molde-mini:hover { border-color: var(--border2); transform: translateY(-1px); }
+.molde-mini-head {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 10px;
+}
+.molde-mini-name {
+  font-family: var(--font-head);
+  font-size: 22px; font-weight: 700;
+  line-height: 1; color: var(--text0);
+}
+.molde-mini-num {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--text2); margin-top: 2px;
+}
+.molde-row {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 5px; font-size: 11px;
+}
+.molde-row-lbl { color: var(--text2); }
+.molde-row-val { font-family: var(--font-mono); color: var(--text1); }
+.peso-track {
+  background: var(--bg5);
+  border-radius: 2px; height: 3px;
+  margin: 8px 0 4px; overflow: hidden;
+}
+.peso-fill { height: 3px; border-radius: 2px; transition: width .6s ease; }
+.molde-obs {
+  font-size: 10px; color: var(--text2);
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border0);
+  line-height: 1.4;
+}
+
+/* ════════════════════════════════════════════════════
+   VIA PILLS
+════════════════════════════════════════════════════ */
+.via-grid {
+  display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0;
+}
+.via-pill {
+  background: var(--bg4);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-sm);
+  padding: 2px 7px;
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--text1);
+}
+
+/* ════════════════════════════════════════════════════
+   TABLE
+════════════════════════════════════════════════════ */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text2);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border1);
+  text-align: left; white-space: nowrap;
+  background: var(--bg3);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border0);
+  color: var(--text1); vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--bg3); }
+.td-mono { font-family: var(--font-mono); }
+.td-r { text-align: right; }
+.td-date { font-family: var(--font-mono); color: var(--text2); white-space: nowrap; }
+
+/* ════════════════════════════════════════════════════
+   GAUGE (Tab 4)
+════════════════════════════════════════════════════ */
+.gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.gauge-card {
+  background: var(--bg2);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-lg);
+  padding: 20px 16px;
+  text-align: center;
+  transition: border-color .2s;
+}
+.gauge-card:hover { border-color: var(--border2); }
+.gauge-wrap { position: relative; width: 120px; margin: 0 auto 12px; }
+.gauge-canvas { width: 120px !important; height: 70px !important; }
+.gauge-pct {
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-head);
+  font-size: 20px; font-weight: 700;
+  color: var(--text0);
+  line-height: 1;
+}
+.gauge-name {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700;
+  color: var(--text0); margin-bottom: 2px;
+}
+.gauge-num { font-family: var(--font-mono); font-size: 10px; color: var(--text2); margin-bottom: 8px; }
+.gauge-eta {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--text2);
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border0);
+}
+.gauge-eta-val { color: var(--amber); font-size: 11px; font-weight: 500; }
+
+/* ════════════════════════════════════════════════════
+   STOCK CARDS (Tab 3)
+════════════════════════════════════════════════════ */
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.stock-card {
+  background: var(--bg2);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  transition: all .2s;
+}
+.stock-card.critical {
+  border-color: var(--red-bd);
+  background: linear-gradient(135deg, var(--bg2) 0%, rgba(240,82,82,0.04) 100%);
+}
+.stock-card:hover { border-color: var(--border2); }
+.stock-cat {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text2);
+  margin-bottom: 6px;
+}
+.stock-name {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  color: var(--text0); margin-bottom: 12px;
+  line-height: 1.3;
+}
+.stock-bar-wrap { margin-bottom: 10px; }
+.stock-bar-labels {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--text2); margin-bottom: 4px;
+}
+.stock-track {
+  background: var(--bg4);
+  border-radius: 3px; height: 6px; overflow: hidden;
+  position: relative;
+}
+.stock-fill { height: 6px; border-radius: 3px; transition: width .6s; }
+.stock-min-line {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: var(--red); opacity: .6;
+}
+.stock-nums {
+  display: flex; justify-content: space-between;
+  align-items: baseline; font-size: 11px; color: var(--text2);
+}
+.stock-actual { font-family: var(--font-head); font-size: 22px; font-weight: 700; }
+.stock-min { font-family: var(--font-mono); font-size: 10px; }
+
+/* ════════════════════════════════════════════════════
+   ACTION BUTTON
+════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--r-md);
+  font-family: var(--font-head);
+  font-size: 13px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  transition: all .15s; cursor: pointer;
+}
+.btn-amber {
+  background: var(--amber);
+  color: var(--bg0);
+  border: none;
+}
+.btn-amber:hover { background: #f5b84b; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245,166,35,.3); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text1);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { border-color: var(--border3); color: var(--text0); }
+
+/* ════════════════════════════════════════════════════
+   CSV CONNECT NOTICE
+════════════════════════════════════════════════════ */
+.csv-notice {
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-bd);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.csv-notice-icon { font-size: 16px; flex-shrink: 0; }
+.csv-notice-text { color: var(--text1); line-height: 1.6; }
+.csv-notice-text strong { color: var(--blue); }
+.csv-notice code {
+  background: var(--bg4);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--amber);
+}
+
+/* ════════════════════════════════════════════════════
+   LOADING STATE
+════════════════════════════════════════════════════ */
+.loading {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 200px; gap: 12px;
+  color: var(--text2); font-family: var(--font-mono); font-size: 12px;
+}
+.spinner {
+  width: 28px; height: 28px;
+  border: 2px solid var(--bg4);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ════════════════════════════════════════════════════
+   SCROLLBAR
+════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg1); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bg5); }
+
+/* ════════════════════════════════════════════════════
+   CORRELATION ANNOTATION
+════════════════════════════════════════════════════ */
+.corr-legend {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  margin-bottom: 12px;
+}
+.corr-item {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text2);
+}
+.corr-line {
+  width: 24px; height: 2px; border-radius: 1px; flex-shrink: 0;
+}
+.corr-dash { background: repeating-linear-gradient(90deg, var(--amber) 0,var(--amber) 5px,transparent 5px,transparent 9px); }
+
+/* ════════════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════════════ */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--text3);
+  border-top: 1px solid var(--border0);
+  margin-top: 40px;
+  letter-spacing: .06em;
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-left">
-    <div class="logo-mark">CV</div>
-    <div>
-      <div class="header-title">DASHBOARD DE PRODUCCIÓN</div>
-      <div class="header-sub">CMP CEVIL · PLANTA LAMINADORAS</div>
+<!-- ════════ TOPBAR ════════ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo">
+      <div class="logo-icon">CV</div>
+      <div class="logo-text">
+        <div class="logo-main">CEVIL · Control de Producción</div>
+        <div class="logo-sub">CMP Cevil Redondo · Planta Laminadoras</div>
+      </div>
+    </div>
+    <div class="topbar-divider"></div>
+    <div class="system-status">
+      <div class="status-dot"></div>
+      <span id="data-status">Datos cargados</span>
     </div>
   </div>
-  <div class="header-right">
-    <div class="pulse"></div>
+  <div class="topbar-right">
     <span id="clock">—</span>
   </div>
 </header>
 
-<!-- NAV -->
-<nav class="nav">
-  <button class="nav-tab active" onclick="switchTab('estano', this)">Control de Estaño — KLB12</button>
-  <button class="nav-tab" onclick="switchTab('moldes', this)">Moldes y Cromado</button>
+<!-- ════════ FILTER BAR ════════ -->
+<div class="filterbar">
+  <span class="filterbar-label">◆ Tipo de ladrillo</span>
+  <div class="filter-chips" id="filter-chips">
+    <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
+    <button class="chip" onclick="setFilter('H8',this)">H8</button>
+    <button class="chip" onclick="setFilter('H12',this)">H12</button>
+    <button class="chip" onclick="setFilter('H18',this)">H18</button>
+    <button class="chip" onclick="setFilter('P12',this)">P12</button>
+    <button class="chip" onclick="setFilter('P18',this)">P18</button>
+    <button class="chip" onclick="setFilter('L12',this)">L12</button>
+    <button class="chip" onclick="setFilter('L16',this)">L16</button>
+    <button class="chip" onclick="setFilter('DM20',this)">DM20</button>
+    <button class="chip" onclick="setFilter('DM27',this)">DM27</button>
+    <button class="chip" onclick="setFilter('KB',this)">KB</button>
+  </div>
+</div>
+
+<!-- ════════ NAV TABS ════════ -->
+<nav class="navtabs">
+  <button class="navtab active" onclick="switchTab('general',this)">
+    <span>01</span> Dashboard General
+    <span class="tab-num" id="tn-general">14</span>
+  </button>
+  <button class="navtab" onclick="switchTab('laminacion',this)">
+    <span>02</span> Control de Laminación
+    <span class="tab-num" id="tn-laminacion">154</span>
+  </button>
+  <button class="navtab" onclick="switchTab('stock',this)">
+    <span>03</span> Stock de Repuestos
+    <span class="tab-num" id="tn-stock">DEMO</span>
+  </button>
+  <button class="navtab" onclick="switchTab('vidautil',this)">
+    <span>04</span> Vida Útil Predictiva
+    <span class="tab-num" id="tn-vidautil">DEMO</span>
+  </button>
 </nav>
 
-<!-- MAIN -->
+<!-- ════════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════════ -->
 <main class="main">
 
-  <!-- ══════════════════════════════════════
-       SECCIÓN 1: CONTROL DE ESTAÑO KLB12
-  ══════════════════════════════════════ -->
-  <section class="section active fade-in" id="sec-estano">
+<!-- ══════════════════════════════════════════════
+     TAB 1: DASHBOARD GENERAL
+══════════════════════════════════════════════ -->
+<section class="tab-section active" id="tab-general">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Estado Actual de Moldes</div>
+      <div class="sec-sub">14 moldes en seguimiento · Última actualización: 25/03/2026</div>
+    </div>
+  </div>
 
-    <div class="section-head">
-      <div>
-        <div class="section-head-title">Laminador KLB12 — Control de Estaño</div>
-        <div class="section-head-sub">154 registros · Ene 2024 – Mar 2026 · Valores de referencia: Esquina 1,50 mm · Tolerancia 0,10 mm</div>
+  <!-- KPIs -->
+  <div class="kpi-row" id="kpi-general"></div>
+
+  <!-- Main layout: chart + alerts -->
+  <div class="grid-70-30">
+    <!-- Gráfico sobrepeso -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--amber)"></div>
+        % Exceso de peso por molde · Umbral crítico: 5%
       </div>
-      <div class="filter-group" id="year-filters">
-        <button class="filter-btn active" onclick="filterYear('todos',this)">Todos</button>
-        <button class="filter-btn" onclick="filterYear('2024',this)">2024</button>
-        <button class="filter-btn" onclick="filterYear('2025',this)">2025</button>
-        <button class="filter-btn" onclick="filterYear('2026',this)">2026</button>
+      <div style="position:relative;width:100%;height:280px;">
+        <canvas id="chartSobrepeso"></canvas>
       </div>
     </div>
-
-    <!-- KPIs -->
-    <div class="kpi-grid" id="kpis-estano"></div>
-
-    <!-- Gráfico 1: Línea temporal -->
-    <div class="chart-card">
-      <div class="chart-top">
-        <div>
-          <div class="chart-title">Evolución de espesores en el tiempo</div>
-          <div class="chart-desc">Centro vs Esquina (mm) · Línea roja punteada = diferencia</div>
-        </div>
-        <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:#5b9cf6;"></div>Centro</div>
-          <div class="leg"><div class="leg-sq" style="background:#4caf7d;"></div>Esquina</div>
-          <div class="leg"><div class="leg-sq" style="background:#e05252;height:2px;"></div>Diferencia</div>
-        </div>
-      </div>
-      <div style="position:relative;width:100%;height:280px;"><canvas id="chartLinea"></canvas></div>
-    </div>
-
-    <!-- Gráfico 2+3: Mensual + Distribución -->
-    <div class="grid-2">
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-top">
-          <div>
-            <div class="chart-title">Diferencia promedio mensual</div>
-            <div class="chart-desc">Promedio y máximo por mes (mm)</div>
-          </div>
-        </div>
-        <div style="position:relative;width:100%;height:220px;"><canvas id="chartMensual"></canvas></div>
-      </div>
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-top">
-          <div>
-            <div class="chart-title">Distribución de diferencias</div>
-            <div class="chart-desc">Cantidad de registros por rango (mm)</div>
-          </div>
-        </div>
-        <div style="position:relative;width:100%;height:220px;"><canvas id="chartDist"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Gráfico 4: Ajustes (vueltas) -->
-    <div class="chart-card">
-      <div class="chart-top">
-        <div>
-          <div class="chart-title">Historial de ajustes — vueltas aplicadas</div>
-          <div class="chart-desc">Cantidad de vueltas por intervención registrada · Total histórico: 191,5 vueltas</div>
-        </div>
-        <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:#e8b84b;"></div>Vueltas de ajuste</div>
-        </div>
-      </div>
-      <div style="position:relative;width:100%;height:180px;"><canvas id="chartVueltas"></canvas></div>
-    </div>
-
-    <!-- Tabla de intervenciones -->
-    <div class="chart-card">
-      <div class="chart-top">
-        <div>
-          <div class="chart-title">Registro de intervenciones con observaciones</div>
-          <div class="chart-desc">Últimas 20 entradas con observación registrada</div>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th style="text-align:right">Centro</th>
-              <th style="text-align:right">Esquina</th>
-              <th style="text-align:right">Dif.</th>
-              <th style="text-align:right">Vueltas</th>
-              <th style="text-align:right">mm/vuelta</th>
-              <th>Observación</th>
-            </tr>
-          </thead>
-          <tbody id="tabla-estano"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- ══════════════════════════════════════
-       SECCIÓN 2: MOLDES Y CROMADO
-  ══════════════════════════════════════ -->
-  <section class="section fade-in" id="sec-moldes">
-
-    <div class="section-head">
-      <div>
-        <div class="section-head-title">Seguimiento de Moldes y Cromado</div>
-        <div class="section-head-sub">CMP Cevil Redondo · 14 moldes activos · Actualizado al 25/03/2026</div>
-      </div>
-      <div class="filter-group" id="molde-filters">
-        <button class="filter-btn active" onclick="filterMoldes('todos',this)">Todos</button>
-        <button class="filter-btn" onclick="filterMoldes('Operativo',this)">Operativos</button>
-        <button class="filter-btn" onclick="filterMoldes('En calibración',this)">En calibración</button>
-        <button class="filter-btn" onclick="filterMoldes('En fabricación',this)">En fabricación</button>
-      </div>
-    </div>
-
-    <!-- KPIs moldes -->
-    <div class="kpi-grid" id="kpis-moldes"></div>
 
     <!-- Alertas -->
-    <div id="alertas-moldes"></div>
-
-    <!-- Gráfico peso -->
-    <div class="chart-card">
-      <div class="chart-top">
-        <div>
-          <div class="chart-title">Peso promedio vs nominal por molde</div>
-          <div class="chart-desc">Verde = dentro del rango óptimo · Naranja = excede el peso nominal</div>
-        </div>
-        <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:#4caf7d;"></div>Óptimo</div>
-          <div class="leg"><div class="leg-sq" style="background:#e8a020;"></div>Excedido</div>
-          <div class="leg"><div class="leg-sq" style="background:#555a68;"></div>Sin datos</div>
-          <div class="leg"><div class="leg-sq" style="background:rgba(232,184,75,0.3);"></div>Nominal</div>
-        </div>
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--red)"></div>
+        Alertas críticas
       </div>
-      <div style="position:relative;width:100%;height:360px;"><canvas id="chartPesos"></canvas></div>
+      <div id="panel-alertas"></div>
     </div>
+  </div>
 
-    <!-- Gráfico estados + cromado -->
-    <div class="grid-2">
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-top">
-          <div>
-            <div class="chart-title">Estado de moldes</div>
-            <div class="chart-desc">Distribución por estado operativo</div>
-          </div>
-        </div>
-        <div style="position:relative;width:100%;height:200px;"><canvas id="chartEstados"></canvas></div>
+  <!-- Moldes grid -->
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-dot" style="background:var(--blue)"></div>
+      Detalle por molde
+    </div>
+    <div class="molde-grid" id="molde-cards"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2: CONTROL DE LAMINACIÓN
+══════════════════════════════════════════════ -->
+<section class="tab-section" id="tab-laminacion">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Laminador KLB12 — Control de Pasta</div>
+      <div class="sec-sub">154 registros · Ene 2024 – Mar 2026 · Ref. Esquina: 1,50 mm · Tolerancia: ±0,10 mm</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-ghost" style="font-size:11px;padding:7px 14px;" onclick="filterLam('todos',this)">Todos</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:7px 14px;" onclick="filterLam('2024',this)">2024</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:7px 14px;" onclick="filterLam('2025',this)">2025</button>
+      <button class="btn btn-ghost" style="font-size:11px;padding:7px 14px;" onclick="filterLam('2026',this)">2026</button>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="kpi-lam"></div>
+
+  <!-- Gráfico principal: línea temporal -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">
+      <div class="card-title-dot" style="background:var(--blue)"></div>
+      Evolución de espesores en el tiempo (mm)
+    </div>
+    <div class="corr-legend">
+      <div class="corr-item"><div class="corr-line" style="background:#60a5fa"></div>Centro (mm)</div>
+      <div class="corr-item"><div class="corr-line" style="background:#3dd68c"></div>Esquina (mm)</div>
+      <div class="corr-item"><div class="corr-line" style="background:#f05252"></div>Diferencia (mm)</div>
+      <div class="corr-item"><div class="corr-line corr-dash"></div>Tolerancia máx. 0,10 mm</div>
+    </div>
+    <div style="position:relative;width:100%;height:280px;">
+      <canvas id="chartLinea"></canvas>
+    </div>
+  </div>
+
+  <!-- Grid 2: mensual + distribución -->
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--amber)"></div>
+        Diferencia promedio mensual (mm)
       </div>
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-top">
-          <div>
-            <div class="chart-title">Estado de cromado</div>
-            <div class="chart-desc">Distribución por estado de cromado</div>
-          </div>
-        </div>
-        <div style="position:relative;width:100%;height:200px;"><canvas id="chartCromado"></canvas></div>
+      <div style="position:relative;width:100%;height:220px;">
+        <canvas id="chartMensual"></canvas>
       </div>
     </div>
-
-    <!-- Cards individuales -->
-    <div class="chart-card" style="margin-top:16px">
-      <div class="chart-top">
-        <div class="chart-title">Detalle por molde</div>
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--teal)"></div>
+        Distribución de diferencias
       </div>
-      <div class="molde-grid" id="molde-cards"></div>
+      <div style="position:relative;width:100%;height:220px;">
+        <canvas id="chartDist"></canvas>
+      </div>
     </div>
+  </div>
 
-  </section>
+  <!-- Correlación: diferencia laminación vs. sobrepeso molde -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">
+      <div class="card-title-dot" style="background:var(--orange)"></div>
+      Correlación: Desgaste de Laminación vs Exceso de Peso de Moldes
+    </div>
+    <div class="csv-notice" style="margin-bottom:16px;">
+      <div class="csv-notice-icon">💡</div>
+      <div class="csv-notice-text">
+        <strong>Lectura de correlación:</strong> Cuando la diferencia de laminación supera <strong>0,5 mm</strong>, el espesor de pasta es irregular → los ladrillos pueden salir con más peso aunque el molde esté en buen estado. Si el molde también está excedido, el problema es <strong>combinado</strong>.
+      </div>
+    </div>
+    <div style="position:relative;width:100%;height:200px;">
+      <canvas id="chartCorr"></canvas>
+    </div>
+  </div>
+
+  <!-- Tabla intervenciones -->
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-dot" style="background:var(--text2)"></div>
+      Últimas 20 intervenciones con observación
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th class="td-r">Centro</th>
+            <th class="td-r">Esquina</th>
+            <th class="td-r">Diferencia</th>
+            <th class="td-r">Vueltas</th>
+            <th class="td-r">mm/vuelta</th>
+            <th>Estado</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-lam"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3: STOCK DE REPUESTOS
+══════════════════════════════════════════════ -->
+<section class="tab-section" id="tab-stock">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Stock de Repuestos — Matricería</div>
+      <div class="sec-sub">Dados · Boquillas · Núcleos · Datos de ejemplo — conectar sheet cuando esté disponible</div>
+    </div>
+    <button class="btn btn-amber" onclick="generarFaltantes()">
+      ▼ Generar lista de faltantes
+    </button>
+  </div>
+
+  <div class="csv-notice">
+    <div class="csv-notice-icon">🔌</div>
+    <div class="csv-notice-text">
+      <strong>Para conectar datos reales:</strong> publicar la hoja de stock como CSV y reemplazar la constante <code>CSV_STOCK_URL</code> en el JS.
+      Ir a <strong>Archivo → Publicar en la web → Seleccionar hoja → CSV → Publicar</strong> y copiar el link generado.
+    </div>
+  </div>
+
+  <!-- KPIs stock -->
+  <div class="kpi-row" id="kpi-stock"></div>
+
+  <!-- Grids por categoría -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>Dados</div>
+    <div class="stock-grid" id="stock-dados"></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><div class="card-title-dot" style="background:var(--teal)"></div>Boquillas</div>
+    <div class="stock-grid" id="stock-boquillas"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="card-title-dot" style="background:var(--amber)"></div>Núcleos</div>
+    <div class="stock-grid" id="stock-nucleos"></div>
+  </div>
+
+  <!-- Modal faltantes -->
+  <div id="modal-faltantes" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:28px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-family:var(--font-head);font-size:16px;font-weight:700;">Lista de Faltantes — Compras</div>
+        <button onclick="document.getElementById('modal-faltantes').style.display='none'" style="color:var(--text2);font-size:18px;background:none;border:none;cursor:pointer;">✕</button>
+      </div>
+      <div id="modal-content"></div>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="copiarFaltantes()">Copiar texto</button>
+        <button class="btn btn-amber" onclick="document.getElementById('modal-faltantes').style.display='none'">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TAB 4: VIDA ÚTIL PREDICTIVA
+══════════════════════════════════════════════ -->
+<section class="tab-section" id="tab-vidautil">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">Vida Útil Predictiva de Moldes</div>
+      <div class="sec-sub">Estimación basada en toneladas producidas y vida útil teórica · Datos de ejemplo — conectar sheet</div>
+    </div>
+  </div>
+
+  <div class="csv-notice">
+    <div class="csv-notice-icon">🔌</div>
+    <div class="csv-notice-text">
+      <strong>Para activar datos reales:</strong> esta pestaña necesita una hoja con columnas <code>Molde</code>, <code>Ton producidas</code>, <code>Vida útil teórica (Ton)</code> y <code>Producción mensual promedio (Ton)</code>.
+      Publicar como CSV y conectar en <code>CSV_VIDA_URL</code>.
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row" id="kpi-vida"></div>
+
+  <!-- Gauges -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><div class="card-title-dot" style="background:var(--amber)"></div>% Vida consumida por molde</div>
+    <div class="gauge-grid" id="gauge-grid"></div>
+  </div>
+
+  <!-- Historial cromados -->
+  <div class="card">
+    <div class="card-title"><div class="card-title-dot" style="background:var(--teal)"></div>Historial de Cromados — Días por proveedor</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Molde</th>
+            <th>Proveedor</th>
+            <th class="td-r">Fecha Envío</th>
+            <th class="td-r">Fecha Retorno</th>
+            <th class="td-r">Días</th>
+            <th>Estado</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-cromados"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
 </main>
 
 <footer class="footer">
-  Dashboard de Producción · CMP CEVIL · Datos desde Google Sheets · Generado automáticamente
+  CEVIL · Sistema de Control de Producción · CMP Cevil Redondo · v2.0 · Datos: Google Sheets
+  <br>Para soporte técnico contactar al equipo de sistemas
 </footer>
 
+<!-- ════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
 <script>
-// ─────────────────────────────────────────────────────
-// DATOS
-// ─────────────────────────────────────────────────────
-const ESTANO = [{"f":"2024-01-13","c":3.0,"e":2.8,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-01-15","c":2.1,"e":2.0,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2024-01-16","c":1.7,"e":1.5,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-01-25","c":1.9,"e":1.7,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-01-25","c":1.6,"e":1.4,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-02-01","c":2.5,"e":1.9,"d":0.6,"v":null,"mm":null,"o":""},{"f":"2024-02-01","c":1.9,"e":1.3,"d":0.6,"v":null,"mm":null,"o":""},{"f":"2024-02-05","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-02-05","c":1.7,"e":1.5,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-02-09","c":1.6,"e":1.6,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-02-09","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-02-16","c":2.2,"e":2.0,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-02-16","c":1.7,"e":1.5,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-02-21","c":2.0,"e":1.7,"d":0.3,"v":null,"mm":null,"o":""},{"f":"2024-02-21","c":1.5,"e":1.2,"d":0.3,"v":null,"mm":null,"o":""},{"f":"2024-02-22","c":1.5,"e":1.2,"d":0.3,"v":null,"mm":null,"o":""},{"f":"2024-02-23","c":1.6,"e":1.3,"d":0.3,"v":null,"mm":null,"o":""},{"f":"2024-02-28","c":1.9,"e":1.4,"d":0.5,"v":null,"mm":null,"o":""},{"f":"2024-02-29","c":2.3,"e":1.6,"d":0.7,"v":null,"mm":null,"o":""},{"f":"2024-03-01","c":1.9,"e":1.3,"d":0.6,"v":null,"mm":null,"o":""},{"f":"2024-03-13","c":2.5,"e":2.0,"d":0.5,"v":null,"mm":null,"o":""},{"f":"2024-03-13","c":2.0,"e":1.5,"d":0.5,"v":null,"mm":null,"o":""},{"f":"2024-03-15","c":2.0,"e":1.8,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-03-21","c":2.4,"e":2.0,"d":0.4,"v":null,"mm":null,"o":""},{"f":"2024-03-22","c":2.1,"e":1.6,"d":0.5,"v":null,"mm":null,"o":""},{"f":"2024-03-28","c":2.4,"e":1.9,"d":0.5,"v":null,"mm":null,"o":""},{"f":"2024-04-03","c":2.4,"e":2.4,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-04-06","c":1.9,"e":1.9,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-04-15","c":2.6,"e":2.6,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-04-16","c":1.5,"e":1.4,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2024-04-26","c":2.2,"e":2.0,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-04-26","c":1.4,"e":1.2,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-04-26","c":1.7,"e":1.7,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-05-13","c":1.9,"e":1.7,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-06-19","c":2.8,"e":2.4,"d":0.4,"v":null,"mm":null,"o":""},{"f":"2024-06-25","c":1.9,"e":1.5,"d":0.4,"v":null,"mm":null,"o":""},{"f":"2024-07-10","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-07-10","c":2.8,"e":2.8,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-07-22","c":2.2,"e":2.0,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-07-22","c":1.5,"e":1.3,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-07-29","c":2.1,"e":1.8,"d":0.3,"v":3.0,"mm":0.13,"o":"Se necesita acercar."},{"f":"2024-07-29","c":1.7,"e":1.4,"d":0.3,"v":null,"mm":null,"o":"En condiciones."},{"f":"2024-08-03","c":2.4,"e":2.1,"d":0.3,"v":3.0,"mm":0.23,"o":"Se necesita acercar"},{"f":"2024-08-03","c":1.6,"e":1.4,"d":0.2,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-08-06","c":1.7,"e":1.4,"d":0.3,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-08-06","c":1.9,"e":1.6,"d":0.3,"v":2.0,"mm":0.1,"o":"Se necesita acercar"},{"f":"2024-08-20","c":2.4,"e":1.9,"d":0.5,"v":3.0,"mm":-0.1,"o":"Se necesita acercar"},{"f":"2024-08-20","c":1.9,"e":1.4,"d":0.5,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-08-28","c":2.4,"e":2.2,"d":0.2,"v":6.0,"mm":0.17,"o":"Se necesita acercar"},{"f":"2024-08-28","c":1.4,"e":1.2,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2024-09-03","c":2.3,"e":1.6,"d":0.7,"v":null,"mm":null,"o":"Se necesita rectificar"},{"f":"2024-09-03","c":2.1,"e":1.4,"d":0.7,"v":2.0,"mm":0.0,"o":"Se acercan"},{"f":"2024-09-19","c":1.5,"e":1.4,"d":0.1,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-09-19","c":2.0,"e":1.9,"d":0.1,"v":3.0,"mm":0.17,"o":"Se necesita acercar"},{"f":"2024-09-27","c":1.5,"e":1.4,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2024-09-27","c":2.1,"e":2.0,"d":0.1,"v":null,"mm":null,"o":"Se necesita cerrar"},{"f":"2024-10-09","c":2.4,"e":2.1,"d":0.3,"v":null,"mm":null,"o":""},{"f":"2024-10-09","c":2.0,"e":1.6,"d":0.4,"v":2.0,"mm":-0.15,"o":"Se necesita acercar"},{"f":"2024-10-09","c":1.8,"e":1.4,"d":0.4,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-10-18","c":2.5,"e":1.9,"d":0.6,"v":null,"mm":null,"o":"Se necesita retificar"},{"f":"2024-10-18","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2024-11-02","c":2.0,"e":2.0,"d":0.0,"v":3.0,"mm":0.17,"o":"Se necesita cerrar"},{"f":"2024-11-02","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-11-08","c":1.4,"e":1.4,"d":0.0,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-11-08","c":1.8,"e":1.8,"d":0.0,"v":3.0,"mm":0.13,"o":"Se necesita acercar"},{"f":"2024-11-12","c":1.8,"e":1.7,"d":0.1,"v":2.0,"mm":0.1,"o":"Se necesita acercar"},{"f":"2024-11-12","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-11-20","c":2.4,"e":2.3,"d":0.1,"v":3.0,"mm":0.27,"o":"Se necesita acercar"},{"f":"2024-11-20","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-11-29","c":2.5,"e":2.1,"d":0.4,"v":3.5,"mm":0.17,"o":"Se necesita acercar"},{"f":"2024-11-29","c":1.9,"e":1.5,"d":0.4,"v":null,"mm":null,"o":"En condiciones"},{"f":"2024-12-27","c":2.4,"e":1.8,"d":0.6,"v":3.0,"mm":0.13,"o":"Se necesita acercar"},{"f":"2024-12-27","c":2.0,"e":1.4,"d":0.6,"v":null,"mm":null,"o":"Hay que rectificar"},{"f":"2025-01-09","c":3.0,"e":2.3,"d":0.7,"v":3.5,"mm":0.2,"o":"Se necesita acercar"},{"f":"2025-01-09","c":2.3,"e":1.6,"d":0.7,"v":null,"mm":null,"o":"Hay que rectificar"},{"f":"2025-01-17","c":2.2,"e":1.5,"d":0.7,"v":null,"mm":null,"o":"Hay que rectificar!"},{"f":"2025-01-17","c":3.1,"e":2.4,"d":0.7,"v":4.0,"mm":0.23,"o":"Se necesita acercar"},{"f":"2025-01-20","c":3.0,"e":3.0,"d":0.0,"v":9.0,"mm":0.17,"o":"Se necesita acercar"},{"f":"2025-01-20","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":"En condiciones."},{"f":"2025-01-29","c":1.9,"e":1.8,"d":0.1,"v":2.5,"mm":0.16,"o":"Se necesita acercar"},{"f":"2025-01-29","c":1.5,"e":1.4,"d":0.1,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-02-17","c":2.4,"e":2.0,"d":0.4,"v":3.0,"mm":0.17,"o":"Se necesita acercar"},{"f":"2025-02-17","c":1.9,"e":1.5,"d":0.4,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-02-26","c":2.6,"e":2.2,"d":0.4,"v":4.5,"mm":0.16,"o":"Se necesita acercar"},{"f":"2025-02-26","c":1.9,"e":1.5,"d":0.4,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-03-07","c":2.6,"e":2.4,"d":0.2,"v":null,"mm":null,"o":"El laminador está en esas condiciones porque la cinta del desparramados está rota"},{"f":"2025-03-19","c":3.0,"e":2.1,"d":0.9,"v":null,"mm":null,"o":"Se necesita rectificar"},{"f":"2025-03-25","c":3.0,"e":3.0,"d":0.0,"v":7.0,"mm":0.21,"o":"Se necesita cerrar"},{"f":"2025-03-25","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-04-01","c":2.0,"e":2.0,"d":0.0,"v":3.0,"mm":0.2,"o":"Se necesita cerrar"},{"f":"2025-04-01","c":1.4,"e":1.4,"d":0.0,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-04-08","c":3.0,"e":2.9,"d":0.1,"v":9.0,"mm":0.01,"o":"Se necesita cerrar"},{"f":"2025-04-08","c":2.9,"e":2.8,"d":0.1,"v":null,"mm":null,"o":"Solo se pudo cerrar 3 vueltas, al acercarlo más rozan los cilindros"},{"f":"2025-04-15","c":2.6,"e":2.4,"d":0.2,"v":null,"mm":null,"o":"Se necesita cerrar a lo que nos de, por la vibración"},{"f":"2025-04-15","c":2.3,"e":2.2,"d":0.1,"v":6.0,"mm":-0.12,"o":"Se cerró lo más que se pudo."},{"f":"2025-04-22","c":2.4,"e":2.3,"d":0.1,"v":3.0,"mm":-0.03,"o":"Se cerro los mas que se pudo."},{"f":"2025-04-22","c":3.0,"e":2.9,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2025-04-30","c":2.6,"e":2.4,"d":0.2,"v":3.0,"mm":0.27,"o":"Se necesita cerrar 3 vueltas"},{"f":"2025-04-30","c":1.8,"e":1.6,"d":0.2,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-05-07","c":2.0,"e":1.8,"d":0.2,"v":2.0,"mm":-0.15,"o":"Se cerrará, por la vibración que tiene"},{"f":"2025-06-02","c":2.6,"e":2.1,"d":0.5,"v":null,"mm":null,"o":"Se necesita rectificar"},{"f":"2025-06-03","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-09-08","c":1.9,"e":1.6,"d":0.3,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-09-10","c":2.0,"e":1.7,"d":0.3,"v":null,"mm":null,"o":"Se necesita rectificar el Cilindro lento por las ranuras que tiene."},{"f":"2025-09-19","c":1.9,"e":1.6,"d":0.3,"v":null,"mm":null,"o":"Se necesita rectificar"},{"f":"2025-09-22","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":"En condiciones"},{"f":"2025-09-24","c":1.6,"e":1.6,"d":0.0,"v":null,"mm":null,"o":"En medida"},{"f":"2025-09-30","c":1.7,"e":1.7,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2025-09-30","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2025-10-03","c":2.8,"e":1.7,"d":1.1,"v":null,"mm":null,"o":"Se está notando mucha diferencia en el centro."},{"f":"2025-10-03","c":2.5,"e":1.5,"d":1.0,"v":null,"mm":null,"o":"El domingo se abrirá para ver las camisas. Desparramador requiere bajar los brazos."},{"f":"2025-10-10","c":2.6,"e":1.5,"d":1.1,"v":null,"mm":null,"o":"Se investiga el problema de tanta diferencia."},{"f":"2025-10-16","c":2.8,"e":1.7,"d":1.1,"v":null,"mm":null,"o":"Se detectan rectificadores con juego."},{"f":"2025-10-16","c":2.6,"e":1.5,"d":1.1,"v":null,"mm":null,"o":"Los desparramadores no están abriendo la tierra por el desgaste."},{"f":"2025-10-22","c":2.6,"e":1.5,"d":1.1,"v":null,"mm":null,"o":"Queda asentado que el domingo 26/10 se vendrá a rectificar con Martin."},{"f":"2025-10-22","c":2.7,"e":1.6,"d":1.1,"v":null,"mm":null,"o":"El domingo 19/10 se calibraron rectificadores"},{"f":"2025-10-27","c":2.8,"e":2.3,"d":0.5,"v":5.0,"mm":0.2,"o":"Se rectifica el 26/10 y se centra rectificador cilindro rápido"},{"f":"2025-10-27","c":1.5,"e":1.3,"d":0.2,"v":null,"mm":null,"o":"En condiciones para trabajar, con una diferencia."},{"f":"2025-11-10","c":2.5,"e":2.1,"d":0.4,"v":4.0,"mm":0.13,"o":""},{"f":"2025-11-10","c":2.0,"e":1.6,"d":0.4,"v":null,"mm":null,"o":"Urgente reparar desparramadores de producción."},{"f":"2025-11-29","c":2.9,"e":2.3,"d":0.6,"v":4.0,"mm":0.18,"o":""},{"f":"2025-11-29","c":2.2,"e":1.6,"d":0.6,"v":null,"mm":null,"o":"Mañana se rectificará el KLB12"},{"f":"2025-12-01","c":1.6,"e":1.4,"d":0.2,"v":12.0,"mm":-0.03,"o":"Rectificado"},{"f":"2025-12-11","c":1.6,"e":1.4,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2025-12-11","c":2.0,"e":1.8,"d":0.2,"v":3.0,"mm":0.13,"o":""},{"f":"2025-12-31","c":2.5,"e":2.2,"d":0.3,"v":4.0,"mm":0.15,"o":"Se necesita cerrar"},{"f":"2025-12-31","c":1.8,"e":1.6,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2026-01-02","c":2.1,"e":1.9,"d":0.2,"v":3.0,"mm":0.13,"o":"Se necesita cerrar"},{"f":"2026-01-02","c":1.7,"e":1.5,"d":0.2,"v":null,"mm":null,"o":"En condiciones."},{"f":"2026-01-12","c":2.4,"e":2.3,"d":0.1,"v":4.0,"mm":0.2,"o":"Se necesita cerrar"},{"f":"2026-01-12","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2026-01-16","c":1.8,"e":1.6,"d":0.2,"v":null,"mm":null,"o":""},{"f":"2026-01-16","c":2.3,"e":2.1,"d":0.2,"v":3.0,"mm":0.17,"o":"Se necesita cerrar"},{"f":"2026-01-20","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":""},{"f":"2026-01-20","c":2.0,"e":1.9,"d":0.1,"v":2.5,"mm":0.16,"o":"Se necesita cerrar"},{"f":"2026-01-27","c":1.9,"e":1.7,"d":0.2,"v":2.0,"mm":0.15,"o":"Se necesita cerrar"},{"f":"2026-01-27","c":1.6,"e":1.4,"d":0.2,"v":null,"mm":null,"o":"En condiciones"},{"f":"2026-02-05","c":2.6,"e":2.4,"d":0.2,"v":5.0,"mm":0.18,"o":"Se necesita cerrar"},{"f":"2026-02-05","c":1.7,"e":1.5,"d":0.2,"v":null,"mm":null,"o":"En condiciones"},{"f":"2026-02-10","c":2.3,"e":2.0,"d":0.3,"v":3.0,"mm":0.17,"o":"Se necesita cerrar"},{"f":"2026-02-10","c":1.8,"e":1.5,"d":0.3,"v":null,"mm":null,"o":"En condiciones"},{"f":"2026-02-13","c":2.4,"e":2.1,"d":0.3,"v":3.0,"mm":0.17,"o":"Se necesita cerrar"},{"f":"2026-02-13","c":1.9,"e":1.6,"d":0.3,"v":null,"mm":null,"o":"En condiciones"},{"f":"2026-02-19","c":2.5,"e":2.2,"d":0.3,"v":4.0,"mm":0.15,"o":"Se necesita cerrar"},{"f":"2026-02-19","c":1.9,"e":1.6,"d":0.3,"v":null,"mm":null,"o":"En condiciones"},{"f":"2026-02-24","c":2.8,"e":2.4,"d":0.4,"v":6.0,"mm":0.15,"o":"Se necesita cerrar"},{"f":"2026-02-24","c":1.9,"e":1.5,"d":0.4,"v":null,"mm":null,"o":"En condiciones"},{"f":"2026-03-03","c":1.6,"e":1.6,"d":0.0,"v":12.0,"mm":-0.04,"o":"Rectificado"},{"f":"2026-03-09","c":2.1,"e":2.1,"d":0.0,"v":4.0,"mm":0.15,"o":"Se necesita cerrar"},{"f":"2026-03-09","c":1.5,"e":1.5,"d":0.0,"v":null,"mm":null,"o":""},{"f":"2026-03-18","c":1.8,"e":1.7,"d":0.1,"v":2.0,"mm":0.1,"o":"Se necesita cerrar"},{"f":"2026-03-24","c":2.5,"e":2.4,"d":0.1,"v":5.0,"mm":0.18,"o":"Se necesita cerrar"},{"f":"2026-03-24","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":"En condiciones."},{"f":"2026-08-18","c":1.6,"e":1.5,"d":0.1,"v":null,"mm":null,"o":"En condiciones."}];
+'use strict';
 
-const MOLDES = [
-  {molde:"H8",num:"1",estado:"Operativo",enPeso:"Excedido",nominal:3.5,vias:[3.675,3.625,3.680,3.680,3.610,3.590,3.585,3.580],prom:3.628,cromado:"Sí",obs:"Molde en proceso de cromado",fecha:"17/11/2025"},
-  {molde:"H8",num:"2",estado:"Operativo",enPeso:"Excedido",nominal:3.5,vias:[3.685,3.620,3.680,3.600,3.660,3.645,3.590,3.690],prom:3.646,cromado:"Sí",obs:"Listo para producción",fecha:"25/03/2026"},
-  {molde:"H12",num:"1",estado:"En calibración",enPeso:"Excedido",nominal:4.5,vias:[],prom:null,cromado:"No",obs:"Molde listo para pruebas",fecha:"04/02/2026"},
-  {molde:"H12",num:"2",estado:"En fabricación",enPeso:"Excedido",nominal:4.5,vias:[],prom:null,cromado:"No",obs:"Molde con piezas muy gastadas, sin arreglos.",fecha:"10/03/2026"},
-  {molde:"H12",num:"3 BR",estado:"Operativo",enPeso:"Óptimo",nominal:4.5,vias:[4.340,4.280,4.335,4.330,4.355,4.315],prom:4.326,cromado:"En proceso",obs:"Se mandaron acromar piezas, menos dados y boquillas",fecha:"05/03/2026"},
-  {molde:"H18",num:"1",estado:"En calibración",enPeso:"Excedido",nominal:6.3,vias:[],prom:null,cromado:"No",obs:"Se realizan primeras pruebas",fecha:"17/11/2025"},
-  {molde:"H18",num:"2",estado:"Operativo",enPeso:"Excedido",nominal:6.3,vias:[6.360,6.420,6.440,6.320],prom:6.385,cromado:"Sí",obs:"Reacondicionado",fecha:"12/12/2025"},
-  {molde:"P12",num:"1",estado:"Operativo",enPeso:"Excedido",nominal:5.6,vias:[5.985,5.875],prom:5.930,cromado:"Sí",obs:"Se calibran dados cromas para producción.",fecha:"17/11/2025"},
-  {molde:"P18",num:"1",estado:"Operativo",enPeso:"Óptimo",nominal:7.8,vias:[7.755,7.685],prom:7.720,cromado:"Sí",obs:"En producción",fecha:"04/02/2026"},
-  {molde:"L12",num:"1",estado:"En calibración",enPeso:"Óptimo",nominal:8.0,vias:[7.010,6.905],prom:6.958,cromado:"No",obs:"Se cambiaron los dados por los de repuesto originales.",fecha:"05/03/2026"},
-  {molde:"L16",num:"1",estado:"Operativo",enPeso:"Óptimo",nominal:10.2,vias:[10.100,10.100],prom:10.100,cromado:"No",obs:"Pendiente cromado",fecha:"07/05/2024"},
-  {molde:"DM20",num:"1",estado:"Operativo",enPeso:"Excedido",nominal:7.1,vias:[8.320,8.360,8.260,8.335],prom:8.319,cromado:"No",obs:"Molde listo para producción.",fecha:"04/11/2025"},
-  {molde:"DM27",num:"1",estado:"En calibración",enPeso:"Excedido",nominal:10.5,vias:[],prom:null,cromado:"No",obs:"Formato sin mercado",fecha:"06/05/2024"},
-  {molde:"KB",num:"1",estado:"Operativo",enPeso:"Óptimo",nominal:9.8,vias:[9.200,9.200],prom:9.200,cromado:"No",obs:"Formato sin mercado",fecha:"07/05/2024"}
+/* ─────────────────────────────────────────────
+   URLS PARA CONECTAR CUANDO LOS SHEETS ESTÉN PUBLICADOS
+   ─────────────────────────────────────────────
+   Pasos:
+   1. Abrir el Google Sheet
+   2. Archivo → Publicar en la web
+   3. Seleccionar la hoja específica
+   4. Formato: Valores separados por comas (.csv)
+   5. Publicar y copiar el link
+   6. Pegar aquí:
+*/
+const CSV_MOLDES_URL   = ''; // URL del sheet de Seguimiento de Moldes
+const CSV_ESTANO_URL   = ''; // URL del sheet de Control de Estaño KLB12
+const CSV_STOCK_URL    = ''; // URL del sheet de Stock de Repuestos (cuando esté listo)
+const CSV_VIDA_URL     = ''; // URL del sheet de Vida Útil (cuando esté listo)
+
+/* ─────────────────────────────────────────────
+   DATOS HARDCODEADOS (se usan cuando las URLs están vacías)
+───────────────────────────────────────────── */
+const MOLDES_DATA = [
+  {id:'H8',  num:'1',    estado:'Operativo',      enPeso:'Excedido', nominal:3.5,  prom:3.628, vias:[3.675,3.625,3.680,3.680,3.610,3.590,3.585,3.580], cromado:'Sí',         obs:'Molde en proceso de cromado',                                     fecha:'17/11/2025'},
+  {id:'H8',  num:'2',    estado:'Operativo',      enPeso:'Excedido', nominal:3.5,  prom:3.646, vias:[3.685,3.620,3.680,3.600,3.660,3.645,3.590,3.690], cromado:'Sí',         obs:'Listo para producción',                                           fecha:'25/03/2026'},
+  {id:'H12', num:'1',    estado:'En calibración', enPeso:'Excedido', nominal:4.5,  prom:null,  vias:[],                                                 cromado:'No',         obs:'Molde listo para pruebas',                                        fecha:'04/02/2026'},
+  {id:'H12', num:'2',    estado:'En fabricación', enPeso:'Excedido', nominal:4.5,  prom:null,  vias:[],                                                 cromado:'No',         obs:'Piezas muy gastadas, sin arreglos',                               fecha:'10/03/2026'},
+  {id:'H12', num:'3 BR', estado:'Operativo',      enPeso:'Óptimo',   nominal:4.5,  prom:4.326, vias:[4.340,4.280,4.335,4.330,4.355,4.315],              cromado:'En proceso', obs:'Se mandaron acromar piezas, menos dados y boquillas',             fecha:'05/03/2026'},
+  {id:'H18', num:'1',    estado:'En calibración', enPeso:'Excedido', nominal:6.3,  prom:null,  vias:[],                                                 cromado:'No',         obs:'Se realizan primeras pruebas',                                    fecha:'17/11/2025'},
+  {id:'H18', num:'2',    estado:'Operativo',      enPeso:'Excedido', nominal:6.3,  prom:6.385, vias:[6.360,6.420,6.440,6.320],                          cromado:'Sí',         obs:'Reacondicionado',                                                 fecha:'12/12/2025'},
+  {id:'P12', num:'1',    estado:'Operativo',      enPeso:'Excedido', nominal:5.6,  prom:5.930, vias:[5.985,5.875],                                      cromado:'Sí',         obs:'Se calibran dados para producción',                               fecha:'17/11/2025'},
+  {id:'P18', num:'1',    estado:'Operativo',      enPeso:'Óptimo',   nominal:7.8,  prom:7.720, vias:[7.755,7.685],                                      cromado:'Sí',         obs:'En producción',                                                   fecha:'04/02/2026'},
+  {id:'L12', num:'1',    estado:'En calibración', enPeso:'Óptimo',   nominal:8.0,  prom:6.958, vias:[7.010,6.905],                                      cromado:'No',         obs:'Se cambiaron dados por repuestos originales',                     fecha:'05/03/2026'},
+  {id:'L16', num:'1',    estado:'Operativo',      enPeso:'Óptimo',   nominal:10.2, prom:10.100,vias:[10.100,10.100],                                    cromado:'No',         obs:'Pendiente cromado',                                               fecha:'07/05/2024'},
+  {id:'DM20',num:'1',    estado:'Operativo',      enPeso:'Excedido', nominal:7.1,  prom:8.319, vias:[8.320,8.360,8.260,8.335],                          cromado:'No',         obs:'Molde listo para producción',                                     fecha:'04/11/2025'},
+  {id:'DM27',num:'1',    estado:'En calibración', enPeso:'Excedido', nominal:10.5, prom:null,  vias:[],                                                 cromado:'No',         obs:'Formato sin mercado',                                             fecha:'06/05/2024'},
+  {id:'KB',  num:'1',    estado:'Operativo',      enPeso:'Óptimo',   nominal:9.8,  prom:9.200, vias:[9.200,9.200],                                      cromado:'No',         obs:'Formato sin mercado',                                             fecha:'07/05/2024'},
 ];
 
-const MONTHLY = [{"mes":"2024-01","prom":0.18,"max":0.2,"n":5},{"mes":"2024-02","prom":0.3,"max":0.7,"n":14},{"mes":"2024-03","prom":0.457,"max":0.6,"n":7},{"mes":"2024-04","prom":0.071,"max":0.2,"n":7},{"mes":"2024-05","prom":0.2,"max":0.2,"n":1},{"mes":"2024-06","prom":0.4,"max":0.4,"n":2},{"mes":"2024-07","prom":0.167,"max":0.3,"n":6},{"mes":"2024-08","prom":0.312,"max":0.5,"n":8},{"mes":"2024-09","prom":0.3,"max":0.7,"n":6},{"mes":"2024-10","prom":0.34,"max":0.6,"n":5},{"mes":"2024-11","prom":0.12,"max":0.4,"n":10},{"mes":"2024-12","prom":0.6,"max":0.6,"n":2},{"mes":"2025-01","prom":0.375,"max":0.7,"n":8},{"mes":"2025-02","prom":0.4,"max":0.4,"n":4},{"mes":"2025-03","prom":0.275,"max":0.9,"n":4},{"mes":"2025-04","prom":0.11,"max":0.2,"n":10},{"mes":"2025-05","prom":0.2,"max":0.2,"n":1},{"mes":"2025-06","prom":0.25,"max":0.5,"n":2},{"mes":"2025-09","prom":0.143,"max":0.3,"n":7},{"mes":"2025-10","prom":0.922,"max":1.1,"n":9},{"mes":"2025-11","prom":0.5,"max":0.6,"n":4},{"mes":"2025-12","prom":0.22,"max":0.3,"n":5},{"mes":"2026-01","prom":0.16,"max":0.2,"n":10},{"mes":"2026-02","prom":0.3,"max":0.4,"n":10},{"mes":"2026-03","prom":0.05,"max":0.1,"n":6},{"mes":"2026-08","prom":0.1,"max":0.1,"n":1}];
+const ESTANO_DATA = [
+  {f:"2024-01-13",c:3.0,e:2.8,d:0.2,v:null,mm:null,o:""},{f:"2024-01-15",c:2.1,e:2.0,d:0.1,v:null,mm:null,o:""},{f:"2024-01-16",c:1.7,e:1.5,d:0.2,v:null,mm:null,o:""},{f:"2024-01-25",c:1.9,e:1.7,d:0.2,v:null,mm:null,o:""},{f:"2024-01-25",c:1.6,e:1.4,d:0.2,v:null,mm:null,o:""},{f:"2024-02-01",c:2.5,e:1.9,d:0.6,v:null,mm:null,o:""},{f:"2024-02-01",c:1.9,e:1.3,d:0.6,v:null,mm:null,o:""},{f:"2024-02-05",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:""},{f:"2024-02-05",c:1.7,e:1.5,d:0.2,v:null,mm:null,o:""},{f:"2024-02-09",c:1.6,e:1.6,d:0.0,v:null,mm:null,o:""},{f:"2024-02-09",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:""},{f:"2024-02-16",c:2.2,e:2.0,d:0.2,v:null,mm:null,o:""},{f:"2024-02-16",c:1.7,e:1.5,d:0.2,v:null,mm:null,o:""},{f:"2024-02-21",c:2.0,e:1.7,d:0.3,v:null,mm:null,o:""},{f:"2024-02-21",c:1.5,e:1.2,d:0.3,v:null,mm:null,o:""},{f:"2024-02-22",c:1.5,e:1.2,d:0.3,v:null,mm:null,o:""},{f:"2024-02-23",c:1.6,e:1.3,d:0.3,v:null,mm:null,o:""},{f:"2024-02-28",c:1.9,e:1.4,d:0.5,v:null,mm:null,o:""},{f:"2024-02-29",c:2.3,e:1.6,d:0.7,v:null,mm:null,o:""},{f:"2024-03-01",c:1.9,e:1.3,d:0.6,v:null,mm:null,o:""},{f:"2024-03-13",c:2.5,e:2.0,d:0.5,v:null,mm:null,o:""},{f:"2024-03-13",c:2.0,e:1.5,d:0.5,v:null,mm:null,o:""},{f:"2024-03-15",c:2.0,e:1.8,d:0.2,v:null,mm:null,o:""},{f:"2024-03-21",c:2.4,e:2.0,d:0.4,v:null,mm:null,o:""},{f:"2024-03-22",c:2.1,e:1.6,d:0.5,v:null,mm:null,o:""},{f:"2024-03-28",c:2.4,e:1.9,d:0.5,v:null,mm:null,o:""},{f:"2024-04-03",c:2.4,e:2.4,d:0.0,v:null,mm:null,o:""},{f:"2024-04-06",c:1.9,e:1.9,d:0.0,v:null,mm:null,o:""},{f:"2024-04-15",c:2.6,e:2.6,d:0.0,v:null,mm:null,o:""},{f:"2024-04-16",c:1.5,e:1.4,d:0.1,v:null,mm:null,o:""},{f:"2024-04-26",c:2.2,e:2.0,d:0.2,v:null,mm:null,o:""},{f:"2024-04-26",c:1.4,e:1.2,d:0.2,v:null,mm:null,o:""},{f:"2024-04-26",c:1.7,e:1.7,d:0.0,v:null,mm:null,o:""},{f:"2024-05-13",c:1.9,e:1.7,d:0.2,v:null,mm:null,o:""},{f:"2024-06-19",c:2.8,e:2.4,d:0.4,v:null,mm:null,o:""},{f:"2024-06-25",c:1.9,e:1.5,d:0.4,v:null,mm:null,o:""},{f:"2024-07-10",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:""},{f:"2024-07-10",c:2.8,e:2.8,d:0.0,v:null,mm:null,o:""},{f:"2024-07-22",c:2.2,e:2.0,d:0.2,v:null,mm:null,o:""},{f:"2024-07-22",c:1.5,e:1.3,d:0.2,v:null,mm:null,o:""},{f:"2024-07-29",c:2.1,e:1.8,d:0.3,v:3.0,mm:0.13,o:"Se necesita acercar."},{f:"2024-07-29",c:1.7,e:1.4,d:0.3,v:null,mm:null,o:"En condiciones."},{f:"2024-08-03",c:2.4,e:2.1,d:0.3,v:3.0,mm:0.23,o:"Se necesita acercar"},{f:"2024-08-03",c:1.6,e:1.4,d:0.2,v:null,mm:null,o:"En condiciones"},{f:"2024-08-06",c:1.7,e:1.4,d:0.3,v:null,mm:null,o:"En condiciones"},{f:"2024-08-06",c:1.9,e:1.6,d:0.3,v:2.0,mm:0.1,o:"Se necesita acercar"},{f:"2024-08-20",c:2.4,e:1.9,d:0.5,v:3.0,mm:-0.1,o:"Se necesita acercar"},{f:"2024-08-20",c:1.9,e:1.4,d:0.5,v:null,mm:null,o:"En condiciones"},{f:"2024-08-28",c:2.4,e:2.2,d:0.2,v:6.0,mm:0.17,o:"Se necesita acercar"},{f:"2024-08-28",c:1.4,e:1.2,d:0.2,v:null,mm:null,o:""},{f:"2024-09-03",c:2.3,e:1.6,d:0.7,v:null,mm:null,o:"Se necesita rectificar"},{f:"2024-09-03",c:2.1,e:1.4,d:0.7,v:2.0,mm:0.0,o:"Se acercan"},{f:"2024-09-19",c:1.5,e:1.4,d:0.1,v:null,mm:null,o:"En condiciones"},{f:"2024-09-19",c:2.0,e:1.9,d:0.1,v:3.0,mm:0.17,o:"Se necesita acercar"},{f:"2024-09-27",c:1.5,e:1.4,d:0.1,v:null,mm:null,o:""},{f:"2024-09-27",c:2.1,e:2.0,d:0.1,v:null,mm:null,o:"Se necesita cerrar"},{f:"2024-10-09",c:2.4,e:2.1,d:0.3,v:null,mm:null,o:""},{f:"2024-10-09",c:2.0,e:1.6,d:0.4,v:2.0,mm:-0.15,o:"Se necesita acercar"},{f:"2024-10-09",c:1.8,e:1.4,d:0.4,v:null,mm:null,o:"En condiciones"},{f:"2024-10-18",c:2.5,e:1.9,d:0.6,v:null,mm:null,o:"Se necesita rectificar"},{f:"2024-10-18",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:""},{f:"2024-11-02",c:2.0,e:2.0,d:0.0,v:3.0,mm:0.17,o:"Se necesita cerrar"},{f:"2024-11-02",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:"En condiciones"},{f:"2024-11-08",c:1.4,e:1.4,d:0.0,v:null,mm:null,o:"En condiciones"},{f:"2024-11-08",c:1.8,e:1.8,d:0.0,v:3.0,mm:0.13,o:"Se necesita acercar"},{f:"2024-11-12",c:1.8,e:1.7,d:0.1,v:2.0,mm:0.1,o:"Se necesita acercar"},{f:"2024-11-12",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:"En condiciones"},{f:"2024-11-20",c:2.4,e:2.3,d:0.1,v:3.0,mm:0.27,o:"Se necesita acercar"},{f:"2024-11-20",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:"En condiciones"},{f:"2024-11-29",c:2.5,e:2.1,d:0.4,v:3.5,mm:0.17,o:"Se necesita acercar"},{f:"2024-11-29",c:1.9,e:1.5,d:0.4,v:null,mm:null,o:"En condiciones"},{f:"2024-12-27",c:2.4,e:1.8,d:0.6,v:3.0,mm:0.13,o:"Se necesita acercar"},{f:"2024-12-27",c:2.0,e:1.4,d:0.6,v:null,mm:null,o:"Hay que rectificar"},{f:"2025-01-09",c:3.0,e:2.3,d:0.7,v:3.5,mm:0.2,o:"Se necesita acercar"},{f:"2025-01-09",c:2.3,e:1.6,d:0.7,v:null,mm:null,o:"Hay que rectificar"},{f:"2025-01-17",c:2.2,e:1.5,d:0.7,v:null,mm:null,o:"Hay que rectificar!"},{f:"2025-01-17",c:3.1,e:2.4,d:0.7,v:4.0,mm:0.23,o:"Se necesita acercar"},{f:"2025-01-20",c:3.0,e:3.0,d:0.0,v:9.0,mm:0.17,o:"Se necesita acercar"},{f:"2025-01-20",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:"En condiciones."},{f:"2025-01-29",c:1.9,e:1.8,d:0.1,v:2.5,mm:0.16,o:"Se necesita acercar"},{f:"2025-01-29",c:1.5,e:1.4,d:0.1,v:null,mm:null,o:"En condiciones"},{f:"2025-02-17",c:2.4,e:2.0,d:0.4,v:3.0,mm:0.17,o:"Se necesita acercar"},{f:"2025-02-17",c:1.9,e:1.5,d:0.4,v:null,mm:null,o:"En condiciones"},{f:"2025-02-26",c:2.6,e:2.2,d:0.4,v:4.5,mm:0.16,o:"Se necesita acercar"},{f:"2025-02-26",c:1.9,e:1.5,d:0.4,v:null,mm:null,o:"En condiciones"},{f:"2025-03-07",c:2.6,e:2.4,d:0.2,v:null,mm:null,o:"El laminador está en esas condiciones porque la cinta del desparramados está rota"},{f:"2025-03-19",c:3.0,e:2.1,d:0.9,v:null,mm:null,o:"Se necesita rectificar"},{f:"2025-03-25",c:3.0,e:3.0,d:0.0,v:7.0,mm:0.21,o:"Se necesita cerrar"},{f:"2025-03-25",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:"En condiciones"},{f:"2025-04-01",c:2.0,e:2.0,d:0.0,v:3.0,mm:0.2,o:"Se necesita cerrar"},{f:"2025-04-01",c:1.4,e:1.4,d:0.0,v:null,mm:null,o:"En condiciones"},{f:"2025-04-08",c:3.0,e:2.9,d:0.1,v:9.0,mm:0.01,o:"Se necesita cerrar"},{f:"2025-04-08",c:2.9,e:2.8,d:0.1,v:null,mm:null,o:"Solo se pudo cerrar 3 vueltas, al acercarlo más rozan los cilindros"},{f:"2025-04-15",c:2.6,e:2.4,d:0.2,v:null,mm:null,o:"Se necesita cerrar a lo que nos de, por la vibración"},{f:"2025-04-15",c:2.3,e:2.2,d:0.1,v:6.0,mm:-0.12,o:"Se cerró lo más que se pudo."},{f:"2025-04-22",c:2.4,e:2.3,d:0.1,v:3.0,mm:-0.03,o:"Se cerro los mas que se pudo."},{f:"2025-04-22",c:3.0,e:2.9,d:0.1,v:null,mm:null,o:""},{f:"2025-04-30",c:2.6,e:2.4,d:0.2,v:3.0,mm:0.27,o:"Se necesita cerrar 3 vueltas"},{f:"2025-04-30",c:1.8,e:1.6,d:0.2,v:null,mm:null,o:"En condiciones"},{f:"2025-05-07",c:2.0,e:1.8,d:0.2,v:2.0,mm:-0.15,o:"Se cerrará, por la vibración que tiene"},{f:"2025-06-02",c:2.6,e:2.1,d:0.5,v:null,mm:null,o:"Se necesita rectificar"},{f:"2025-06-03",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:"En condiciones"},{f:"2025-09-08",c:1.9,e:1.6,d:0.3,v:null,mm:null,o:"En condiciones"},{f:"2025-09-10",c:2.0,e:1.7,d:0.3,v:null,mm:null,o:"Se necesita rectificar el Cilindro lento por las ranuras que tiene."},{f:"2025-09-19",c:1.9,e:1.6,d:0.3,v:null,mm:null,o:"Se necesita rectificar"},{f:"2025-09-22",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:"En condiciones"},{f:"2025-09-24",c:1.6,e:1.6,d:0.0,v:null,mm:null,o:"En medida"},{f:"2025-09-30",c:1.7,e:1.7,d:0.0,v:null,mm:null,o:""},{f:"2025-09-30",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:""},{f:"2025-10-03",c:2.8,e:1.7,d:1.1,v:null,mm:null,o:"Se está notando mucha diferencia en el centro."},{f:"2025-10-03",c:2.5,e:1.5,d:1.0,v:null,mm:null,o:"El domingo se abrirá para ver las camisas."},{f:"2025-10-10",c:2.6,e:1.5,d:1.1,v:null,mm:null,o:"Se investiga el problema de tanta diferencia."},{f:"2025-10-16",c:2.8,e:1.7,d:1.1,v:null,mm:null,o:"Se detectan rectificadores con juego."},{f:"2025-10-16",c:2.6,e:1.5,d:1.1,v:null,mm:null,o:"Desparramadores no abren la tierra por el desgaste."},{f:"2025-10-22",c:2.6,e:1.5,d:1.1,v:null,mm:null,o:"Asentado: domingo 26/10 se vendrá a rectificar con Martin."},{f:"2025-10-22",c:2.7,e:1.6,d:1.1,v:null,mm:null,o:"19/10 se calibraron rectificadores"},{f:"2025-10-27",c:2.8,e:2.3,d:0.5,v:5.0,mm:0.2,o:"Rectificado 26/10, centrado rectificador cilindro rápido"},{f:"2025-10-27",c:1.5,e:1.3,d:0.2,v:null,mm:null,o:"En condiciones para trabajar, con diferencia."},{f:"2025-11-10",c:2.5,e:2.1,d:0.4,v:4.0,mm:0.13,o:""},{f:"2025-11-10",c:2.0,e:1.6,d:0.4,v:null,mm:null,o:"Urgente reparar desparramadores de producción."},{f:"2025-11-29",c:2.9,e:2.3,d:0.6,v:4.0,mm:0.18,o:""},{f:"2025-11-29",c:2.2,e:1.6,d:0.6,v:null,mm:null,o:"Mañana se rectificará el KLB12"},{f:"2025-12-01",c:1.6,e:1.4,d:0.2,v:12.0,mm:-0.03,o:"Rectificado"},{f:"2025-12-11",c:1.6,e:1.4,d:0.2,v:null,mm:null,o:""},{f:"2025-12-11",c:2.0,e:1.8,d:0.2,v:3.0,mm:0.13,o:""},{f:"2025-12-31",c:2.5,e:2.2,d:0.3,v:4.0,mm:0.15,o:"Se necesita cerrar"},{f:"2025-12-31",c:1.8,e:1.6,d:0.2,v:null,mm:null,o:""},{f:"2026-01-02",c:2.1,e:1.9,d:0.2,v:3.0,mm:0.13,o:"Se necesita cerrar"},{f:"2026-01-02",c:1.7,e:1.5,d:0.2,v:null,mm:null,o:"En condiciones."},{f:"2026-01-12",c:2.4,e:2.3,d:0.1,v:4.0,mm:0.2,o:"Se necesita cerrar"},{f:"2026-01-12",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:""},{f:"2026-01-16",c:1.8,e:1.6,d:0.2,v:null,mm:null,o:""},{f:"2026-01-16",c:2.3,e:2.1,d:0.2,v:3.0,mm:0.17,o:"Se necesita cerrar"},{f:"2026-01-20",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:""},{f:"2026-01-20",c:2.0,e:1.9,d:0.1,v:2.5,mm:0.16,o:"Se necesita cerrar"},{f:"2026-01-27",c:1.9,e:1.7,d:0.2,v:2.0,mm:0.15,o:"Se necesita cerrar"},{f:"2026-01-27",c:1.6,e:1.4,d:0.2,v:null,mm:null,o:"En condiciones"},{f:"2026-02-05",c:2.6,e:2.4,d:0.2,v:5.0,mm:0.18,o:"Se necesita cerrar"},{f:"2026-02-05",c:1.7,e:1.5,d:0.2,v:null,mm:null,o:"En condiciones"},{f:"2026-02-10",c:2.3,e:2.0,d:0.3,v:3.0,mm:0.17,o:"Se necesita cerrar"},{f:"2026-02-10",c:1.8,e:1.5,d:0.3,v:null,mm:null,o:"En condiciones"},{f:"2026-02-13",c:2.4,e:2.1,d:0.3,v:3.0,mm:0.17,o:"Se necesita cerrar"},{f:"2026-02-13",c:1.9,e:1.6,d:0.3,v:null,mm:null,o:"En condiciones"},{f:"2026-02-19",c:2.5,e:2.2,d:0.3,v:4.0,mm:0.15,o:"Se necesita cerrar"},{f:"2026-02-19",c:1.9,e:1.6,d:0.3,v:null,mm:null,o:"En condiciones"},{f:"2026-02-24",c:2.8,e:2.4,d:0.4,v:6.0,mm:0.15,o:"Se necesita cerrar"},{f:"2026-02-24",c:1.9,e:1.5,d:0.4,v:null,mm:null,o:"En condiciones"},{f:"2026-03-03",c:1.6,e:1.6,d:0.0,v:12.0,mm:-0.04,o:"Rectificado"},{f:"2026-03-09",c:2.1,e:2.1,d:0.0,v:4.0,mm:0.15,o:"Se necesita cerrar"},{f:"2026-03-09",c:1.5,e:1.5,d:0.0,v:null,mm:null,o:""},{f:"2026-03-18",c:1.8,e:1.7,d:0.1,v:2.0,mm:0.1,o:"Se necesita cerrar"},{f:"2026-03-24",c:2.5,e:2.4,d:0.1,v:5.0,mm:0.18,o:"Se necesita cerrar"},{f:"2026-03-24",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:"En condiciones."},{f:"2026-08-18",c:1.6,e:1.5,d:0.1,v:null,mm:null,o:"En condiciones."}
+];
 
-// ─────────────────────────────────────────────────────
-// CHART REGISTRY
-// ─────────────────────────────────────────────────────
-const charts = {};
-function destroyChart(id) { if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+const MONTHLY_DATA = [
+  {mes:"2024-01",prom:0.18,max:0.2,n:5},{mes:"2024-02",prom:0.3,max:0.7,n:14},{mes:"2024-03",prom:0.457,max:0.6,n:7},{mes:"2024-04",prom:0.071,max:0.2,n:7},{mes:"2024-05",prom:0.2,max:0.2,n:1},{mes:"2024-06",prom:0.4,max:0.4,n:2},{mes:"2024-07",prom:0.167,max:0.3,n:6},{mes:"2024-08",prom:0.312,max:0.5,n:8},{mes:"2024-09",prom:0.3,max:0.7,n:6},{mes:"2024-10",prom:0.34,max:0.6,n:5},{mes:"2024-11",prom:0.12,max:0.4,n:10},{mes:"2024-12",prom:0.6,max:0.6,n:2},{mes:"2025-01",prom:0.375,max:0.7,n:8},{mes:"2025-02",prom:0.4,max:0.4,n:4},{mes:"2025-03",prom:0.275,max:0.9,n:4},{mes:"2025-04",prom:0.11,max:0.2,n:10},{mes:"2025-05",prom:0.2,max:0.2,n:1},{mes:"2025-06",prom:0.25,max:0.5,n:2},{mes:"2025-09",prom:0.143,max:0.3,n:7},{mes:"2025-10",prom:0.922,max:1.1,n:9},{mes:"2025-11",prom:0.5,max:0.6,n:4},{mes:"2025-12",prom:0.22,max:0.3,n:5},{mes:"2026-01",prom:0.16,max:0.2,n:10},{mes:"2026-02",prom:0.3,max:0.4,n:10},{mes:"2026-03",prom:0.05,max:0.1,n:6},{mes:"2026-08",prom:0.1,max:0.1,n:1}
+];
 
-// ─────────────────────────────────────────────────────
-// RELOJ
-// ─────────────────────────────────────────────────────
-function updateClock(){
+/* Demo data — reemplazar con CSV cuando esté disponible */
+const STOCK_DATA = [
+  // DADOS
+  {cat:'Dado', nombre:'Dado H8 completo',       molde:'H8',  actual:4,  minimo:2, unidad:'juego'},
+  {cat:'Dado', nombre:'Dado H12 completo',      molde:'H12', actual:1,  minimo:2, unidad:'juego'},
+  {cat:'Dado', nombre:'Dado H18 completo',      molde:'H18', actual:3,  minimo:2, unidad:'juego'},
+  {cat:'Dado', nombre:'Dado P12 completo',      molde:'P12', actual:0,  minimo:1, unidad:'juego'},
+  {cat:'Dado', nombre:'Dado P18 completo',      molde:'P18', actual:2,  minimo:1, unidad:'juego'},
+  {cat:'Dado', nombre:'Dado DM20 completo',     molde:'DM20',actual:1,  minimo:1, unidad:'juego'},
+  // BOQUILLAS
+  {cat:'Boquilla', nombre:'Boquilla H8',        molde:'H8',  actual:8,  minimo:4, unidad:'u'},
+  {cat:'Boquilla', nombre:'Boquilla H12',       molde:'H12', actual:3,  minimo:6, unidad:'u'},
+  {cat:'Boquilla', nombre:'Boquilla H18',       molde:'H18', actual:6,  minimo:4, unidad:'u'},
+  {cat:'Boquilla', nombre:'Boquilla P18',       molde:'P18', actual:4,  minimo:4, unidad:'u'},
+  {cat:'Boquilla', nombre:'Boquilla L12',       molde:'L12', actual:2,  minimo:3, unidad:'u'},
+  {cat:'Boquilla', nombre:'Boquilla L16',       molde:'L16', actual:5,  minimo:3, unidad:'u'},
+  // NÚCLEOS
+  {cat:'Núcleo', nombre:'Núcleo H8 8 vías',     molde:'H8',  actual:12, minimo:8, unidad:'u'},
+  {cat:'Núcleo', nombre:'Núcleo H12 6 vías',    molde:'H12', actual:5,  minimo:6, unidad:'u'},
+  {cat:'Núcleo', nombre:'Núcleo H18 4 vías',    molde:'H18', actual:8,  minimo:4, unidad:'u'},
+  {cat:'Núcleo', nombre:'Núcleo P18 2 vías',    molde:'P18', actual:2,  minimo:2, unidad:'u'},
+  {cat:'Núcleo', nombre:'Núcleo DM20 4 vías',   molde:'DM20',actual:0,  minimo:2, unidad:'u'},
+  {cat:'Núcleo', nombre:'Núcleo KB 2 vías',     molde:'KB',  actual:3,  minimo:2, unidad:'u'},
+];
+
+const VIDA_DATA = [
+  {molde:'H8 #1',   tonProd:180, vidaUtil:300, prodMes:12, cromados:3},
+  {molde:'H8 #2',   tonProd:140, vidaUtil:300, prodMes:12, cromados:2},
+  {molde:'H12 #3',  tonProd:90,  vidaUtil:250, prodMes:10, cromados:1},
+  {molde:'H18 #2',  tonProd:60,  vidaUtil:200, prodMes:8,  cromados:1},
+  {molde:'P12 #1',  tonProd:110, vidaUtil:200, prodMes:9,  cromados:2},
+  {molde:'P18 #1',  tonProd:50,  vidaUtil:180, prodMes:7,  cromados:1},
+  {molde:'L12 #1',  tonProd:30,  vidaUtil:220, prodMes:6,  cromados:0},
+  {molde:'L16 #1',  tonProd:200, vidaUtil:250, prodMes:8,  cromados:3},
+  {molde:'DM20 #1', tonProd:75,  vidaUtil:200, prodMes:9,  cromados:1},
+  {molde:'KB #1',   tonProd:160, vidaUtil:220, prodMes:7,  cromados:2},
+];
+
+const CROMADOS_HIST = [
+  {molde:'H8 #1',    prov:'Cerámica Santiago', envio:'15/10/2025', retorno:'28/10/2025', dias:13, estado:'Completado', obs:'Sin novedad'},
+  {molde:'H12 #3',   prov:'Prados',            envio:'01/11/2025', retorno:'20/11/2025', dias:19, estado:'Completado', obs:'Demora por stock de insumos'},
+  {molde:'H18 #2',   prov:'Cerámica Santiago', envio:'05/11/2025', retorno:'16/11/2025', dias:11, estado:'Completado', obs:'Sin novedad'},
+  {molde:'P12 #1',   prov:'Prados',            envio:'10/10/2025', retorno:'30/10/2025', dias:20, estado:'Completado', obs:'Requirió segundo baño'},
+  {molde:'H8 #2',    prov:'Cerámica Santiago', envio:'20/11/2025', retorno:'01/12/2025', dias:11, estado:'Completado', obs:'Sin novedad'},
+  {molde:'H12 #3',   prov:'Cerámica Santiago', envio:'01/03/2026', retorno:null,         dias:null, estado:'En curso', obs:'Estimado retorno: 20/03/2026'},
+  {molde:'H8 #1',    prov:'Cerámica Santiago', envio:'10/11/2025', retorno:null,         dias:null, estado:'En curso', obs:'Demorado — pendiente confirmar'},
+];
+
+/* ─────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────── */
+let activeFilter = 'todos';
+let activeTab    = 'general';
+let lamYear      = 'todos';
+const chartReg   = {};
+
+/* ─────────────────────────────────────────────
+   CLOCK
+───────────────────────────────────────────── */
+function tick(){
   const n = new Date();
   const p = v => String(v).padStart(2,'0');
-  document.getElementById('clock').textContent = `${p(n.getDate())}/${p(n.getMonth()+1)}/${n.getFullYear()} ${p(n.getHours())}:${p(n.getMinutes())}`;
+  document.getElementById('clock').textContent =
+    `${p(n.getDate())}/${p(n.getMonth()+1)}/${n.getFullYear()} ${p(n.getHours())}:${p(n.getMinutes())}`;
 }
-updateClock(); setInterval(updateClock, 60000);
+tick(); setInterval(tick, 60000);
 
-// ─────────────────────────────────────────────────────
-// TABS
-// ─────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────
+   TABS
+───────────────────────────────────────────── */
 function switchTab(id, btn){
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.classList.remove('fade-in'); });
+  document.querySelectorAll('.navtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
   btn.classList.add('active');
-  const sec = document.getElementById('sec-'+id);
+  const sec = document.getElementById('tab-'+id);
   sec.classList.add('active');
-  void sec.offsetWidth;
-  sec.classList.add('fade-in');
-  if(id === 'estano') buildEstano('todos');
-  if(id === 'moldes') buildMoldes('todos');
+  activeTab = id;
+  renderTab(id);
 }
 
-// ─────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────
-function difColor(d){
-  if(d >= 0.8) return '#e05252';
-  if(d >= 0.5) return '#e8a020';
-  if(d >= 0.3) return '#e8b84b';
-  return '#4caf7d';
+function renderTab(id){
+  if(id==='general')    buildGeneral();
+  if(id==='laminacion') buildLaminacion(lamYear);
+  if(id==='stock')      buildStock();
+  if(id==='vidautil')   buildVidaUtil();
 }
-function difBadge(d){
-  if(d >= 0.8) return '<span class="badge badge-red">CRÍTICO</span>';
-  if(d >= 0.5) return '<span class="badge badge-amber">ALTO</span>';
-  if(d >= 0.3) return '<span class="badge badge-gray">MODERADO</span>';
-  return '<span class="badge badge-green">OK</span>';
-}
-function fmtFecha(f){ return f.split('-').reverse().join('/'); }
 
-// ─────────────────────────────────────────────────────
-// FILTRO AÑO (ESTAÑO)
-// ─────────────────────────────────────────────────────
-let currentYear = 'todos';
-
-function filterYear(y, btn){
-  currentYear = y;
-  document.querySelectorAll('#year-filters .filter-btn').forEach(b => b.classList.remove('active'));
+/* ─────────────────────────────────────────────
+   GLOBAL FILTER
+───────────────────────────────────────────── */
+function setFilter(f, btn){
+  activeFilter = f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
-  buildEstano(y);
+  renderTab(activeTab);
 }
 
-function getEstanoData(y){
-  if(y === 'todos') return ESTANO;
-  return ESTANO.filter(r => r.f.startsWith(y));
+function filteredMoldes(){
+  if(activeFilter==='todos') return MOLDES_DATA;
+  return MOLDES_DATA.filter(m=>m.id===activeFilter);
 }
 
-// ─────────────────────────────────────────────────────
-// BUILD ESTAÑO
-// ─────────────────────────────────────────────────────
-function buildEstano(y){
-  const data = getEstanoData(y);
-  const monthly = y === 'todos' ? MONTHLY : MONTHLY.filter(m => m.mes.startsWith(y));
+/* ─────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────── */
+function dc(id){ if(chartReg[id]){ chartReg[id].destroy(); delete chartReg[id]; } }
+function pct(prom,nom){ return nom>0 ? ((prom-nom)/nom*100) : 0; }
+function fmtN(n,dec=2){ return n==null||isNaN(n)?'—':n.toFixed(dec); }
+function fmtDate(s){ return s?s.split('-').reverse().join('/'):s; }
+function difColor(d){
+  if(d>=0.8) return '#f05252';
+  if(d>=0.5) return '#f5a623';
+  if(d>=0.3) return '#fbbf24';
+  return '#3dd68c';
+}
+function estadoBadge(e){
+  const m = {'Operativo':'badge-green','En calibración':'badge-blue','En fabricación':'badge-red'};
+  return `<span class="badge ${m[e]||'badge-gray'}">${e}</span>`;
+}
+function pesoBadge(p){ return p==='Óptimo'?'<span class="badge badge-green">Óptimo</span>':'<span class="badge badge-amber">Excedido</span>'; }
+function cromBadge(c){
+  if(c==='Sí')         return '<span class="badge badge-green">Cromado</span>';
+  if(c==='En proceso') return '<span class="badge badge-amber">En proceso</span>';
+  return '<span class="badge badge-gray">Sin cromado</span>';
+}
+function mesLabel(m){
+  const [y,mo]=m.split('-');
+  const nm=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return nm[+mo]+" '"+y.slice(2);
+}
 
-  // KPIs
-  const last = data[data.length-1];
-  const avgDif = data.reduce((s,r)=>s+r.d,0)/data.length;
-  const maxDif = Math.max(...data.map(r=>r.d));
-  const rectifs = data.filter(r => r.o && r.o.toLowerCase().includes('rectif')).length;
-  const ajustes = data.filter(r => r.v !== null).length;
+/* ─────────────────────────────────────────────
+   TAB 1: GENERAL
+───────────────────────────────────────────── */
+function buildGeneral(){
+  const data = filteredMoldes();
+  const ops  = data.filter(m=>m.estado==='Operativo').length;
+  const cal  = data.filter(m=>m.estado==='En calibración').length;
+  const fab  = data.filter(m=>m.estado==='En fabricación').length;
+  const crom = data.filter(m=>m.cromado==='Sí'||m.cromado==='En proceso').length;
 
-  document.getElementById('kpis-estano').innerHTML = `
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--accent)"></div>
-      <div class="kpi-label">Última medición</div>
-      <div class="kpi-value" style="font-size:18px;color:var(--text)">${fmtFecha(last.f)}</div>
-      <div class="kpi-meta">Centro: ${last.c.toFixed(2)} mm · Esquina: ${last.e.toFixed(2)} mm</div>
-      ${difBadge(last.d)}
+  document.getElementById('kpi-general').innerHTML = `
+    <div class="kpi-card green">
+      <div class="kpi-label">En Producción</div>
+      <div class="kpi-val" style="color:var(--green)">${ops}</div>
+      <div class="kpi-meta">moldes operativos</div>
     </div>
-    <div class="kpi">
-      <div class="kpi-accent" style="background:${difColor(last.d)}"></div>
-      <div class="kpi-label">Diferencia actual</div>
-      <div class="kpi-value" style="color:${difColor(last.d)}">${last.d.toFixed(2)}</div>
-      <div class="kpi-meta">mm · Centro − Esquina</div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">En Cromado / Calibración</div>
+      <div class="kpi-val" style="color:var(--blue)">${crom+cal}</div>
+      <div class="kpi-meta">${crom} en cromado · ${cal} en calibración</div>
     </div>
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--blue)"></div>
-      <div class="kpi-label">Diferencia promedio</div>
-      <div class="kpi-value" style="color:var(--blue)">${avgDif.toFixed(3)}</div>
-      <div class="kpi-meta">mm · ${data.length} registros</div>
+    <div class="kpi-card red">
+      <div class="kpi-label">En Fabricación / Reparación</div>
+      <div class="kpi-val" style="color:var(--red)">${fab}</div>
+      <div class="kpi-meta">fuera de línea</div>
     </div>
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--amber)"></div>
-      <div class="kpi-label">Intervenciones</div>
-      <div class="kpi-value" style="color:var(--amber)">${ajustes}</div>
-      <div class="kpi-meta">ajustes · ${rectifs} rectificaciones</div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Con exceso de peso</div>
+      <div class="kpi-val" style="color:var(--amber)">${data.filter(m=>m.enPeso==='Excedido').length}</div>
+      <div class="kpi-meta">de ${data.length} moldes filtrados</div>
     </div>
   `;
 
-  // CHART LÍNEA
-  destroyChart('linea');
-  charts['linea'] = new Chart(document.getElementById('chartLinea'), {
-    type: 'line',
-    data: {
-      labels: data.map(r => fmtFecha(r.f)),
-      datasets: [
-        { label:'Centro', data: data.map(r=>r.c), borderColor:'#5b9cf6', backgroundColor:'rgba(91,156,246,0.05)', tension:0.3, pointRadius:2, pointHoverRadius:5, borderWidth:2 },
-        { label:'Esquina', data: data.map(r=>r.e), borderColor:'#4caf7d', backgroundColor:'rgba(76,175,125,0.05)', tension:0.3, pointRadius:2, pointHoverRadius:5, borderWidth:2 },
-        { label:'Diferencia', data: data.map(r=>r.d), borderColor:'#e05252', backgroundColor:'rgba(224,82,82,0.04)', tension:0.3, pointRadius:2, pointHoverRadius:5, borderWidth:1.5, borderDash:[5,3] }
-      ]
+  // Chart sobrepeso
+  dc('sobrepeso');
+  const withData = data.filter(m=>m.prom!==null);
+  const labels = withData.map(m=>`${m.id} #${m.num}`);
+  const vals = withData.map(m=>pct(m.prom,m.nominal));
+  const UMBRAL = 5;
+  chartReg['sobrepeso'] = new Chart(document.getElementById('chartSobrepeso'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'% Exceso de peso',
+        data: vals,
+        backgroundColor: vals.map(v=>v>UMBRAL?'rgba(240,82,82,0.75)':v>0?'rgba(245,166,35,0.7)':'rgba(61,214,140,0.65)'),
+        borderColor:     vals.map(v=>v>UMBRAL?'#f05252':v>0?'#f5a623':'#3dd68c'),
+        borderWidth:1, borderRadius:4
+      }]
     },
-    options: {
+    options:{
       responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins: {
+      plugins:{
         legend:{display:false},
-        tooltip:{ callbacks:{ label: ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} mm` } }
+        annotation:{
+          annotations:{
+            umbral:{type:'line',yMin:UMBRAL,yMax:UMBRAL,borderColor:'rgba(240,82,82,0.5)',borderWidth:1.5,borderDash:[6,4],
+              label:{content:'Umbral crítico 5%',display:true,position:'end',color:'#f05252',font:{size:10,family:'IBM Plex Mono'}}}
+          }
+        },
+        tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y.toFixed(2)}% sobre nominal`}}
       },
       scales:{
-        x:{ ticks:{maxRotation:45,autoSkip:true,maxTicksLimit:24,font:{size:10},color:'#555a68'}, grid:{color:'rgba(255,255,255,0.04)'} },
-        y:{ title:{display:true,text:'mm',color:'#555a68',font:{size:11}}, ticks:{color:'#555a68',font:{size:11}}, grid:{color:'rgba(255,255,255,0.04)'} }
+        x:{ticks:{color:'#6e7d96',font:{size:10}},grid:{display:false}},
+        y:{title:{display:true,text:'% exceso',color:'#6e7d96',font:{size:10}},ticks:{color:'#6e7d96',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'},min:-5}
       }
     }
   });
-
-  // CHART MENSUAL
-  destroyChart('mensual');
-  charts['mensual'] = new Chart(document.getElementById('chartMensual'), {
-    type: 'bar',
-    data: {
-      labels: monthly.map(m => {
-        const [y,mo] = m.mes.split('-');
-        const meses = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-        return meses[+mo]+' '+y.slice(2);
-      }),
-      datasets: [
-        { label:'Promedio', data: monthly.map(m=>m.prom), backgroundColor: monthly.map(m => m.prom >= 0.8 ? '#e05252' : m.prom >= 0.5 ? '#e8a020' : m.prom >= 0.3 ? '#e8b84b' : '#4caf7d'), borderRadius:3, borderWidth:0 },
-        { label:'Máximo', data: monthly.map(m=>m.max), type:'line', borderColor:'rgba(224,82,82,0.5)', borderWidth:1.5, borderDash:[4,3], pointRadius:2, tension:0.3, backgroundColor:'transparent' }
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)} mm` } } },
-      scales:{
-        x:{ ticks:{maxRotation:45,autoSkip:true,maxTicksLimit:12,font:{size:9},color:'#555a68'}, grid:{display:false} },
-        y:{ ticks:{color:'#555a68',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} }
-      }
-    }
-  });
-
-  // CHART DISTRIBUCIÓN
-  const buckets = {'0.0':0,'0.1–0.2':0,'0.3–0.4':0,'0.5–0.6':0,'0.7–0.9':0,'≥ 1.0':0};
-  data.forEach(r=>{
-    if(r.d===0) buckets['0.0']++;
-    else if(r.d<=0.2) buckets['0.1–0.2']++;
-    else if(r.d<=0.4) buckets['0.3–0.4']++;
-    else if(r.d<=0.6) buckets['0.5–0.6']++;
-    else if(r.d<=0.9) buckets['0.7–0.9']++;
-    else buckets['≥ 1.0']++;
-  });
-  destroyChart('dist');
-  charts['dist'] = new Chart(document.getElementById('chartDist'), {
-    type:'bar',
-    data:{
-      labels: Object.keys(buckets),
-      datasets:[{ label:'Registros', data:Object.values(buckets), backgroundColor:['#4caf7d','#5b9cf6','#e8b84b','#e8a020','#e05252','#791919'], borderRadius:4, borderWidth:0 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false} },
-      scales:{
-        x:{ ticks:{color:'#555a68',font:{size:10}}, grid:{display:false} },
-        y:{ ticks:{stepSize:5,color:'#555a68',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} }
-      }
-    }
-  });
-
-  // CHART VUELTAS
-  const ajData = data.filter(r => r.v !== null);
-  destroyChart('vueltas');
-  charts['vueltas'] = new Chart(document.getElementById('chartVueltas'), {
-    type:'bar',
-    data:{
-      labels: ajData.map(r => fmtFecha(r.f)),
-      datasets:[{ label:'Vueltas', data:ajData.map(r=>r.v), backgroundColor:'rgba(232,184,75,0.6)', borderColor:'#e8b84b', borderWidth:1, borderRadius:3 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>`${ctx.parsed.y} vueltas` } } },
-      scales:{
-        x:{ ticks:{maxRotation:45,autoSkip:true,maxTicksLimit:20,font:{size:9},color:'#555a68'}, grid:{display:false} },
-        y:{ title:{display:true,text:'Vueltas',color:'#555a68',font:{size:10}}, ticks:{color:'#555a68',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} }
-      }
-    }
-  });
-
-  // TABLA
-  const conObs = [...data].filter(r=>r.o).reverse().slice(0,20);
-  document.getElementById('tabla-estano').innerHTML = conObs.map(r=>`
-    <tr>
-      <td class="td-date">${fmtFecha(r.f)}</td>
-      <td class="td-num">${r.c.toFixed(2)}</td>
-      <td class="td-num">${r.e.toFixed(2)}</td>
-      <td class="td-num" style="color:${difColor(r.d)};font-weight:500">${r.d.toFixed(2)}</td>
-      <td class="td-num">${r.v !== null ? r.v : '—'}</td>
-      <td class="td-num">${r.mm !== null ? r.mm.toFixed(2) : '—'}</td>
-      <td class="td-obs">${r.o || '—'}</td>
-    </tr>
-  `).join('');
-}
-
-// ─────────────────────────────────────────────────────
-// FILTRO MOLDES
-// ─────────────────────────────────────────────────────
-function filterMoldes(f, btn){
-  document.querySelectorAll('#molde-filters .filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  buildMoldes(f);
-}
-
-function buildMoldes(filtro){
-  const data = filtro === 'todos' ? MOLDES : MOLDES.filter(m=>m.estado===filtro);
-
-  // KPIs
-  const total = MOLDES.length;
-  const ops = MOLDES.filter(m=>m.estado==='Operativo').length;
-  const crom = MOLDES.filter(m=>m.cromado==='Sí').length;
-  const exc = MOLDES.filter(m=>m.enPeso==='Excedido').length;
-
-  document.getElementById('kpis-moldes').innerHTML = `
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--accent)"></div>
-      <div class="kpi-label">Total moldes</div>
-      <div class="kpi-value" style="color:var(--text)">${total}</div>
-      <div class="kpi-meta">en seguimiento activo</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--green)"></div>
-      <div class="kpi-label">Operativos</div>
-      <div class="kpi-value" style="color:var(--green)">${ops}</div>
-      <div class="kpi-meta">${Math.round(ops/total*100)}% del total</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--blue)"></div>
-      <div class="kpi-label">Con cromado activo</div>
-      <div class="kpi-value" style="color:var(--blue)">${crom}</div>
-      <div class="kpi-meta">de ${total} moldes</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent" style="background:var(--amber)"></div>
-      <div class="kpi-label">Excedidos en peso</div>
-      <div class="kpi-value" style="color:var(--amber)">${exc}</div>
-      <div class="kpi-meta">sobre peso nominal</div>
-    </div>
-  `;
 
   // Alertas
-  const enFab = MOLDES.filter(m=>m.estado==='En fabricación');
-  const pendCrom = MOLDES.filter(m=>m.estado==='Operativo' && m.cromado==='No');
-  let alertHTML = '';
-  enFab.forEach(m => {
-    alertHTML += `<div class="alert alert-red"><div class="alert-icon">⚠</div><div class="alert-text"><strong>${m.molde} #${m.num} — En fabricación:</strong> ${m.obs}</div></div>`;
+  let al = '';
+  const enFab = data.filter(m=>m.estado==='En fabricación');
+  enFab.forEach(m=>{
+    al+=`<div class="alert-item alert-crit">
+      <div class="alert-icon">⚠</div>
+      <div class="alert-body"><div class="alert-title">${m.id} #${m.num} — En fabricación</div><div class="alert-desc">${m.obs}</div></div>
+    </div>`;
   });
-  if(pendCrom.length > 0){
-    alertHTML += `<div class="alert alert-amber"><div class="alert-icon">◆</div><div class="alert-text"><strong>Cromado pendiente:</strong> ${pendCrom.map(m=>m.molde+' #'+m.num).join(', ')} — Revisar programación de cromado.</div></div>`;
+  const sobrePeso = data.filter(m=>m.prom&&pct(m.prom,m.nominal)>UMBRAL);
+  sobrePeso.forEach(m=>{
+    al+=`<div class="alert-item alert-crit">
+      <div class="alert-icon">◆</div>
+      <div class="alert-body"><div class="alert-title">${m.id} #${m.num} — Sobrepeso crítico</div><div class="alert-desc">${pct(m.prom,m.nominal).toFixed(1)}% sobre el nominal de ${m.nominal} kg (promedio: ${m.prom.toFixed(3)} kg)</div></div>
+    </div>`;
+  });
+  const pendCrom = data.filter(m=>m.estado==='Operativo'&&m.cromado==='No');
+  if(pendCrom.length>0){
+    al+=`<div class="alert-item alert-warn">
+      <div class="alert-icon">◇</div>
+      <div class="alert-body"><div class="alert-title">Cromado pendiente</div><div class="alert-desc">${pendCrom.map(m=>m.id+' #'+m.num).join(', ')}</div></div>
+    </div>`;
   }
-  document.getElementById('alertas-moldes').innerHTML = alertHTML;
+  if(!al) al='<div class="alert-item alert-info"><div class="alert-icon">✓</div><div class="alert-body"><div class="alert-title">Sin alertas críticas</div><div class="alert-desc">Todos los moldes filtrados dentro de parámetros.</div></div></div>';
+  document.getElementById('panel-alertas').innerHTML = al;
 
-  // CHART PESOS
-  const withData = MOLDES.filter(m=>m.prom !== null);
-  const withoutData = MOLDES.filter(m=>m.prom === null);
-  destroyChart('pesos');
-  charts['pesos'] = new Chart(document.getElementById('chartPesos'), {
-    type:'bar',
-    data:{
-      labels: MOLDES.map(m=>`${m.molde} #${m.num}`),
-      datasets:[
-        { label:'Peso promedio real', data: MOLDES.map(m=>m.prom || 0),
-          backgroundColor: MOLDES.map(m=>
-            m.prom === null ? 'rgba(85,90,104,0.3)' :
-            m.enPeso==='Óptimo' ? 'rgba(76,175,125,0.75)' : 'rgba(232,160,32,0.75)'
-          ),
-          borderColor: MOLDES.map(m=>
-            m.prom === null ? '#555a68' :
-            m.enPeso==='Óptimo' ? '#4caf7d' : '#e8a020'
-          ),
-          borderWidth:1, borderRadius:4
-        },
-        { label:'Peso nominal', data: MOLDES.map(m=>m.nominal),
-          backgroundColor:'rgba(232,184,75,0.12)', borderColor:'rgba(232,184,75,0.4)', borderWidth:1.5, borderRadius:4, type:'bar'
-        }
-      ]
-    },
-    options:{
-      indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>`${ctx.dataset.label}: ${ctx.parsed.x.toFixed(3)} kg` } } },
-      scales:{
-        x:{ title:{display:true,text:'kg',color:'#555a68',font:{size:11}}, ticks:{color:'#555a68',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} },
-        y:{ ticks:{color:'#8b90a0',font:{size:11}}, grid:{display:false} }
-      }
-    }
-  });
-
-  // CHART ESTADOS
-  const estadoCount = {'Operativo':0,'En calibración':0,'En fabricación':0};
-  MOLDES.forEach(m=>estadoCount[m.estado]++);
-  destroyChart('estados');
-  charts['estados'] = new Chart(document.getElementById('chartEstados'), {
-    type:'doughnut',
-    data:{
-      labels:['Operativo','En calibración','En fabricación'],
-      datasets:[{ data:Object.values(estadoCount), backgroundColor:['#4caf7d','#5b9cf6','#e05252'], borderColor:'#14161a', borderWidth:3, hoverOffset:6 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'bottom', labels:{color:'#8b90a0',font:{size:11},padding:14,boxWidth:12}} }
-    }
-  });
-
-  // CHART CROMADO
-  const cromCount = {'Sí':0,'En proceso':0,'No':0};
-  MOLDES.forEach(m=>cromCount[m.cromado]++);
-  destroyChart('cromado');
-  charts['cromado'] = new Chart(document.getElementById('chartCromado'), {
-    type:'doughnut',
-    data:{
-      labels:['Cromado activo','En proceso','Sin cromado'],
-      datasets:[{ data:Object.values(cromCount), backgroundColor:['#4caf7d','#e8b84b','#555a68'], borderColor:'#14161a', borderWidth:3, hoverOffset:6 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'bottom', labels:{color:'#8b90a0',font:{size:11},padding:14,boxWidth:12}} }
-    }
-  });
-
-  // MOLDE CARDS
-  function estadoBadge(e){
-    if(e==='Operativo') return '<span class="badge badge-green">Operativo</span>';
-    if(e==='En calibración') return '<span class="badge badge-blue">En calibración</span>';
-    return '<span class="badge badge-red">En fabricación</span>';
-  }
-  function pesoBadge(p){ return p==='Óptimo' ? '<span class="badge badge-green">Óptimo</span>' : '<span class="badge badge-amber">Excedido</span>'; }
-  function cromBadge(c){
-    if(c==='Sí') return '<span class="badge badge-teal">Cromado</span>';
-    if(c==='En proceso') return '<span class="badge badge-amber">En proceso</span>';
-    return '<span class="badge badge-gray">Sin cromado</span>';
-  }
-
+  // Molde cards
   document.getElementById('molde-cards').innerHTML = data.map(m=>{
-    const barPct = m.prom ? Math.min((m.prom/m.nominal)*100,130) : 0;
-    const barColor = m.enPeso==='Óptimo' ? '#4caf7d' : '#e8a020';
-    const nomPct = Math.min((m.nominal/m.nominal)*100,130);
-
-    const viasHTML = m.vias.length > 0 ? `
-      <div style="margin:10px 0 8px;">
-        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:.06em;margin-bottom:5px;">PESOS POR VÍA (kg)</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;">
-          ${m.vias.map((v,i)=>`<span style="background:var(--bg4);border-radius:3px;padding:2px 6px;font-family:var(--font-mono);font-size:10px;color:var(--text2);">V${i+1}: ${v.toFixed(3)}</span>`).join('')}
-        </div>
-      </div>` : '';
-
+    const exc = m.prom ? pct(m.prom,m.nominal) : null;
+    const barColor = m.prom===null?'var(--bg5)':exc>UMBRAL?'var(--red)':exc>0?'var(--amber)':'var(--green)';
+    const barPct = m.prom ? Math.min(Math.abs(m.prom/m.nominal)*100, 130) : 0;
     return `
-    <div class="molde-card">
-      <div class="molde-card-head">
-        <div>
-          <div class="molde-name">${m.molde}</div>
-          <div class="molde-num">N° ${m.num}</div>
-        </div>
-        <div style="text-align:right;">${estadoBadge(m.estado)}</div>
+    <div class="molde-mini">
+      <div class="molde-mini-head">
+        <div><div class="molde-mini-name">${m.id}</div><div class="molde-mini-num">N° ${m.num}</div></div>
+        ${estadoBadge(m.estado)}
       </div>
-      <div class="molde-row"><span class="molde-row-label">En peso</span>${pesoBadge(m.enPeso)}</div>
-      <div class="molde-row"><span class="molde-row-label">Nominal</span><span class="molde-row-val">${m.nominal.toFixed(1)} kg</span></div>
-      <div class="molde-row"><span class="molde-row-label">Promedio</span><span class="molde-row-val" style="color:${m.prom?barColor:'var(--text3)'}">${m.prom ? m.prom.toFixed(3)+' kg' : '— sin datos'}</span></div>
-      ${m.prom ? `
-      <div class="weight-bar">
-        <div class="weight-bar-label"><span>0</span><span>Nom. ${m.nominal.toFixed(1)}</span><span>${(m.nominal*1.2).toFixed(1)}</span></div>
-        <div class="weight-bar-track">
-          <div class="weight-bar-fill" style="width:${Math.min(barPct/1.3,100).toFixed(1)}%;background:${barColor};"></div>
-        </div>
-      </div>` : ''}
-      ${viasHTML}
-      <div class="molde-row" style="margin-top:6px;"><span class="molde-row-label">Cromado</span>${cromBadge(m.cromado)}</div>
+      <div class="molde-row"><span class="molde-row-lbl">Peso</span>${pesoBadge(m.enPeso)}</div>
+      <div class="molde-row"><span class="molde-row-lbl">Nominal</span><span class="molde-row-val">${m.nominal.toFixed(1)} kg</span></div>
+      <div class="molde-row"><span class="molde-row-lbl">Promedio</span><span class="molde-row-val" style="color:${barColor}">${m.prom?m.prom.toFixed(3)+' kg':'S/D'}</span></div>
+      ${m.prom?`<div class="molde-row"><span class="molde-row-lbl">Exceso</span><span class="molde-row-val" style="color:${barColor};font-weight:600">${exc>0?'+':''}${exc.toFixed(1)}%</span></div>`:''}
+      ${m.prom?`<div class="peso-track"><div class="peso-fill" style="width:${Math.min(barPct/1.3,100).toFixed(0)}%;background:${barColor}"></div></div>`:''}
+      ${m.vias.length>0?`<div class="via-grid">${m.vias.map((v,i)=>`<span class="via-pill">V${i+1} ${v.toFixed(3)}</span>`).join('')}</div>`:''}
+      <div class="molde-row"><span class="molde-row-lbl">Cromado</span>${cromBadge(m.cromado)}</div>
       <div class="molde-obs">${m.obs}</div>
-      <div class="molde-date">Actualizado: ${m.fecha}</div>
     </div>`;
   }).join('');
 }
 
-// ─────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────
-buildEstano('todos');
+/* ─────────────────────────────────────────────
+   TAB 2: LAMINACIÓN
+───────────────────────────────────────────── */
+function filterLam(y, btn){
+  lamYear = y;
+  document.querySelectorAll('#tab-laminacion .btn-ghost').forEach(b=>b.style.color='');
+  btn.style.color='var(--amber)';
+  buildLaminacion(y);
+}
+
+function buildLaminacion(y){
+  const data = y==='todos'?ESTANO_DATA:ESTANO_DATA.filter(r=>r.f.startsWith(y));
+  const monthly = y==='todos'?MONTHLY_DATA:MONTHLY_DATA.filter(m=>m.mes.startsWith(y));
+
+  const last = data[data.length-1];
+  const avgDif = data.reduce((s,r)=>s+r.d,0)/data.length;
+  const maxDif = Math.max(...data.map(r=>r.d));
+  const rect = data.filter(r=>r.o&&r.o.toLowerCase().includes('rectif')).length;
+
+  document.getElementById('kpi-lam').innerHTML = `
+    <div class="kpi-card amber">
+      <div class="kpi-label">Última medición</div>
+      <div class="kpi-val" style="font-size:18px;color:var(--text0)">${fmtDate(last.f)}</div>
+      <div class="kpi-meta">C: ${last.c.toFixed(2)} mm · E: ${last.e.toFixed(2)} mm · Dif: ${last.d.toFixed(2)} mm</div>
+    </div>
+    <div class="kpi-card ${last.d>=0.5?'red':last.d>=0.3?'amber':'green'}">
+      <div class="kpi-label">Diferencia actual</div>
+      <div class="kpi-val" style="color:${difColor(last.d)}">${last.d.toFixed(2)}</div>
+      <div class="kpi-meta">mm · ${last.d>=0.5?'⚠ Por encima de tolerancia':last.d>=0.3?'◆ Revisar':'✓ Dentro de rango'}</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Diferencia promedio</div>
+      <div class="kpi-val" style="color:var(--blue)">${avgDif.toFixed(3)}</div>
+      <div class="kpi-meta">mm · ${data.length} registros · máx ${maxDif.toFixed(2)}</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Rectificaciones</div>
+      <div class="kpi-val" style="color:var(--red)">${rect}</div>
+      <div class="kpi-meta">eventos · ${data.filter(r=>r.v!==null).length} ajustes totales</div>
+    </div>
+  `;
+
+  // Línea temporal
+  dc('linea');
+  chartReg['linea'] = new Chart(document.getElementById('chartLinea'),{
+    type:'line',
+    data:{
+      labels: data.map(r=>fmtDate(r.f)),
+      datasets:[
+        {label:'Centro',     data:data.map(r=>r.c), borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,0.05)', tension:.3, pointRadius:1.5, borderWidth:2},
+        {label:'Esquina',    data:data.map(r=>r.e), borderColor:'#3dd68c', backgroundColor:'rgba(61,214,140,0.05)', tension:.3, pointRadius:1.5, borderWidth:2},
+        {label:'Diferencia', data:data.map(r=>r.d), borderColor:'#f05252', backgroundColor:'rgba(240,82,82,0.04)',  tension:.3, pointRadius:1.5, borderWidth:1.5, borderDash:[5,3]},
+        {label:'Tolerancia', data:data.map(()=>0.1),borderColor:'rgba(245,166,35,0.35)', borderWidth:1, borderDash:[4,4], pointRadius:0, fill:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtN(ctx.parsed.y)} mm`}}
+      },
+      scales:{
+        x:{ticks:{maxRotation:45,autoSkip:true,maxTicksLimit:22,font:{size:9},color:'#6e7d96'},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{title:{display:true,text:'mm',color:'#6e7d96',font:{size:10}},ticks:{color:'#6e7d96',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}}
+      }
+    }
+  });
+
+  // Mensual
+  dc('mensual');
+  chartReg['mensual'] = new Chart(document.getElementById('chartMensual'),{
+    type:'bar',
+    data:{
+      labels: monthly.map(m=>mesLabel(m.mes)),
+      datasets:[
+        {label:'Promedio',data:monthly.map(m=>m.prom),
+         backgroundColor:monthly.map(m=>m.prom>=0.8?'rgba(240,82,82,.75)':m.prom>=0.5?'rgba(245,166,35,.7)':m.prom>=0.3?'rgba(251,191,36,.65)':'rgba(61,214,140,.65)'),
+         borderRadius:3,borderWidth:0},
+        {label:'Máximo',data:monthly.map(m=>m.max),type:'line',borderColor:'rgba(240,82,82,.4)',borderWidth:1.5,borderDash:[4,3],pointRadius:2,tension:.3,backgroundColor:'transparent'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtN(ctx.parsed.y,3)} mm`}}},
+      scales:{
+        x:{ticks:{maxRotation:45,autoSkip:true,maxTicksLimit:14,font:{size:9},color:'#6e7d96'},grid:{display:false}},
+        y:{ticks:{color:'#6e7d96',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}}
+      }
+    }
+  });
+
+  // Distribución
+  dc('dist');
+  const buck={'0.0':0,'0.1–0.2':0,'0.3–0.4':0,'0.5–0.6':0,'0.7–0.9':0,'≥1.0':0};
+  data.forEach(r=>{
+    if(r.d===0)     buck['0.0']++;
+    else if(r.d<=.2)buck['0.1–0.2']++;
+    else if(r.d<=.4)buck['0.3–0.4']++;
+    else if(r.d<=.6)buck['0.5–0.6']++;
+    else if(r.d<=.9)buck['0.7–0.9']++;
+    else            buck['≥1.0']++;
+  });
+  chartReg['dist'] = new Chart(document.getElementById('chartDist'),{
+    type:'bar',
+    data:{
+      labels:Object.keys(buck),
+      datasets:[{label:'Registros',data:Object.values(buck),
+        backgroundColor:['#3dd68c','#60a5fa','#fbbf24','#f5a623','#f05252','#991b1b'],
+        borderRadius:4,borderWidth:0}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#6e7d96',font:{size:10}},grid:{display:false}},
+        y:{ticks:{stepSize:5,color:'#6e7d96',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}}
+      }
+    }
+  });
+
+  // Correlación: diferencia laminación por mes vs exceso de peso promedio moldes
+  dc('corr');
+  const corrMonths = MONTHLY_DATA.slice(-12);
+  const avgExceso = MOLDES_DATA.filter(m=>m.prom).reduce((s,m)=>s+pct(m.prom,m.nominal),0)/MOLDES_DATA.filter(m=>m.prom).length;
+  chartReg['corr'] = new Chart(document.getElementById('chartCorr'),{
+    type:'line',
+    data:{
+      labels:corrMonths.map(m=>mesLabel(m.mes)),
+      datasets:[
+        {label:'Dif. laminación (mm)',data:corrMonths.map(m=>m.prom),
+         borderColor:'#f05252',backgroundColor:'rgba(240,82,82,0.07)',tension:.4,pointRadius:3,borderWidth:2,yAxisID:'y'},
+        {label:'% exceso peso moldes (referencia)',data:corrMonths.map(()=>avgExceso),
+         borderColor:'rgba(245,166,35,0.5)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0,yAxisID:'y2'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#6e7d96',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{type:'linear',position:'left',title:{display:true,text:'Dif. mm',color:'#6e7d96',font:{size:9}},ticks:{color:'#6e7d96',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y2:{type:'linear',position:'right',title:{display:true,text:'% Exceso',color:'#6e7d96',font:{size:9}},ticks:{color:'#6e7d96',font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+
+  // Tabla
+  const conObs = [...data].filter(r=>r.o).reverse().slice(0,20);
+  document.getElementById('tabla-lam').innerHTML = conObs.map(r=>`
+    <tr>
+      <td class="td-date">${fmtDate(r.f)}</td>
+      <td class="td-mono td-r">${fmtN(r.c)}</td>
+      <td class="td-mono td-r">${fmtN(r.e)}</td>
+      <td class="td-mono td-r" style="color:${difColor(r.d)};font-weight:600">${fmtN(r.d)}</td>
+      <td class="td-mono td-r">${r.v!==null?r.v:'—'}</td>
+      <td class="td-mono td-r">${r.mm!==null?fmtN(r.mm):'—'}</td>
+      <td>${r.d>=0.5?'<span class="badge badge-red">Alto</span>':r.d>=0.3?'<span class="badge badge-amber">Mod.</span>':'<span class="badge badge-green">OK</span>'}</td>
+      <td style="font-size:11px;color:var(--text1);max-width:240px">${r.o}</td>
+    </tr>
+  `).join('');
+}
+
+/* ─────────────────────────────────────────────
+   TAB 3: STOCK
+───────────────────────────────────────────── */
+function buildStock(){
+  const filt = activeFilter==='todos'?STOCK_DATA:STOCK_DATA.filter(s=>s.molde===activeFilter||s.molde===activeFilter.replace('-',''));
+  const total = filt.length;
+  const criticos = filt.filter(s=>s.actual<s.minimo).length;
+  const ok = filt.filter(s=>s.actual>=s.minimo).length;
+
+  document.getElementById('kpi-stock').innerHTML=`
+    <div class="kpi-card amber"><div class="kpi-label">Total repuestos</div><div class="kpi-val" style="color:var(--text0)">${total}</div><div class="kpi-meta">ítems en inventario</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Stock OK</div><div class="kpi-val" style="color:var(--green)">${ok}</div><div class="kpi-meta">sobre el mínimo</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Bajo mínimo</div><div class="kpi-val" style="color:var(--red)">${criticos}</div><div class="kpi-meta">requieren reposición</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Categorías</div><div class="kpi-val" style="color:var(--blue)">3</div><div class="kpi-meta">Dados · Boquillas · Núcleos</div></div>
+  `;
+
+  function stockCard(s){
+    const pct = Math.min(s.actual/Math.max(s.minimo*2,1)*100,100);
+    const color = s.actual===0?'var(--red)':s.actual<s.minimo?'#f5a623':'var(--green)';
+    const minLeft = s.minimo>0?(s.minimo/Math.max(s.minimo*2,1)*100):50;
+    return `
+    <div class="stock-card ${s.actual<s.minimo?'critical':''}">
+      <div class="stock-cat">${s.cat} · ${s.molde}</div>
+      <div class="stock-name">${s.nombre}</div>
+      <div class="stock-bar-wrap">
+        <div class="stock-bar-labels"><span>Stock</span><span>Mín: ${s.minimo}</span></div>
+        <div class="stock-track">
+          <div class="stock-fill" style="width:${pct.toFixed(0)}%;background:${color}"></div>
+          <div class="stock-min-line" style="left:${minLeft.toFixed(0)}%"></div>
+        </div>
+      </div>
+      <div class="stock-nums">
+        <span class="stock-actual" style="color:${color}">${s.actual}</span>
+        <span class="stock-min">${s.unidad} · mín ${s.minimo}</span>
+      </div>
+      ${s.actual<s.minimo?`<div style="margin-top:8px"><span class="badge badge-red">Reponer: ${s.minimo-s.actual} ${s.unidad}</span></div>`:''}
+    </div>`;
+  }
+
+  ['dados','boquillas','nucleos'].forEach((cat,i)=>{
+    const cats=['Dado','Boquilla','Núcleo'];
+    const ids=['stock-dados','stock-boquillas','stock-nucleos'];
+    document.getElementById(ids[i]).innerHTML = filt.filter(s=>s.cat===cats[i]).map(stockCard).join('') || '<div style="color:var(--text2);font-size:12px;padding:12px 0">Sin repuestos para este filtro.</div>';
+  });
+}
+
+/* modal faltantes */
+function generarFaltantes(){
+  const filt = activeFilter==='todos'?STOCK_DATA:STOCK_DATA.filter(s=>s.molde===activeFilter);
+  const falt = filt.filter(s=>s.actual<s.minimo);
+  const modal = document.getElementById('modal-faltantes');
+  const mc = document.getElementById('modal-content');
+
+  if(falt.length===0){
+    mc.innerHTML='<div class="alert-item alert-info"><div class="alert-icon">✓</div><div class="alert-body"><div class="alert-title">Sin faltantes</div><div class="alert-desc">Todos los repuestos están sobre el stock mínimo.</div></div></div>';
+  } else {
+    const rows = falt.map(s=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border0);">
+        <div>
+          <div style="font-weight:600;color:var(--text0);font-size:13px">${s.nombre}</div>
+          <div style="font-size:11px;color:var(--text2)">${s.cat} · Molde ${s.molde}</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="badge badge-red">Faltan ${s.minimo-s.actual} ${s.unidad}</span>
+          <div style="font-size:10px;color:var(--text2);margin-top:3px">Stock: ${s.actual} / Mín: ${s.minimo}</div>
+        </div>
+      </div>`).join('');
+    mc.innerHTML=`<div style="margin-bottom:12px;font-size:12px;color:var(--text2)">${falt.length} ítem(s) por debajo del stock mínimo — ${new Date().toLocaleDateString('es-AR')}</div>${rows}`;
+  }
+  modal.style.display='flex';
+}
+
+function copiarFaltantes(){
+  const falt = STOCK_DATA.filter(s=>s.actual<s.minimo);
+  const txt = `LISTA DE FALTANTES — MATRICERÍA CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n`+falt.map(s=>`• ${s.nombre} (${s.cat} Molde ${s.molde}): Faltan ${s.minimo-s.actual} ${s.unidad} [Stock: ${s.actual} / Mín: ${s.minimo}]`).join('\n');
+  navigator.clipboard.writeText(txt).then(()=>alert('Copiado al portapapeles'));
+}
+
+/* ─────────────────────────────────────────────
+   TAB 4: VIDA ÚTIL
+───────────────────────────────────────────── */
+function buildVidaUtil(){
+  const filt = activeFilter==='todos'?VIDA_DATA:VIDA_DATA.filter(d=>d.molde.startsWith(activeFilter));
+  const avgVida = filt.reduce((s,d)=>s+d.tonProd/d.vidaUtil,0)/filt.length*100;
+  const critical = filt.filter(d=>d.tonProd/d.vidaUtil>0.8).length;
+
+  document.getElementById('kpi-vida').innerHTML=`
+    <div class="kpi-card amber"><div class="kpi-label">Moldes en seguimiento</div><div class="kpi-val" style="color:var(--text0)">${filt.length}</div><div class="kpi-meta">con vida útil calculada</div></div>
+    <div class="kpi-card ${avgVida>60?'red':'green'}"><div class="kpi-label">Vida consumida prom.</div><div class="kpi-val" style="color:${avgVida>60?'var(--red)':'var(--green)'}">${avgVida.toFixed(0)}%</div><div class="kpi-meta">del total teórico</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Críticos (>80%)</div><div class="kpi-val" style="color:var(--red)">${critical}</div><div class="kpi-meta">requieren atención</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Cromados totales</div><div class="kpi-val" style="color:var(--blue)">${filt.reduce((s,d)=>s+d.cromados,0)}</div><div class="kpi-meta">en el historial</div></div>
+  `;
+
+  // Gauges
+  document.getElementById('gauge-grid').innerHTML = filt.map(d=>{
+    const pctV = Math.min(d.tonProd/d.vidaUtil*100,100);
+    const restante = d.vidaUtil-d.tonProd;
+    const mesesETA = restante>0 ? (restante/d.prodMes).toFixed(1) : 0;
+    const color = pctV>80?'#f05252':pctV>60?'#f5a623':'#3dd68c';
+    const cId = 'g_'+d.molde.replace(/[^a-z0-9]/gi,'');
+    return `
+    <div class="gauge-card">
+      <div class="gauge-wrap">
+        <canvas id="${cId}" class="gauge-canvas" width="120" height="70"></canvas>
+        <div class="gauge-pct" style="color:${color}">${pctV.toFixed(0)}%</div>
+      </div>
+      <div class="gauge-name">${d.molde.split(' ')[0]}</div>
+      <div class="gauge-num">N° ${d.molde.split(' ')[1]||''}</div>
+      <div style="font-size:10px;color:var(--text2)">${d.tonProd} / ${d.vidaUtil} Ton</div>
+      ${pctV<100?`<div class="gauge-eta">Fin estimado<br><span class="gauge-eta-val">~${mesesETA} meses</span></div>`:`<div class="gauge-eta"><span style="color:var(--red)">Vida útil agotada</span></div>`}
+      <div style="margin-top:6px"><span class="badge ${pctV>80?'badge-red':pctV>60?'badge-amber':'badge-green'}">${d.cromados} cromados</span></div>
+    </div>`;
+  }).join('');
+
+  // Dibujar gauges con canvas 2D
+  requestAnimationFrame(()=>{
+    filt.forEach(d=>{
+      const pctV = Math.min(d.tonProd/d.vidaUtil*100,100);
+      const cId = 'g_'+d.molde.replace(/[^a-z0-9]/gi,'');
+      const canvas = document.getElementById(cId);
+      if(!canvas) return;
+      const ctx2 = canvas.getContext('2d');
+      const W=120,H=70,cx=60,cy=62,r=48;
+      ctx2.clearRect(0,0,W,H);
+      // Fondo
+      ctx2.beginPath();
+      ctx2.arc(cx,cy,r,Math.PI,0);
+      ctx2.strokeStyle='rgba(255,255,255,0.06)';
+      ctx2.lineWidth=10;
+      ctx2.lineCap='round';
+      ctx2.stroke();
+      // Fill
+      const color = pctV>80?'#f05252':pctV>60?'#f5a623':'#3dd68c';
+      const endAngle = Math.PI+(Math.PI*(pctV/100));
+      ctx2.beginPath();
+      ctx2.arc(cx,cy,r,Math.PI,endAngle);
+      ctx2.strokeStyle=color;
+      ctx2.lineWidth=10;
+      ctx2.lineCap='round';
+      ctx2.stroke();
+    });
+  });
+
+  // Tabla cromados
+  document.getElementById('tabla-cromados').innerHTML = CROMADOS_HIST.map(r=>`
+    <tr>
+      <td style="font-weight:600;color:var(--text0)">${r.molde}</td>
+      <td><span class="badge ${r.prov==='Prados'?'badge-blue':'badge-amber'}">${r.prov}</span></td>
+      <td class="td-date td-r">${r.envio}</td>
+      <td class="td-date td-r">${r.retorno||'—'}</td>
+      <td class="td-mono td-r" style="color:${r.dias?r.dias>15?'var(--red)':r.dias>12?'var(--amber)':'var(--green)':'var(--text2)'}">${r.dias?r.dias+' días':'—'}</td>
+      <td><span class="badge ${r.estado==='Completado'?'badge-green':'badge-amber'}">${r.estado}</span></td>
+      <td style="font-size:11px;color:var(--text2)">${r.obs}</td>
+    </tr>
+  `).join('');
+}
+
+/* ─────────────────────────────────────────────
+   ASYNC CSV FETCH (para cuando se conecten los sheets)
+───────────────────────────────────────────── */
+async function fetchCSV(url){
+  if(!url) return null;
+  try{
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const text = await r.text();
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h=>h.trim().replace(/"/g,''));
+    return lines.slice(1).map(line=>{
+      const vals = line.split(',').map(v=>v.trim().replace(/"/g,'').replace(/,/g,'.'));
+      const obj={};
+      headers.forEach((h,i)=>{ obj[h]=vals[i]??''; });
+      return obj;
+    });
+  }catch(e){
+    console.warn('CSV fetch error:',e);
+    return null;
+  }
+}
+
+/* Normalizar ID de molde: "H-8", "H 8", "h8" → "H8" */
+function normalizeMoldeId(raw){
+  if(!raw) return '';
+  return raw.trim().toUpperCase().replace(/[\s\-_]+/g,'');
+}
+
+/* Helper seguro para celdas vacías o "S/D" */
+function safeNum(val, fallback=0){
+  if(val===null||val===undefined||val===''||val==='S/D'||val==='-') return fallback;
+  const n = parseFloat(String(val).replace(',','.'));
+  return isNaN(n) ? fallback : n;
+}
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+async function init(){
+  document.getElementById('data-status').textContent='Cargando datos...';
+
+  // Intentar cargar desde CSV si hay URLs configuradas
+  const [csvMoldes, csvEstano] = await Promise.all([
+    fetchCSV(CSV_MOLDES_URL),
+    fetchCSV(CSV_ESTANO_URL)
+  ]);
+
+  if(csvMoldes){
+    console.log('Moldes CSV cargado:', csvMoldes.length, 'filas');
+    // Aquí procesar csvMoldes y reemplazar MOLDES_DATA
+  }
+  if(csvEstano){
+    console.log('Estaño CSV cargado:', csvEstano.length, 'filas');
+    // Aquí procesar csvEstano y reemplazar ESTANO_DATA
+  }
+
+  document.getElementById('data-status').textContent = csvMoldes||csvEstano ? 'Datos en tiempo real' : 'Datos locales cargados';
+  buildGeneral();
+}
+
+init();
 </script>
 </body>
 </html>
