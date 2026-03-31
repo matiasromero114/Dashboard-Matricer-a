@@ -1253,6 +1253,10 @@ function buildStockTable(data) {
       plugins: { 
         legend: { position: 'bottom', labels: { color: '#8b90a0', font: { size: 11 }, padding: 14 } }
       }
+    }
+  });
+}
+
 // ─────────────────────────────────────────────────────
 // FUNCIONES DE CARGA DE DATOS
 // ─────────────────────────────────────────────────────
@@ -1277,6 +1281,9 @@ async function fetchCSV(url) {
     console.error('Error fetching CSV:', error);
     return [];
   }
+}
+
+function parseLaminadoraData(rows) {
   return rows.map(row => {
     const parseNum = (val) => {
       const cleaned = (val || '').toString().replace(',', '.');
@@ -1292,6 +1299,26 @@ async function fetchCSV(url) {
       observaciones: row.OBSERVACIONES || ''
     };
   }).filter(row => row.fecha);
+}
+
+function parseStockData(rows) {
+  return rows.map(row => {
+    const parseNum = (val) => {
+      const cleaned = (val || '').toString().replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    };
+    
+    return {
+      tipoMolde: row.TIPO_MOLDE || '',
+      boquillas: parseNum(row.BOQUILLAS),
+      aranasJuegos: parseNum(row.ARANAS_JUEGOS),
+      dadosJuegos: parseNum(row.DADOS_JUEGOS),
+      placaBase: parseNum(row.PLACA_BASE),
+      frenosJuegos: parseNum(row.FRENOS_JUEGOS),
+      fechaRevision: row.FECHA_REVISION || ''
+    };
+  }).filter(row => row.tipoMolde);
 }
 
 // ─────────────────────────────────────────────────────
@@ -1420,10 +1447,23 @@ STOCK = [
 // ─────────────────────────────────────────────────────
 // Cargar datos automáticamente al iniciar
 document.addEventListener('DOMContentLoaded', function() {
-  loadAllData();
+  // Intentar cargar datos reales, si falla usa demo
+  loadAllData().catch(() => {
+    console.log('📋 Usando datos de demostración');
+    loadDemoData();
+  });
+  
+  // Construir interfaces con datos disponibles
   buildEstano('todos');
   buildMoldes('todos');
   buildCromadosTable();
+  buildLaminadoras();
+  buildStockTable(STOCK);
+  
+  // Actualizar reloj
+  const now = new Date();
+  const timeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  document.getElementById('clock').textContent = timeStr;
 });
 </script>
 </body>
