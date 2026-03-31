@@ -383,92 +383,54 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <button class="nav-tab active" onclick="switchTab('estano', this)">Control de Estaño — KLB12</button>
+  <button class="nav-tab active" onclick="switchTab('laminadoras', this)">Control de Laminadoras</button>
   <button class="nav-tab" onclick="switchTab('moldes', this)">Moldes y Cromado</button>
+  <button class="nav-tab" onclick="switchTab('stock', this)">Stock de Repuestos</button>
 </nav>
 
 <!-- MAIN -->
 <main class="main">
 
   <!-- ══════════════════════════════════════
-       SECCIÓN 1: CONTROL DE ESTAÑO KLB12
+       SECCIÓN 1: CONTROL DE LAMINADORAS
   ══════════════════════════════════════ -->
-  <section class="section active fade-in" id="sec-estano">
+  <section class="section active fade-in" id="sec-laminadoras">
 
     <div class="section-head">
       <div>
-        <div class="section-head-title">Laminador KLB12 — Control de Estaño</div>
-        <div class="section-head-sub">154 registros · Ene 2024 – Mar 2026 · Valores de referencia: Esquina 1,50 mm · Tolerancia 0,10 mm</div>
+        <div class="section-head-title">Control de Laminadoras — KLB12 & LM1210</div>
+        <div class="section-head-sub" id="laminadoras-meta">Cargando datos...</div>
       </div>
-      <div class="filter-group" id="year-filters">
-        <button class="filter-btn active" onclick="filterYear('todos',this)">Todos</button>
-        <button class="filter-btn" onclick="filterYear('2024',this)">2024</button>
-        <button class="filter-btn" onclick="filterYear('2025',this)">2025</button>
-        <button class="filter-btn" onclick="filterYear('2026',this)">2026</button>
+      <div class="filter-group" id="laminadora-filters">
+        <button class="filter-btn active" onclick="switchLaminadora('KLB12', this)">KLB12</button>
+        <button class="filter-btn" onclick="switchLaminadora('LM1210', this)">LM1210</button>
       </div>
     </div>
 
-    <!-- KPIs -->
-    <div class="kpi-grid" id="kpis-estano"></div>
+    <!-- KPIs de Intervenciones -->
+    <div class="kpi-grid" id="kpis-laminadoras"></div>
 
-    <!-- Gráfico 1: Línea temporal -->
+    <!-- Gráfico de Desgaste por Evento -->
     <div class="chart-card">
       <div class="chart-top">
         <div>
-          <div class="chart-title">Evolución de espesores en el tiempo</div>
-          <div class="chart-desc">Centro vs Esquina (mm) · Línea roja punteada = diferencia</div>
+          <div class="chart-title">Desgaste por Evento — Rectificados</div>
+          <div class="chart-desc">Material retirado en mm por fecha de intervención · <span id="laminadora-actual">KLB12</span></div>
         </div>
         <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:#5b9cf6;"></div>Centro</div>
-          <div class="leg"><div class="leg-sq" style="background:#4caf7d;"></div>Esquina</div>
-          <div class="leg"><div class="leg-sq" style="background:#e05252;height:2px;"></div>Diferencia</div>
+          <div class="leg"><div class="leg-sq" style="background:#5b9cf6;"></div>Rectificado Lento</div>
+          <div class="leg"><div class="leg-sq" style="background:#e8b84b;"></div>Rectificado Rápido</div>
         </div>
       </div>
-      <div style="position:relative;width:100%;height:280px;"><canvas id="chartLinea"></canvas></div>
+      <div style="position:relative;width:100%;height:300px;"><canvas id="chartDesgaste"></canvas></div>
     </div>
 
-    <!-- Gráfico 2+3: Mensual + Distribución -->
-    <div class="grid-2">
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-top">
-          <div>
-            <div class="chart-title">Diferencia promedio mensual</div>
-            <div class="chart-desc">Promedio y máximo por mes (mm)</div>
-          </div>
-        </div>
-        <div style="position:relative;width:100%;height:220px;"><canvas id="chartMensual"></canvas></div>
-      </div>
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-top">
-          <div>
-            <div class="chart-title">Distribución de diferencias</div>
-            <div class="chart-desc">Cantidad de registros por rango (mm)</div>
-          </div>
-        </div>
-        <div style="position:relative;width:100%;height:220px;"><canvas id="chartDist"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Gráfico 4: Ajustes (vueltas) -->
+    <!-- Tabla de Intervenciones -->
     <div class="chart-card">
       <div class="chart-top">
         <div>
-          <div class="chart-title">Historial de ajustes — vueltas aplicadas</div>
-          <div class="chart-desc">Cantidad de vueltas por intervención registrada · Total histórico: 191,5 vueltas</div>
-        </div>
-        <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:#e8b84b;"></div>Vueltas de ajuste</div>
-        </div>
-      </div>
-      <div style="position:relative;width:100%;height:180px;"><canvas id="chartVueltas"></canvas></div>
-    </div>
-
-    <!-- Tabla de intervenciones -->
-    <div class="chart-card">
-      <div class="chart-top">
-        <div>
-          <div class="chart-title">Registro de intervenciones con observaciones</div>
-          <div class="chart-desc">Últimas 20 entradas con observación registrada</div>
+          <div class="chart-title">Registro de Intervenciones</div>
+          <div class="chart-desc">Historial completo de rectificados y observaciones</div>
         </div>
       </div>
       <div class="table-wrap">
@@ -476,15 +438,14 @@
           <thead>
             <tr>
               <th>Fecha</th>
-              <th style="text-align:right">Centro</th>
-              <th style="text-align:right">Esquina</th>
-              <th style="text-align:right">Dif.</th>
-              <th style="text-align:right">Vueltas</th>
-              <th style="text-align:right">mm/vuelta</th>
-              <th>Observación</th>
+              <th style="text-align:right">Rect. Lento (mm)</th>
+              <th style="text-align:right">Rect. Rápido (mm)</th>
+              <th style="text-align:right">Total (mm)</th>
+              <th>Responsable</th>
+              <th>Observaciones</th>
             </tr>
           </thead>
-          <tbody id="tabla-estano"></tbody>
+          <tbody id="tabla-laminadoras"></tbody>
         </table>
       </div>
     </div>
@@ -515,18 +476,18 @@
     <!-- Alertas -->
     <div id="alertas-moldes"></div>
 
-    <!-- Gráfico peso -->
+    <!-- Gráfico peso con nueva lógica de colores -->
     <div class="chart-card">
       <div class="chart-top">
         <div>
           <div class="chart-title">Peso promedio vs nominal por molde</div>
-          <div class="chart-desc">Verde = dentro del rango óptimo · Naranja = excede el peso nominal</div>
+          <div class="chart-desc">Verde: &lt; Nominal · Amarillo: ±100 kg · Rojo: &gt;100 kg sobre nominal</div>
         </div>
         <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:#4caf7d;"></div>Óptimo</div>
-          <div class="leg"><div class="leg-sq" style="background:#e8a020;"></div>Excedido</div>
+          <div class="leg"><div class="leg-sq" style="background:#4caf7d;"></div>Por debajo del nominal</div>
+          <div class="leg"><div class="leg-sq" style="background:#e8a020;"></div>±100 kg del nominal</div>
+          <div class="leg"><div class="leg-sq" style="background:#e05252;"></div>&gt;100 kg sobre nominal</div>
           <div class="leg"><div class="leg-sq" style="background:#555a68;"></div>Sin datos</div>
-          <div class="leg"><div class="leg-sq" style="background:rgba(232,184,75,0.3);"></div>Nominal</div>
         </div>
       </div>
       <div style="position:relative;width:100%;height:360px;"><canvas id="chartPesos"></canvas></div>
@@ -554,12 +515,109 @@
       </div>
     </div>
 
+    <!-- Tabla de Cromados -->
+    <div class="chart-card">
+      <div class="chart-top">
+        <div>
+          <div class="chart-title">Control de Cromados</div>
+          <div class="chart-desc">Historial de envíos y recepciones de moldes para cromado</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Molde</th>
+              <th>Fecha Envío</th>
+              <th>Fecha Recepción</th>
+              <th>Proveedor</th>
+              <th>Detalles</th>
+              <th>Observaciones</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-cromados"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Cards individuales -->
     <div class="chart-card" style="margin-top:16px">
       <div class="chart-top">
         <div class="chart-title">Detalle por molde</div>
       </div>
       <div class="molde-grid" id="molde-cards"></div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 3: STOCK DE REPUESTOS
+  ══════════════════════════════════════ -->
+  <section class="section fade-in" id="sec-stock">
+
+    <div class="section-head">
+      <div>
+        <div class="section-head-title">Stock de Repuestos de Moldes</div>
+        <div class="section-head-sub" id="stock-meta">Cargando inventario...</div>
+      </div>
+      <div class="filter-group">
+        <input type="text" id="stock-search" placeholder="Buscar por tipo de molde (ej: H8, H12, P18)" 
+               style="padding:8px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);border-radius:var(--radius);font-family:var(--font-mono);font-size:12px;width:250px;"
+               onkeyup="filterStock()">
+      </div>
+    </div>
+
+    <!-- KPIs de Stock -->
+    <div class="kpi-grid" id="kpis-stock"></div>
+
+    <!-- Tabla de Stock -->
+    <div class="chart-card">
+      <div class="chart-top">
+        <div>
+          <div class="chart-title">Inventario de Repuestos por Tipo de Molde</div>
+          <div class="chart-desc">Boquillas, Arañas, Dados, Placa Base, Frenos y Fecha de Revisión</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo de Molde</th>
+              <th style="text-align:right">Boquillas</th>
+              <th style="text-align:right">Arañas [juegos]</th>
+              <th style="text-align:right">Dados [juegos]</th>
+              <th style="text-align:right">Placa Base</th>
+              <th style="text-align:right">Frenos [juegos]</th>
+              <th>Fecha Revisión</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-stock"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Estadísticas por Tipo -->
+    <div class="grid-2">
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-top">
+          <div>
+            <div class="chart-title">Distribución de Stock por Componente</div>
+            <div class="chart-desc">Cantidad total de cada tipo de repuesto</div>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:250px;"><canvas id="chartStockDist"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-top">
+          <div>
+            <div class="chart-title">Estado de Revisiones</div>
+            <div class="chart-desc">Repuestos que requieren revisión vs actualizados</div>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:250px;"><canvas id="chartRevisiones"></canvas></div>
+      </div>
     </div>
 
   </section>
