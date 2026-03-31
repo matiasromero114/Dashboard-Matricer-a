@@ -1253,31 +1253,140 @@ function buildStockTable(data) {
       plugins: { 
         legend: { position: 'bottom', labels: { color: '#8b90a0', font: { size: 11 }, padding: 14 } }
       }
-    }
-  });
+// ─────────────────────────────────────────────────────
+// FUNCIONES DE CARGA DE DATOS
+// ─────────────────────────────────────────────────────
+async function fetchCSV(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toUpperCase());
+    return lines.slice(1).map(line => {
+      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+      const row = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+      return row;
+    });
+  } catch (error) {
+    console.error('Error fetching CSV:', error);
+    return [];
+  }
+}
+
+function parseLaminadoraData(rows) {
+  return rows.map(row => {
+    const parseNum = (val) => {
+      const cleaned = (val || '').toString().replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num; // Nulos → 0 mm
+    };
+    
+    return {
+      fecha: row.FECHA || '',
+      rectificadoLento: parseNum(row.RECTIFICADO_LENTO),
+      rectificadoRapido: parseNum(row.RECTIFICADO_RAPIDO),
+      responsable: row.RESPONSABLE || '',
+      observaciones: row.OBSERVACIONES || ''
+    };
+  }).filter(row => row.fecha);
+}
+
+function parseStockData(rows) {
+  return rows.map(row => {
+    const parseNum = (val) => {
+      const cleaned = (val || '').toString().replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    };
+    
+    return {
+      tipoMolde: row.TIPO_MOLDE || '',
+      boquillas: parseNum(row.BOQUILLAS),
+      aranasJuegos: parseNum(row.ARANAS_JUEGOS),
+      dadosJuegos: parseNum(row.DADOS_JUEGOS),
+      placaBase: parseNum(row.PLACA_BASE),
+      frenosJuegos: parseNum(row.FRENOS_JUEGOS),
+      fechaRevision: row.FECHA_REVISION || ''
+    };
+  }).filter(row => row.tipoMolde);
 }
 
 // ─────────────────────────────────────────────────────
-// FUNCIONES CROMADOS
+// CARGA INICIAL DE DATOS
 // ─────────────────────────────────────────────────────
-function buildCromadosTable() {
-  document.getElementById('tabla-cromados').innerHTML = CROMADOS.map(cromado => {
-    const estado = !cromado.fechaRecepcion ? 
-      '<span class="badge badge-amber">En proceso</span>' : 
-      '<span class="badge badge-green">Recibido</span>';
+async function loadAllData() {
+  try {
+    // Mostrar estado de carga
+    document.getElementById('clock').textContent = 'Cargando...';
     
-    return `
-      <tr>
-        <td><strong>${cromado.molde}</strong></td>
-        <td class="td-date">${cromado.fechaEnvio || '—'}</td>
-        <td class="td-date">${cromado.fechaRecepcion || '—'}</td>
-        <td>${cromado.proveedor || '—'}</td>
-        <td class="td-obs">${cromado.detalles || '—'}</td>
-        <td class="td-obs">${cromado.observaciones || '—'}</td>
-        <td>${estado}</td>
-      </tr>
-    `;
-  }).join('');
+    // Cargar datos en paralelo
+    const [klb12Rows, lm1210Rows, stockRows] = await Promise.all([
+      fetchCSV(SHEET_CONFIG.klb12.url),
+      fetchCSV(SHEET_CONFIG.lm1210.url),
+      fetchCSV(SHEET_CONFIG.stock.url)
+    ]);
+    
+    // Procesar datos
+    LAMINADORAS.KLB12 = parseLaminadoraData(klb12Rows);
+    LAMINADORAS.LM1210 = parseLaminadoraData(lm1210Rows);
+    STOCK = parseStockData(stockRows);
+    
+    // Actualizar estado
+    const now = new Date();
+    const timeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById('clock').textContent = timeStr;
+    
+    // Construir interfaces
+    buildLaminadoras();
+    buildStockTable(STOCK);
+    
+    // Mostrar resumen en consola
+    console.log('✅ Datos cargados exitosamente:');
+    console.log(`🏭 Laminadora KLB12: ${LAMINADORAS.KLB12.length} registros`);
+    console.log(`🏭 Laminadora LM1210: ${LAMINADORAS.LM1210.length} registros`);
+    console.log(`📦 Stock: ${STOCK.length} tipos de molde`);
+    
+  } catch (error) {
+    console.error('❌ Error cargando datos:', error);
+    document.getElementById('clock').textContent = 'Error de carga';
+    
+    // Cargar datos de demostración si hay error
+    loadDemoData();
+  }
+}
+
+function loadDemoData() {
+  // Datos demo para Laminadoras
+  LAMINADORAS.KLB12 = [
+    { fecha: '2024-01-15', rectificadoLento: 0.15, rectificadoRapido: 0.08, responsable: 'J. Pérez', observaciones: 'Mantenimiento rutinario' },
+    { fecha: '2024-02-20', rectificadoLento: 0.22, rectificadoRapido: 0.12, responsable: 'M. García', observaciones: 'Desgaste detectado' },
+    { fecha: '2024-03-10', rectificadoLento: 0.18, rectificadoRapido: 0.10, responsable: 'A. López', observaciones: 'Ajuste normal' },
+    { fecha: '2024-04-05', rectificadoLento: 0.25, rectificadoRapido: 0.15, responsable: 'J. Pérez', observaciones: 'Rectificación programada' }
+  ];
+
+  LAMINADORAS.LM1210 = [
+    { fecha: '2024-01-20', rectificadoLento: 0.12, rectificadoRapido: 0.06, responsable: 'R. Martínez', observaciones: 'Inspección semanal' },
+    { fecha: '2024-02-25', rectificadoLento: 0.20, rectificadoRapido: 0.11, responsable: 'S. Rodríguez', observaciones: 'Corrección de alineación' },
+    { fecha: '2024-03-15', rectificadoLento: 0.16, rectificadoRapido: 0.09, responsable: 'L. Torres', observaciones: 'Mantenimiento preventivo' }
+  ];
+
+  // Datos demo para Stock
+  STOCK = [
+    { tipoMolde: 'H8', boquillas: 24, aranasJuegos: 6, dadosJuegos: 4, placaBase: 2, frenosJuegos: 3, fechaRevision: '2024-03-01' },
+    { tipoMolde: 'H12', boquillas: 18, aranasJuegos: 4, dadosJuegos: 3, placaBase: 2, frenosJuegos: 2, fechaRevision: '2024-02-15' },
+    { tipoMolde: 'P18', boquillas: 12, aranasJuegos: 3, dadosJuegos: 2, placaBase: 1, frenosJuegos: 2, fechaRevision: '' },
+    { tipoMolde: 'L12', boquillas: 8, aranasJuegos: 2, dadosJuegos: 1, placaBase: 1, frenosJuegos: 1, fechaRevision: '2024-01-20' }
+  ];
+  
+  console.log('📋 Cargados datos de demostración');
+  buildLaminadoras();
+  buildStockTable(STOCK);
 }
 
 // ─────────────────────────────────────────────────────
@@ -1332,10 +1441,13 @@ STOCK = [
 // ─────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────
-buildEstano('todos');
-buildLaminadoras();
-buildCromadosTable();
-buildStockTable(STOCK);
+// Cargar datos automáticamente al iniciar
+document.addEventListener('DOMContentLoaded', function() {
+  loadAllData();
+  buildEstano('todos');
+  buildMoldes('todos');
+  buildCromadosTable();
+});
 </script>
 </body>
 </html>
