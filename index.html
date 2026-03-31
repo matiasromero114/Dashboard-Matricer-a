@@ -1277,9 +1277,6 @@ async function fetchCSV(url) {
     console.error('Error fetching CSV:', error);
     return [];
   }
-}
-
-function parseLaminadoraData(rows) {
   return rows.map(row => {
     const parseNum = (val) => {
       const cleaned = (val || '').toString().replace(',', '.');
@@ -1295,26 +1292,6 @@ function parseLaminadoraData(rows) {
       observaciones: row.OBSERVACIONES || ''
     };
   }).filter(row => row.fecha);
-}
-
-function parseStockData(rows) {
-  return rows.map(row => {
-    const parseNum = (val) => {
-      const cleaned = (val || '').toString().replace(',', '.');
-      const num = parseFloat(cleaned);
-      return isNaN(num) ? 0 : num;
-    };
-    
-    return {
-      tipoMolde: row.TIPO_MOLDE || '',
-      boquillas: parseNum(row.BOQUILLAS),
-      aranasJuegos: parseNum(row.ARANAS_JUEGOS),
-      dadosJuegos: parseNum(row.DADOS_JUEGOS),
-      placaBase: parseNum(row.PLACA_BASE),
-      frenosJuegos: parseNum(row.FRENOS_JUEGOS),
-      fechaRevision: row.FECHA_REVISION || ''
-    };
-  }).filter(row => row.tipoMolde);
 }
 
 // ─────────────────────────────────────────────────────
