@@ -1050,9 +1050,292 @@ function buildMoldes(filtro){
 }
 
 // ─────────────────────────────────────────────────────
+// FUNCIONES LAMINADORAS
+// ─────────────────────────────────────────────────────
+function switchLaminadora(laminadora, btn) {
+  CURRENT_LAMINADORA = laminadora;
+  document.querySelectorAll('#laminadora-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('laminadora-actual').textContent = laminadora;
+  buildLaminadoras();
+}
+
+function buildLaminadoras() {
+  const data = LAMINADORAS[CURRENT_LAMINADORA] || [];
+  
+  // KPIs
+  const totalIntervenciones = data.length;
+  const totalLento = data.reduce((sum, r) => sum + (r.rectificadoLento || 0), 0);
+  const totalRapido = data.reduce((sum, r) => sum + (r.rectificadoRapido || 0), 0);
+  const totalMm = totalLento + totalRapido;
+  
+  document.getElementById('kpis-laminadoras').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--accent)"></div>
+      <div class="kpi-label">Total Intervenciones</div>
+      <div class="kpi-value" style="color:var(--text)">${totalIntervenciones}</div>
+      <div class="kpi-meta">registros históricos</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:#5b9cf6"></div>
+      <div class="kpi-label">Rectificado Lento</div>
+      <div class="kpi-value" style="color:#5b9cf6">${totalLento.toFixed(2)}</div>
+      <div class="kpi-meta">mm acumulados</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:#e8b84b"></div>
+      <div class="kpi-label">Rectificado Rápido</div>
+      <div class="kpi-value" style="color:#e8b84b">${totalRapido.toFixed(2)}</div>
+      <div class="kpi-meta">mm acumulados</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--green)"></div>
+      <div class="kpi-label">Total Desgaste</div>
+      <div class="kpi-value" style="color:var(--green)">${totalMm.toFixed(2)}</div>
+      <div class="kpi-meta">mm material retirado</div>
+    </div>
+  `;
+
+  // Actualizar meta
+  document.getElementById('laminadoras-meta').textContent = 
+    `${totalIntervenciones} registros · ${CURRENT_LAMINADORA} · Total desgaste: ${totalMm.toFixed(2)} mm`;
+
+  // Gráfico de Desgaste
+  destroyChart('desgaste');
+  charts['desgaste'] = new Chart(document.getElementById('chartDesgaste'), {
+    type: 'bar',
+    data: {
+      labels: data.map(r => r.fecha),
+      datasets: [
+        { label: 'Rectificado Lento', data: data.map(r => r.rectificadoLento || 0), backgroundColor: '#5b9cf6', borderRadius: 3 },
+        { label: 'Rectificado Rápido', data: data.map(r => r.rectificadoRapido || 0), backgroundColor: '#e8b84b', borderRadius: 3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} mm` } }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 45, autoSkip: true, font: { size: 10 }, color: '#555a68' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { title: { display: true, text: 'mm', color: '#555a68', font: { size: 11 } }, ticks: { color: '#555a68', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+
+  // Tabla de Intervenciones
+  document.getElementById('tabla-laminadoras').innerHTML = data.slice().reverse().map(r => {
+    const total = (r.rectificadoLento || 0) + (r.rectificadoRapido || 0);
+    return `
+      <tr>
+        <td class="td-date">${r.fecha}</td>
+        <td class="td-num">${(r.rectificadoLento || 0).toFixed(2)}</td>
+        <td class="td-num">${(r.rectificadoRapido || 0).toFixed(2)}</td>
+        <td class="td-num" style="font-weight:500">${total.toFixed(2)}</td>
+        <td>${r.responsable || '—'}</td>
+        <td class="td-obs">${r.observaciones || '—'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// FUNCIONES STOCK
+// ─────────────────────────────────────────────────────
+function filterStock() {
+  const searchTerm = document.getElementById('stock-search').value.toLowerCase();
+  const filtered = searchTerm ? STOCK.filter(item => 
+    item.tipoMolde.toLowerCase().includes(searchTerm)
+  ) : STOCK;
+  buildStockTable(filtered);
+}
+
+function buildStockTable(data) {
+  // KPIs
+  const totalTipos = data.length;
+  const totalBoquillas = data.reduce((sum, item) => sum + (parseInt(item.boquillas) || 0), 0);
+  const totalAranas = data.reduce((sum, item) => sum + (parseInt(item.aranasJuegos) || 0), 0);
+  const totalDados = data.reduce((sum, item) => sum + (parseInt(item.dadosJuegos) || 0), 0);
+  
+  document.getElementById('kpis-stock').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--accent)"></div>
+      <div class="kpi-label">Tipos de Molde</div>
+      <div class="kpi-value" style="color:var(--text)">${totalTipos}</div>
+      <div class="kpi-meta">en inventario</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--blue)"></div>
+      <div class="kpi-label">Boquillas</div>
+      <div class="kpi-value" style="color:var(--blue)">${totalBoquillas}</div>
+      <div class="kpi-meta">unidades totales</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--green)"></div>
+      <div class="kpi-label">Arañas</div>
+      <div class="kpi-value" style="color:var(--green)">${totalAranas}</div>
+      <div class="kpi-meta">juegos totales</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--amber)"></div>
+      <div class="kpi-label">Dados</div>
+      <div class="kpi-value" style="color:var(--amber)">${totalDados}</div>
+      <div class="kpi-meta">juegos totales</div>
+    </div>
+  `;
+
+  // Actualizar meta
+  document.getElementById('stock-meta').textContent = 
+    `${totalTipos} tipos de molde · ${totalBoquillas} boquillas · ${totalAranas} arañas · ${totalDados} dados`;
+
+  // Tabla
+  document.getElementById('tabla-stock').innerHTML = data.map(item => {
+    const estado = item.fechaRevision ? 
+      '<span class="badge badge-green">Actualizado</span>' : 
+      '<span class="badge badge-amber">Pendiente</span>';
+    
+    return `
+      <tr>
+        <td><strong>${item.tipoMolde}</strong></td>
+        <td class="td-num">${item.boquillas || 0}</td>
+        <td class="td-num">${item.aranasJuegos || 0}</td>
+        <td class="td-num">${item.dadosJuegos || 0}</td>
+        <td class="td-num">${item.placaBase || 0}</td>
+        <td class="td-num">${item.frenosJuegos || 0}</td>
+        <td class="td-date">${item.fechaRevision || '—'}</td>
+        <td>${estado}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Gráfico Distribución
+  destroyChart('stockDist');
+  charts['stockDist'] = new Chart(document.getElementById('chartStockDist'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Boquillas', 'Arañas', 'Dados', 'Placa Base', 'Frenos'],
+      datasets: [{
+        data: [totalBoquillas, totalAranas, totalDados, 
+                data.reduce((sum, item) => sum + (parseInt(item.placaBase) || 0), 0),
+                data.reduce((sum, item) => sum + (parseInt(item.frenosJuegos) || 0), 0)],
+        backgroundColor: ['#5b9cf6', '#4caf7d', '#e8b84b', '#e05252', '#e8a020'],
+        borderColor: '#14161a',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { 
+        legend: { position: 'bottom', labels: { color: '#8b90a0', font: { size: 11 }, padding: 14 } }
+      }
+    }
+  });
+
+  // Gráfico Revisiones
+  const actualizados = data.filter(item => item.fechaRevision).length;
+  const pendientes = totalTipos - actualizados;
+  
+  destroyChart('revisiones');
+  charts['revisiones'] = new Chart(document.getElementById('chartRevisiones'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Actualizados', 'Pendientes'],
+      datasets: [{
+        data: [actualizados, pendientes],
+        backgroundColor: ['#4caf7d', '#e8a020'],
+        borderColor: '#14161a',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { 
+        legend: { position: 'bottom', labels: { color: '#8b90a0', font: { size: 11 }, padding: 14 } }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// FUNCIONES CROMADOS
+// ─────────────────────────────────────────────────────
+function buildCromadosTable() {
+  document.getElementById('tabla-cromados').innerHTML = CROMADOS.map(cromado => {
+    const estado = !cromado.fechaRecepcion ? 
+      '<span class="badge badge-amber">En proceso</span>' : 
+      '<span class="badge badge-green">Recibido</span>';
+    
+    return `
+      <tr>
+        <td><strong>${cromado.molde}</strong></td>
+        <td class="td-date">${cromado.fechaEnvio || '—'}</td>
+        <td class="td-date">${cromado.fechaRecepcion || '—'}</td>
+        <td>${cromado.proveedor || '—'}</td>
+        <td class="td-obs">${cromado.detalles || '—'}</td>
+        <td class="td-obs">${cromado.observaciones || '—'}</td>
+        <td>${estado}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// ACTUALIZAR SWITCH TAB
+// ─────────────────────────────────────────────────────
+function switchTab(id, btn){
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.classList.remove('fade-in'); });
+  btn.classList.add('active');
+  const sec = document.getElementById('sec-'+id);
+  sec.classList.add('active');
+  void sec.offsetWidth;
+  sec.classList.add('fade-in');
+  
+  if(id === 'laminadoras') buildLaminadoras();
+  if(id === 'moldes') buildMoldes('todos');
+  if(id === 'stock') buildStockTable(STOCK);
+}
+
+// ─────────────────────────────────────────────────────
+// DATOS DEMO
+// ─────────────────────────────────────────────────────
+// Datos demo para Laminadoras
+LAMINADORAS.KLB12 = [
+  { fecha: '2024-01-15', rectificadoLento: 0.15, rectificadoRapido: 0.08, responsable: 'J. Pérez', observaciones: 'Mantenimiento rutinario' },
+  { fecha: '2024-02-20', rectificadoLento: 0.22, rectificadoRapido: 0.12, responsable: 'M. García', observaciones: 'Desgaste detectado' },
+  { fecha: '2024-03-10', rectificadoLento: 0.18, rectificadoRapido: 0.10, responsable: 'A. López', observaciones: 'Ajuste normal' },
+  { fecha: '2024-04-05', rectificadoLento: 0.25, rectificadoRapido: 0.15, responsable: 'J. Pérez', observaciones: 'Rectificación programada' }
+];
+
+LAMINADORAS.LM1210 = [
+  { fecha: '2024-01-20', rectificadoLento: 0.12, rectificadoRapido: 0.06, responsable: 'R. Martínez', observaciones: 'Inspección semanal' },
+  { fecha: '2024-02-25', rectificadoLento: 0.20, rectificadoRapido: 0.11, responsable: 'S. Rodríguez', observaciones: 'Corrección de alineación' },
+  { fecha: '2024-03-15', rectificadoLento: 0.16, rectificadoRapido: 0.09, responsable: 'L. Torres', observaciones: 'Mantenimiento preventivo' }
+];
+
+// Datos demo para Cromados
+CROMADOS = [
+  { molde: 'H8', fechaEnvio: '2024-03-01', fechaRecepcion: '2024-03-15', proveedor: 'Cromados SA', detalles: 'Cromado completo', observaciones: 'Proceso exitoso' },
+  { molde: 'H12', fechaEnvio: '2024-03-10', fechaRecepcion: '', proveedor: 'Metalurgica Ltda', detalles: 'Recuperación de superficie', observaciones: 'En proceso' },
+  { molde: 'P18', fechaEnvio: '2024-02-15', fechaRecepcion: '2024-03-01', proveedor: 'Cromados SA', detalles: 'Cromado duro', observaciones: 'Calidad óptima' }
+];
+
+// Datos demo para Stock
+STOCK = [
+  { tipoMolde: 'H8', boquillas: 24, aranasJuegos: 6, dadosJuegos: 4, placaBase: 2, frenosJuegos: 3, fechaRevision: '2024-03-01' },
+  { tipoMolde: 'H12', boquillas: 18, aranasJuegos: 4, dadosJuegos: 3, placaBase: 2, frenosJuegos: 2, fechaRevision: '2024-02-15' },
+  { tipoMolde: 'P18', boquillas: 12, aranasJuegos: 3, dadosJuegos: 2, placaBase: 1, frenosJuegos: 2, fechaRevision: '' },
+  { tipoMolde: 'L12', boquillas: 8, aranasJuegos: 2, dadosJuegos: 1, placaBase: 1, frenosJuegos: 1, fechaRevision: '2024-01-20' }
+];
+
+// ─────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────
 buildEstano('todos');
+buildLaminadoras();
+buildCromadosTable();
+buildStockTable(STOCK);
 </script>
 </body>
 </html>
