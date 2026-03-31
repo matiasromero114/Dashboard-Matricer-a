@@ -345,12 +345,26 @@
       <div style="position:relative;width:100%;height:300px;"><canvas id="chartDesgaste"></canvas></div>
     </div>
 
+    <!-- Gráfico de Vueltas por Fecha -->
+    <div class="chart-card">
+      <div class="chart-top">
+        <div>
+          <div class="chart-title">Vueltas por Fecha</div>
+          <div class="chart-desc">Cantidad de vueltas registradas por fecha · <span id="laminadora-actual">KLB12</span></div>
+        </div>
+        <div class="legend">
+          <div class="leg"><div class="leg-sq" style="background:#e8b84b;"></div>Vueltas</div>
+        </div>
+      </div>
+      <div style="position:relative;width:100%;height:300px;"><canvas id="chartVueltas"></canvas></div>
+    </div>
+
     <!-- Tabla de Intervenciones -->
     <div class="chart-card">
       <div class="chart-top">
         <div>
           <div class="chart-title">Registro de Intervenciones</div>
-          <div class="chart-desc">Historial completo de rectificados y observaciones</div>
+          <div class="chart-desc">Historial completo de rectificados, vueltas y observaciones</div>
         </div>
       </div>
       <div class="table-wrap">
@@ -361,6 +375,7 @@
               <th style="text-align:right">Rect. Lento (mm)</th>
               <th style="text-align:right">Rect. Rápido (mm)</th>
               <th style="text-align:right">Total (mm)</th>
+              <th style="text-align:right">Vueltas</th>
               <th>Responsable</th>
               <th>Observaciones</th>
             </tr>
@@ -504,7 +519,7 @@
 
 <script>
 // ─────────────────────────────────────────────────────
-// DATOS
+// DATOS Y CONFIGURACIÓN
 // ─────────────────────────────────────────────────────
 const charts = {};
 
@@ -515,46 +530,204 @@ function destroyChart(id) {
   }
 }
 
-// Datos demo para Laminadoras
-const LAMINADORAS = {
-  KLB12: [
-    { fecha: '2024-01-15', rectificadoLento: 0.15, rectificadoRapido: 0.08, responsable: 'J. Pérez', observaciones: 'Mantenimiento rutinario' },
-    { fecha: '2024-02-20', rectificadoLento: 0.22, rectificadoRapido: 0.12, responsable: 'M. García', observaciones: 'Desgaste detectado' },
-    { fecha: '2024-03-10', rectificadoLento: 0.18, rectificadoRapido: 0.10, responsable: 'A. López', observaciones: 'Ajuste normal' },
-    { fecha: '2024-04-05', rectificadoLento: 0.25, rectificadoRapido: 0.15, responsable: 'J. Pérez', observaciones: 'Rectificación programada' }
-  ],
-  LM1210: [
-    { fecha: '2024-01-20', rectificadoLento: 0.12, rectificadoRapido: 0.06, responsable: 'R. Martínez', observaciones: 'Inspección semanal' },
-    { fecha: '2024-02-25', rectificadoLento: 0.20, rectificadoRapido: 0.11, responsable: 'S. Rodríguez', observaciones: 'Corrección de alineación' },
-    { fecha: '2024-03-15', rectificadoLento: 0.16, rectificadoRapido: 0.09, responsable: 'L. Torres', observaciones: 'Mantenimiento preventivo' }
-  ]
+// Variables globales para datos
+let LAMINADORAS = { KLB12: [], LM1210: [] };
+let MOLDES = [];
+let CROMADOS = [];
+let STOCK = [];
+let CURRENT_LAMINADORA = 'KLB12';
+
+// ─────────────────────────────────────────────────────
+// CONFIGURACIÓN GOOGLE SHEETS
+// ─────────────────────────────────────────────────────
+const SHEET_CONFIG = {
+  // Laminadoras - IDs correctos de tus Google Sheets
+  klb12: {
+    url: 'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=0',
+    sheet: 'Camisa_KLB12',
+    columns: ['Fecha', 'Rectificado Lento', 'Rectificado Rápido', 'Vueltas', 'Responsable', 'Observaciones']
+  },
+  lm1210: {
+    url: 'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=1',
+    sheet: 'Camisa_LM1210',
+    columns: ['Fecha', 'Rectificado Lento', 'Rectificado Rápido', 'Vueltas', 'Responsable', 'Observaciones']
+  },
+  // Stock
+  stock: {
+    url: 'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=2',
+    sheet: 'Stock Repuestos de Moldes',
+    columns: ['Tipo Molde', 'Boquillas', 'Arañas [juegos]', 'Dados [juegos]', 'Placa Base', 'Frenos [juegos]', 'Fecha Revisión']
+  }
 };
 
-// Datos demo para Moldes
-const MOLDES = [
-  {molde:"H8",num:"1",estado:"Operativo",enPeso:"Excedido",nominal:3.5,vias:[3.675,3.625,3.680,3.680,3.610,3.590,3.585,3.580],prom:3.628,cromado:"Sí",obs:"Molde en proceso de cromado",fecha:"17/11/2025"},
-  {molde:"H8",num:"2",estado:"Operativo",enPeso:"Excedido",nominal:3.5,vias:[3.685,3.620,3.680,3.600,3.660,3.645,3.590,3.690],prom:3.646,cromado:"Sí",obs:"Listo para producción",fecha:"25/03/2026"},
-  {molde:"H12",num:"1",estado:"En calibración",enPeso:"Excedido",nominal:4.5,vias:[],prom:null,cromado:"No",obs:"Molde listo para pruebas",fecha:"04/02/2026"},
-  {molde:"H12",num:"2",estado:"En fabricación",enPeso:"Excedido",nominal:4.5,vias:[],prom:null,cromado:"No",obs:"Molde con piezas muy gastadas, sin arreglos.",fecha:"10/03/2026"},
-  {molde:"H12",num:"3 BR",estado:"Operativo",enPeso:"Óptimo",nominal:4.5,vias:[4.340,4.280,4.335,4.330,4.355,4.315],prom:4.326,cromado:"En proceso",obs:"Se mandaron acromar piezas, menos dados y boquillas",fecha:"05/03/2026"}
-];
+// ─────────────────────────────────────────────────────
+// FUNCIONES DE CARGA DE DATOS
+// ─────────────────────────────────────────────────────
+async function fetchCSV(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toUpperCase());
+    return lines.slice(1).map(line => {
+      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+      const row = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+      return row;
+    });
+  } catch (error) {
+    console.error('Error fetching CSV:', error);
+    return [];
+  }
+}
 
-// Datos demo para Cromados
-const CROMADOS = [
-  { molde: 'H8', fechaEnvio: '2024-03-01', fechaRecepcion: '2024-03-15', proveedor: 'Cromados SA', detalles: 'Cromado completo', observaciones: 'Proceso exitoso' },
-  { molde: 'H12', fechaEnvio: '2024-03-10', fechaRecepcion: '', proveedor: 'Metalurgica Ltda', detalles: 'Recuperación de superficie', observaciones: 'En proceso' },
-  { molde: 'P18', fechaEnvio: '2024-02-15', fechaRecepcion: '2024-03-01', proveedor: 'Cromados SA', detalles: 'Cromado duro', observaciones: 'Calidad óptima' }
-];
+function parseLaminadoraData(rows) {
+  return rows.map(row => {
+    const parseNum = (val) => {
+      const cleaned = (val || '').toString().replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num; // Nulos → 0 mm
+    };
+    
+    return {
+      fecha: row.FECHA || '',
+      rectificadoLento: parseNum(row['RECTIFICADO LENTO']),
+      rectificadoRapido: parseNum(row['RECTIFICADO RÁPIDO']),
+      vueltas: parseNum(row.VUELTAS),
+      responsable: row.RESPONSABLE || '',
+      observaciones: row.OBSERVACIONES || ''
+    };
+  }).filter(row => row.fecha);
+}
 
-// Datos demo para Stock
-const STOCK = [
-  { tipoMolde: 'H8', boquillas: 24, aranasJuegos: 6, dadosJuegos: 4, placaBase: 2, frenosJuegos: 3, fechaRevision: '2024-03-01' },
-  { tipoMolde: 'H12', boquillas: 18, aranasJuegos: 4, dadosJuegos: 3, placaBase: 2, frenosJuegos: 2, fechaRevision: '2024-02-15' },
-  { tipoMolde: 'P18', boquillas: 12, aranasJuegos: 3, dadosJuegos: 2, placaBase: 1, frenosJuegos: 2, fechaRevision: '' },
-  { tipoMolde: 'L12', boquillas: 8, aranasJuegos: 2, dadosJuegos: 1, placaBase: 1, frenosJuegos: 1, fechaRevision: '2024-01-20' }
-];
+function parseStockData(rows) {
+  return rows.map(row => {
+    const parseNum = (val) => {
+      const cleaned = (val || '').toString().replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    };
+    
+    return {
+      tipoMolde: row['TIPO MOLDE'] || '',
+      boquillas: parseNum(row.BOQUILLAS),
+      aranasJuegos: parseNum(row['ARAÑAS [JUEGOS]']),
+      dadosJuegos: parseNum(row['DADOS [JUEGOS]']),
+      placaBase: parseNum(row['PLACA BASE']),
+      frenosJuegos: parseNum(row['FRENOS [JUEGOS]']),
+      fechaRevision: row['FECHA REVISIÓN'] || ''
+    };
+  }).filter(row => row.tipoMolde);
+}
 
-let CURRENT_LAMINADORA = 'KLB12';
+// ─────────────────────────────────────────────────────
+// DATOS DEMO (FALLBACK)
+// ─────────────────────────────────────────────────────
+const DEMO_DATA = {
+  moldes: [
+    {molde:"H8",num:"1",estado:"Operativo",enPeso:"Excedido",nominal:3.5,vias:[3.675,3.625,3.680,3.680,3.610,3.590,3.585,3.580],prom:3.628,cromado:"Sí",obs:"Molde en proceso de cromado",fecha:"17/11/2025"},
+    {molde:"H8",num:"2",estado:"Operativo",enPeso:"Excedido",nominal:3.5,vias:[3.685,3.620,3.680,3.600,3.660,3.645,3.590,3.690],prom:3.646,cromado:"Sí",obs:"Listo para producción",fecha:"25/03/2026"},
+    {molde:"H12",num:"1",estado:"En calibración",enPeso:"Excedido",nominal:4.5,vias:[],prom:null,cromado:"No",obs:"Molde listo para pruebas",fecha:"04/02/2026"},
+    {molde:"H12",num:"2",estado:"En fabricación",enPeso:"Excedido",nominal:4.5,vias:[],prom:null,cromado:"No",obs:"Molde con piezas muy gastadas, sin arreglos.",fecha:"10/03/2026"},
+    {molde:"H12",num:"3 BR",estado:"Operativo",enPeso:"Óptimo",nominal:4.5,vias:[4.340,4.280,4.335,4.330,4.355,4.315],prom:4.326,cromado:"En proceso",obs:"Se mandaron acromar piezas, menos dados y boquillas",fecha:"05/03/2026"}
+  ],
+  cromados: [
+    { molde: 'H8', fechaEnvio: '2024-03-01', fechaRecepcion: '2024-03-15', proveedor: 'Cromados SA', detalles: 'Cromado completo', observaciones: 'Proceso exitoso' },
+    { molde: 'H12', fechaEnvio: '2024-03-10', fechaRecepcion: '', proveedor: 'Metalurgica Ltda', detalles: 'Recuperación de superficie', observaciones: 'En proceso' },
+    { molde: 'P18', fechaEnvio: '2024-02-15', fechaRecepcion: '2024-03-01', proveedor: 'Cromados SA', detalles: 'Cromado duro', observaciones: 'Calidad óptima' }
+  ],
+  stock: [
+    { tipoMolde: 'H8', boquillas: 48, aranasJuegos: 8, dadosJuegos: 6, placaBase: 4, frenosJuegos: 6, fechaRevision: '2024-03-01' },
+    { tipoMolde: 'H12', boquillas: 36, aranasJuegos: 6, dadosJuegos: 4, placaBase: 3, frenosJuegos: 4, fechaRevision: '2024-02-15' },
+    { tipoMolde: 'H18', boquillas: 24, aranasJuegos: 4, dadosJuegos: 3, placaBase: 2, frenosJuegos: 3, fechaRevision: '2024-01-20' },
+    { tipoMolde: 'P12', boquillas: 24, aranasJuegos: 4, dadosJuegos: 3, placaBase: 2, frenosJuegos: 3, fechaRevision: '' },
+    { tipoMolde: 'P18', boquillas: 18, aranasJuegos: 3, dadosJuegos: 2, placaBase: 2, frenosJuegos: 2, fechaRevision: '' },
+    { tipoMolde: 'L12', boquillas: 16, aranasJuegos: 2, dadosJuegos: 2, placaBase: 1, frenosJuegos: 2, fechaRevision: '2024-01-20' },
+    { tipoMolde: 'L16', boquillas: 12, aranasJuegos: 2, dadosJuegos: 1, placaBase: 1, frenosJuegos: 1, fechaRevision: '2023-12-15' },
+    { tipoMolde: 'DM20', boquillas: 20, aranasJuegos: 3, dadosJuegos: 2, placaBase: 2, frenosJuegos: 2, fechaRevision: '2024-02-01' }
+  ],
+  laminadoras: {
+    KLB12: [
+      { fecha: '2024-01-15', rectificadoLento: 0.15, rectificadoRapido: 0.08, vueltas: 1250, responsable: 'J. Pérez', observaciones: 'Mantenimiento rutinario' },
+      { fecha: '2024-02-20', rectificadoLento: 0.22, rectificadoRapido: 0.12, vueltas: 1580, responsable: 'M. García', observaciones: 'Desgaste detectado' },
+      { fecha: '2024-03-10', rectificadoLento: 0.18, rectificadoRapido: 0.10, vueltas: 1420, responsable: 'A. López', observaciones: 'Ajuste normal' },
+      { fecha: '2024-04-05', rectificadoLento: 0.25, rectificadoRapido: 0.15, vueltas: 1890, responsable: 'J. Pérez', observaciones: 'Rectificación programada' }
+    ],
+    LM1210: [
+      { fecha: '2024-01-20', rectificadoLento: 0.12, rectificadoRapido: 0.06, vueltas: 980, responsable: 'R. Martínez', observaciones: 'Inspección semanal' },
+      { fecha: '2024-02-25', rectificadoLento: 0.20, rectificadoRapido: 0.11, vueltas: 1320, responsable: 'S. Rodríguez', observaciones: 'Corrección de alineación' },
+      { fecha: '2024-03-15', rectificadoLento: 0.16, rectificadoRapido: 0.09, vueltas: 1150, responsable: 'L. Torres', observaciones: 'Mantenimiento preventivo' }
+    ]
+  }
+};
+
+// ─────────────────────────────────────────────────────
+// CARGA INICIAL DE DATOS
+// ─────────────────────────────────────────────────────
+async function loadAllData() {
+  try {
+    // Mostrar estado de carga
+    document.getElementById('clock').textContent = 'Cargando...';
+    
+    // Cargar datos en paralelo
+    const [klb12Rows, lm1210Rows, stockRows] = await Promise.all([
+      fetchCSV(SHEET_CONFIG.klb12.url),
+      fetchCSV(SHEET_CONFIG.lm1210.url),
+      fetchCSV(SHEET_CONFIG.stock.url)
+    ]);
+    
+    // Procesar datos
+    LAMINADORAS.KLB12 = parseLaminadoraData(klb12Rows);
+    LAMINADORAS.LM1210 = parseLaminadoraData(lm1210Rows);
+    STOCK = parseStockData(stockRows);
+    
+    // Actualizar estado
+    const now = new Date();
+    const timeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById('clock').textContent = timeStr;
+    
+    // Construir interfaces
+    buildLaminadoras();
+    buildStockTable(STOCK);
+    
+    // Mostrar resumen en consola
+    console.log('✅ Datos cargados exitosamente:');
+    console.log(`🏭 Laminadora KLB12: ${LAMINADORAS.KLB12.length} registros`);
+    console.log(`🏭 Laminadora LM1210: ${LAMINADORAS.LM1210.length} registros`);
+    console.log(`📦 Stock: ${STOCK.length} tipos de molde`);
+    
+  } catch (error) {
+    console.error('❌ Error cargando datos:', error);
+    document.getElementById('clock').textContent = 'Error de carga';
+    
+    // Cargar datos de demostración si hay error
+    loadDemoData();
+  }
+}
+
+function loadDemoData() {
+  console.log('📋 Cargados datos de demostración');
+  LAMINADORAS = DEMO_DATA.laminadoras;
+  STOCK = DEMO_DATA.stock;
+  MOLDES = DEMO_DATA.moldes;
+  CROMADOS = DEMO_DATA.cromados;
+  
+  // Actualizar reloj
+  const now = new Date();
+  const timeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  document.getElementById('clock').textContent = timeStr;
+  
+  // Construir interfaces
+  buildLaminadoras();
+  buildMoldes('todos');
+  buildCromadosTable();
+  buildStockTable(STOCK);
+}
 
 // ─────────────────────────────────────────────────────
 // FUNCIONES LAMINADORAS
@@ -575,6 +748,7 @@ function buildLaminadoras() {
   const totalLento = data.reduce((sum, r) => sum + (r.rectificadoLento || 0), 0);
   const totalRapido = data.reduce((sum, r) => sum + (r.rectificadoRapido || 0), 0);
   const totalMm = totalLento + totalRapido;
+  const totalVueltas = data.reduce((sum, r) => sum + (r.vueltas || 0), 0);
   
   document.getElementById('kpis-laminadoras').innerHTML = `
     <div class="kpi">
@@ -591,9 +765,9 @@ function buildLaminadoras() {
     </div>
     <div class="kpi">
       <div class="kpi-accent" style="background:#e8b84b"></div>
-      <div class="kpi-label">Rectificado Rápido</div>
-      <div class="kpi-value" style="color:#e8b84b">${totalRapido.toFixed(2)}</div>
-      <div class="kpi-meta">mm acumulados</div>
+      <div class="kpi-label">Total Vueltas</div>
+      <div class="kpi-value" style="color:#e8b84b">${totalVueltas.toLocaleString()}</div>
+      <div class="kpi-meta">vueltas acumuladas</div>
     </div>
     <div class="kpi">
       <div class="kpi-accent" style="background:var(--green)"></div>
@@ -631,6 +805,39 @@ function buildLaminadoras() {
     }
   });
 
+  // Gráfico de Vueltas
+  destroyChart('vueltas');
+  charts['vueltas'] = new Chart(document.getElementById('chartVueltas'), {
+    type: 'line',
+    data: {
+      labels: data.map(r => r.fecha),
+      datasets: [{
+        label: 'Vueltas',
+        data: data.map(r => r.vueltas || 0),
+        borderColor: '#e8b84b',
+        backgroundColor: 'rgba(232,184,75,0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: '#e8b84b',
+        pointBorderColor: '#14161a',
+        pointBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.parsed.y.toLocaleString()} vueltas` } }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 45, autoSkip: true, font: { size: 10 }, color: '#555a68' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { title: { display: true, text: 'Vueltas', color: '#555a68', font: { size: 11 } }, ticks: { color: '#555a68', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+
   // Tabla de Intervenciones
   document.getElementById('tabla-laminadoras').innerHTML = data.slice().reverse().map(r => {
     const total = (r.rectificadoLento || 0) + (r.rectificadoRapido || 0);
@@ -640,6 +847,7 @@ function buildLaminadoras() {
         <td class="td-num">${(r.rectificadoLento || 0).toFixed(2)}</td>
         <td class="td-num">${(r.rectificadoRapido || 0).toFixed(2)}</td>
         <td class="td-num" style="font-weight:500">${total.toFixed(2)}</td>
+        <td class="td-num" style="font-weight:500">${(r.vueltas || 0).toLocaleString()}</td>
         <td>${r.responsable || '—'}</td>
         <td class="td-obs">${r.observaciones || '—'}</td>
       </tr>
@@ -893,18 +1101,151 @@ function switchTab(id, btn){
 }
 
 // ─────────────────────────────────────────────────────
+// FUNCIONES MOLDES Y CROMADOS
+// ─────────────────────────────────────────────────────
+function filterMoldes(f, btn){
+  document.querySelectorAll('#molde-filters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildMoldes(f);
+}
+
+function buildMoldes(filtro){
+  const data = filtro === 'todos' ? MOLDES : MOLDES.filter(m=>m.estado===filtro);
+
+  // KPIs
+  const total = MOLDES.length;
+  const ops = MOLDES.filter(m=>m.estado==='Operativo').length;
+  const crom = MOLDES.filter(m=>m.cromado==='Sí').length;
+  const exc = MOLDES.filter(m=>m.enPeso==='Excedido').length;
+
+  document.getElementById('kpis-moldes').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--accent)"></div>
+      <div class="kpi-label">Total moldes</div>
+      <div class="kpi-value" style="color:var(--text)">${total}</div>
+      <div class="kpi-meta">en seguimiento activo</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--green)"></div>
+      <div class="kpi-label">Operativos</div>
+      <div class="kpi-value" style="color:var(--green)">${ops}</div>
+      <div class="kpi-meta">${Math.round(ops/total*100)}% del total</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--blue)"></div>
+      <div class="kpi-label">Con cromado activo</div>
+      <div class="kpi-value" style="color:var(--blue)">${crom}</div>
+      <div class="kpi-meta">de ${total} moldes</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-accent" style="background:var(--amber)"></div>
+      <div class="kpi-label">Excedidos en peso</div>
+      <div class="kpi-value" style="color:var(--amber)">${exc}</div>
+      <div class="kpi-meta">sobre peso nominal</div>
+    </div>
+  `;
+
+  // CHART PESOS
+  destroyChart('pesos');
+  charts['pesos'] = new Chart(document.getElementById('chartPesos'), {
+    type: 'bar',
+    data: {
+      labels: MOLDES.map(m=>`${m.molde} #${m.num}`),
+      datasets:[
+        { label:'Peso promedio real', data: MOLDES.map(m=>m.prom || 0),
+          backgroundColor: MOLDES.map(m=>
+            m.prom === null ? 'rgba(85,90,104,0.3)' :
+            m.enPeso==='Óptimo' ? 'rgba(76,175,125,0.75)' : 'rgba(232,160,32,0.75)'
+          ),
+          borderColor: MOLDES.map(m=>
+            m.prom === null ? '#555a68' :
+            m.enPeso==='Óptimo' ? '#4caf7d' : '#e8a020'
+          ),
+          borderWidth:1, borderRadius:4
+        },
+        { label:'Peso nominal', data: MOLDES.map(m=>m.nominal),
+          backgroundColor:'rgba(232,184,75,0.12)', borderColor:'rgba(232,184,75,0.4)', borderWidth:1.5, borderRadius:4, type:'bar'
+        }
+      ]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>`${ctx.dataset.label}: ${ctx.parsed.x.toFixed(3)} kg` } } },
+      scales:{
+        x:{ title:{display:true,text:'kg',color:'#555a68',font:{size:11}}, ticks:{color:'#555a68',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} },
+        y:{ ticks:{color:'#8b90a0',font:{size:11}}, grid:{display:false} }
+      }
+    }
+  });
+
+  // CHART ESTADOS
+  const estadoCount = {'Operativo':0,'En calibración':0,'En fabricación':0};
+  MOLDES.forEach(m=>estadoCount[m.estado]++);
+  destroyChart('estados');
+  charts['estados'] = new Chart(document.getElementById('chartEstados'), {
+    type:'doughnut',
+    data:{
+      labels:['Operativo','En calibración','En fabricación'],
+      datasets:[{ data:Object.values(estadoCount), backgroundColor:['#4caf7d','#5b9cf6','#e05252'], borderColor:'#14161a', borderWidth:3, hoverOffset:6 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{color:'#8b90a0',font:{size:11},padding:14,boxWidth:12}} }
+    }
+  });
+
+  // CHART CROMADO
+  const cromCount = {'Sí':0,'En proceso':0,'No':0};
+  MOLDES.forEach(m=>cromCount[m.cromado]++);
+  destroyChart('cromado');
+  charts['cromado'] = new Chart(document.getElementById('chartCromado'), {
+    type:'doughnut',
+    data:{
+      labels:['Cromado activo','En proceso','Sin cromado'],
+      datasets:[{ data:Object.values(cromCount), backgroundColor:['#4caf7d','#e8b84b','#555a68'], borderColor:'#14161a', borderWidth:3, hoverOffset:6 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{color:'#8b90a0',font:{size:11},padding:14,boxWidth:12}} }
+    }
+  });
+}
+
+function buildCromadosTable() {
+  // Esta función se implementaría si tuviéramos datos reales de cromados
+  // Por ahora, no mostramos tabla de cromados ya que no está conectada
+}
+
+// ─────────────────────────────────────────────────────
+// SWITCH TAB
+// ─────────────────────────────────────────────────────
+function switchTab(id, btn){
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.classList.remove('fade-in'); });
+  btn.classList.add('active');
+  const sec = document.getElementById('sec-'+id);
+  sec.classList.add('active');
+  void sec.offsetWidth;
+  sec.classList.add('fade-in');
+  
+  if(id === 'laminadoras') buildLaminadoras();
+  if(id === 'moldes') buildMoldes('todos');
+  if(id === 'stock') buildStockTable(STOCK);
+}
+
+// ─────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
-  // Actualizar reloj
-  const now = new Date();
-  const timeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  document.getElementById('clock').textContent = timeStr;
+  // Intentar cargar datos reales, si falla usa demo
+  loadAllData().catch(() => {
+    console.log('📋 Usando datos de demostración');
+    loadDemoData();
+  });
   
-  // Construir interfaces
-  buildLaminadoras();
+  // Construir interfaces con datos disponibles
   buildMoldes('todos');
-  buildStockTable(STOCK);
+  buildCromadosTable();
 });
 </script>
 </body>
