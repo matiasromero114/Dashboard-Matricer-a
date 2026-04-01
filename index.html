@@ -586,11 +586,23 @@ function normID(s){ return (s||'').trim().toUpperCase().replace(/[\s\-_]+/g,'');
 async function fetchCSV(url){
   if(!url) return null;
   try{
+    console.log('🌐 Intentando descargar:', url);
     const r = await fetch(url, {cache:'no-store'});
+    console.log('📡 Response status:', r.status, r.statusText);
+    
     if(!r.ok) throw new Error('HTTP '+r.status);
     const txt = await r.text();
-    return txt.trim().split('\n').map(l=>l.split(',').map(c=>c.trim().replace(/^"|"$/g,'')));
-  }catch(e){ console.warn('CSV error',url,e); return null; }
+    console.log('📄 Texto recibido (primeros 200 chars):', txt.substring(0, 200));
+    
+    const rows = txt.trim().split('\n').map(l=>l.split(',').map(c=>c.trim().replace(/^"|"$/g,'')));
+    console.log('📋 Filas parseadas:', rows.length);
+    
+    return rows;
+  }catch(e){ 
+    console.error('❌ CSV error en', url, e); 
+    console.error('Stack:', e.stack);
+    return null; 
+  }
 }
 
 /* Parsear Camisa CSV: fila 7 (índice 6 base-0) son headers, filas 8+ son datos */
@@ -616,10 +628,17 @@ function parseCamisa(rows, maq){
 /* Parsear Moldes CSV */
 function parseMoldes(rows){
   if(!rows) return null;
-  const hdr = rows.find(r=>r[0]==='Molde'||r[1]==='Molde');
-  if(!hdr) return null;
-  const hi = rows.indexOf(hdr);
-  return rows.slice(hi+1).filter(r=>r[0]&&r[0].trim()&&r[0]!=='Molde').map(r=>({
+  console.log('📋 Moldes CSV - primeras 5 filas:', rows.slice(0, 5));
+  
+  // Buscar fila que contenga 'Molde' como header
+  const hdrIndex = rows.findIndex(r=>r.some(c=>c.includes('Molde')));
+  if(hdrIndex === -1) return null;
+  
+  console.log('📍 Header encontrado en fila:', hdrIndex);
+  console.log('📍 Headers:', rows[hdrIndex]);
+  
+  const dataStart = hdrIndex + 1;
+  return rows.slice(dataStart).filter(r=>r[0]&&r[0].trim()&&!r[0].includes('Molde')).map(r=>({
     id:normID(r[0]),num:r[1]||'1',estado:r[2]||'',enPeso:r[3]||'',
     nominal:sn(r[4]),prom:r[13]&&r[13]!=='-'?sn(r[13]):null,
     vias:[r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]].map(sn).filter(v=>v>0),
@@ -662,6 +681,9 @@ async function cargarDatos(){
   document.getElementById('dstatus').textContent='Actualizando...';
 
   try{
+    console.log('🔄 Iniciando carga de datos...');
+    console.log('📊 URLs a cargar:', URLS);
+    
     const [r1,r2,r3,r4,r5] = await Promise.all([
       fetchCSV(URLS.CAMISA_KLB12),
       fetchCSV(URLS.CAMISA_LM1210),
@@ -670,12 +692,19 @@ async function cargarDatos(){
       fetchCSV(URLS.STOCK),
     ]);
 
+    console.log('📥 Resultados brutos:');
+    console.log('  KLB12:', r1 ? `${r1.length} filas` : 'NULL');
+    console.log('  LM1210:', r2 ? `${r2.length} filas` : 'NULL');
+    console.log('  MOLDES:', r3 ? `${r3.length} filas` : 'NULL');
+    console.log('  CROMADO:', r4 ? `${r4.length} filas` : 'NULL');
+    console.log('  STOCK:', r5 ? `${r5.length} filas` : 'NULL');
+
     let live=false;
-    if(r1){ const p=parseCamisa(r1,'KLB12'); if(p&&p.rows.length>0){STATE.data.KLB12=p;live=true;}}
-    if(r2){ const p=parseCamisa(r2,'LM1210'); if(p&&p.rows.length>0){STATE.data.LM1210=p;live=true;}}
-    if(r3){ const p=parseMoldes(r3); if(p&&p.length>0){STATE.data.MOLDES=p;live=true;}}
-    if(r4){ const p=parseCromado(r4); if(p&&p.length>0){STATE.data.CROMADO=p;live=true;}}
-    if(r5){ const p=parseStock(r5); if(p&&p.length>0){STATE.data.STOCK=p;live=true;}}
+    if(r1){ const p=parseCamisa(r1,'KLB12'); if(p&&p.rows.length>0){STATE.data.KLB12=p;live=true; console.log('✅ KLB12 parseado:', p.rows.length, 'registros');}}
+    if(r2){ const p=parseCamisa(r2,'LM1210'); if(p&&p.rows.length>0){STATE.data.LM1210=p;live=true; console.log('✅ LM1210 parseado:', p.rows.length, 'registros');}}
+    if(r3){ const p=parseMoldes(r3); if(p&&p.length>0){STATE.data.MOLDES=p;live=true; console.log('✅ MOLDES parseado:', p.length, 'registros');}}
+    if(r4){ const p=parseCromado(r4); if(p&&p.length>0){STATE.data.CROMADO=p;live=true; console.log('✅ CROMADO parseado:', p.length, 'registros');}}
+    if(r5){ const p=parseStock(r5); if(p&&p.length>0){STATE.data.STOCK=p;live=true; console.log('✅ STOCK parseado:', p.length, 'registros');}}
 
     // Fallback a hardcoded si no hay live
     if(!STATE.data.KLB12)  STATE.data.KLB12  = FB.KLB12;
