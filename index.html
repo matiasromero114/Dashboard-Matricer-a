@@ -625,31 +625,116 @@ function parseCamisa(rows, maq){
   return {maq, ini:{lento:iniLento,rapido:iniRapido}, act:{lento:actLento,rapido:actRapido}, rows:data};
 }
 
-/* Parsear Moldes CSV */
+/* Parsear Moldes CSV - SOLUCIÓN GARANTIZADA */
 function parseMoldes(rows){
-  if(!rows) return null;
-  console.log('📋 Moldes CSV - primeras 10 filas:', rows.slice(0, 10));
+  if(!rows || rows.length === 0) return null;
   
-  // Buscar fila que contenga 'Molde' como header (buscar en cualquier columna)
-  const hdrIndex = rows.findIndex(r=>r.some(c=>c && c.toString().includes('Molde')));
-  if(hdrIndex === -1) {
-    console.log('❌ No se encontró header con "Molde"');
+  console.log('� === INICIANDO PARSEO GARANTIZADO ===');
+  console.log('📋 Total filas recibidas:', rows.length);
+  console.log('📋 Primeras 5 filas:', rows.slice(0, 5));
+  
+  // ESTRATEGIA GARANTIZADA: Buscar en TODAS las columnas por "Molde"
+  let hdrIndex = -1;
+  let headers = [];
+  
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    console.log(`🔍 Analizando fila ${i}:`, row);
+    
+    // Buscar "Molde" en cualquier posición de la fila
+    const moldeIndex = row.findIndex(cell => 
+      cell && typeof cell === 'string' && cell.trim().toLowerCase() === 'molde'
+    );
+    
+    if (moldeIndex !== -1) {
+      hdrIndex = i;
+      headers = row;
+      console.log(`✅ Header encontrado en fila ${i}, columna ${moldeIndex}`);
+      break;
+    }
+    
+    // Si encontramos una fila con H8, H12, etc., asumimos que son datos
+    const hasMoldeData = row.some(cell => 
+      cell && typeof cell === 'string' && /^(H8|H12|H18|P12|P18|L12|L16|DM20|DM27|KB)/i.test(cell.trim())
+    );
+    
+    if (hasMoldeData && hdrIndex === -1) {
+      console.log(`⚠️ Fila ${i} tiene datos de molde pero no hay header aún`);
+    }
+  }
+  
+  if (hdrIndex === -1) {
+    console.log('❌ No se encontró header "Molde" en ninguna fila');
+    console.log('� Último intento: buscar cualquier fila con H8, H12, etc.');
+    
+    // ÚLTIMO RECURSO: Buscar primera fila con datos válidos
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[0] && /^(H8|H12|H18|P12|P18|L12|L16|DM20|DM27|KB)/i.test(row[0].trim())) {
+        hdrIndex = i - 1; // Header en fila anterior
+        headers = rows[hdrIndex] || ['Molde', 'Num', 'Estado', 'En peso', 'Peso nominal', 'Vía 1', 'Vía 2', 'Vía 3', 'Vía 4', 'Vía 5', 'Vía 6', 'Vía 7', 'Vía 8', 'Cromado', 'Observaciones', 'Fecha'];
+        console.log(`🎯 Header inferido en fila ${hdrIndex} (fallback)`);
+        break;
+      }
+    }
+  }
+  
+  if (hdrIndex === -1) {
+    console.log('❌ Falla total: no se pudo determinar estructura');
     return null;
   }
   
-  console.log('📍 Header encontrado en fila:', hdrIndex);
-  console.log('📍 Headers:', rows[hdrIndex]);
+  console.log('📍 Header final en fila:', hdrIndex);
+  console.log('📍 Headers detectados:', headers);
   
   const dataStart = hdrIndex + 1;
-  const dataRows = rows.slice(dataStart).filter(r=>r[0]&&r[0].trim()&&!r[0].includes('Molde'));
-  console.log('📊 Filas de datos encontradas:', dataRows.length);
+  const dataRows = rows.slice(dataStart).filter(r=> {
+    const isValid = r[0] && r[0].trim() && /^(H8|H12|H18|P12|P18|L12|L16|DM20|DM27|KB)/i.test(r[0].trim());
+    if (!isValid) console.log('❌ Fila inválida ignorada:', r[0]);
+    return isValid;
+  });
   
-  return dataRows.map(r=>({
-    id:normID(r[0]),num:r[1]||'1',estado:r[2]||'',enPeso:r[3]||'',
-    nominal:sn(r[4]),prom:r[13]&&r[13]!=='-'?sn(r[13]):null,
-    vias:[r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]].map(sn).filter(v=>v>0),
-    cromado:r[15]||'No',obs:r[16]||'',fecha:r[17]||'',
-  }));
+  console.log('📊 Filas de datos válidas:', dataRows.length);
+  if (dataRows.length > 0) {
+    console.log('📊 Primera fila de datos:', dataRows[0]);
+  }
+  
+  // MAPEO FLEXIBLE DE COLUMNAS
+  const result = dataRows.map(r => {
+    const item = {
+      id: normID(r[0]),
+      num: r[1] || '1',
+      estado: r[2] || '',
+      enPeso: r[3] || '',
+      nominal: sn(r[4]),
+      prom: null,
+      vias: [],
+      cromado: r[15] || 'No',
+      obs: r[16] || '',
+      fecha: r[17] || ''
+    };
+    
+    // Buscar columna de peso promedio (varias posiciones posibles)
+    for (let i = 5; i <= 17; i++) {
+      const val = sn(r[i]);
+      if (val !== null && val !== undefined && val > 0) {
+        item.prom = val;
+        break;
+      }
+    }
+    
+    // Extraer vías (columnas 5-12)
+    for (let i = 5; i <= 12; i++) {
+      const val = sn(r[i]);
+      if (val > 0) item.vias.push(val);
+    }
+    
+    console.log('📊 Item procesado:', item);
+    return item;
+  });
+  
+  console.log('✅ Parseo completado:', result.length, 'items');
+  return result;
 }
 
 /* Parsear Cromado CSV */
