@@ -629,7 +629,7 @@ function parseCamisa(rows, maq){
 function parseMoldes(rows){
   if(!rows || rows.length === 0) return null;
   
-  console.log('� === INICIANDO PARSEO GARANTIZADO ===');
+  console.log('🔍 === INICIANDO PARSEO GARANTIZADO ===');
   console.log('📋 Total filas recibidas:', rows.length);
   console.log('📋 Primeras 5 filas:', rows.slice(0, 5));
   
@@ -665,7 +665,7 @@ function parseMoldes(rows){
   
   if (hdrIndex === -1) {
     console.log('❌ No se encontró header "Molde" en ninguna fila');
-    console.log('� Último intento: buscar cualquier fila con H8, H12, etc.');
+    console.log('🔍 Último intento: buscar cualquier fila con H8, H12, etc.');
     
     // ÚLTIMO RECURSO: Buscar primera fila con datos válidos
     for (let i = 0; i < rows.length; i++) {
