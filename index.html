@@ -699,8 +699,10 @@ function parseMoldes(rows){
     console.log('📊 Primera fila de datos:', dataRows[0]);
   }
   
-  // MAPEO FLEXIBLE DE COLUMNAS
+  // MAPEO INTELIGENTE DE COLUMNAS
   const result = dataRows.map(r => {
+    console.log('🔍 Procesando fila:', r);
+    
     const item = {
       id: normID(r[0]),
       num: r[1] || '1',
@@ -709,25 +711,44 @@ function parseMoldes(rows){
       nominal: sn(r[4]),
       prom: null,
       vias: [],
-      cromado: r[15] || 'No',
-      obs: r[16] || '',
-      fecha: r[17] || ''
+      cromado: 'No',
+      obs: '',
+      fecha: ''
     };
     
-    // Buscar columna de peso promedio (varias posiciones posibles)
-    for (let i = 5; i <= 17; i++) {
-      const val = sn(r[i]);
-      if (val !== null && val !== undefined && val > 0) {
-        item.prom = val;
-        break;
+    // Buscar inteligentemente las columnas por su contenido
+    r.forEach((cell, index) => {
+      const cellStr = (cell || '').toString().trim();
+      
+      // Columna de peso promedio (buscar números > 0)
+      if (cellStr && !isNaN(cellStr.replace(',', '.')) && parseFloat(cellStr.replace(',', '.')) > 0) {
+        if (!item.prom || item.prom === null) {
+          item.prom = sn(cellStr);
+        }
       }
-    }
-    
-    // Extraer vías (columnas 5-12)
-    for (let i = 5; i <= 12; i++) {
-      const val = sn(r[i]);
-      if (val > 0) item.vias.push(val);
-    }
+      
+      // Columna de vías (números pequeños, típicamente 3.xxx)
+      if (cellStr && !isNaN(cellStr.replace(',', '.')) && parseFloat(cellStr.replace(',', '.')) > 0 && parseFloat(cellStr.replace(',', '.')) < 10) {
+        item.vias.push(sn(cellStr));
+      }
+      
+      // Columna de cromado (buscar "Sí", "No", "En proceso")
+      if (cellStr.toLowerCase().includes('sí') || cellStr.toLowerCase().includes('si')) {
+        item.cromado = 'Sí';
+      } else if (cellStr.toLowerCase().includes('proceso')) {
+        item.cromado = 'En proceso';
+      }
+      
+      // Columna de observaciones (texto largo)
+      if (cellStr.length > 10 && !item.obs && isNaN(cellStr.replace(',', '.'))) {
+        item.obs = cellStr;
+      }
+      
+      // Columna de fecha (formato dd/mm/yyyy o dd/mm/yy)
+      if (cellStr.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) {
+        item.fecha = cellStr;
+      }
+    });
     
     console.log('📊 Item procesado:', item);
     return item;
