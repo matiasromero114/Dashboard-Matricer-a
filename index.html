@@ -628,17 +628,23 @@ function parseCamisa(rows, maq){
 /* Parsear Moldes CSV */
 function parseMoldes(rows){
   if(!rows) return null;
-  console.log('📋 Moldes CSV - primeras 5 filas:', rows.slice(0, 5));
+  console.log('📋 Moldes CSV - primeras 10 filas:', rows.slice(0, 10));
   
-  // Buscar fila que contenga 'Molde' como header
-  const hdrIndex = rows.findIndex(r=>r.some(c=>c.includes('Molde')));
-  if(hdrIndex === -1) return null;
+  // Buscar fila que contenga 'Molde' como header (buscar en cualquier columna)
+  const hdrIndex = rows.findIndex(r=>r.some(c=>c && c.toString().includes('Molde')));
+  if(hdrIndex === -1) {
+    console.log('❌ No se encontró header con "Molde"');
+    return null;
+  }
   
   console.log('📍 Header encontrado en fila:', hdrIndex);
   console.log('📍 Headers:', rows[hdrIndex]);
   
   const dataStart = hdrIndex + 1;
-  return rows.slice(dataStart).filter(r=>r[0]&&r[0].trim()&&!r[0].includes('Molde')).map(r=>({
+  const dataRows = rows.slice(dataStart).filter(r=>r[0]&&r[0].trim()&&!r[0].includes('Molde'));
+  console.log('📊 Filas de datos encontradas:', dataRows.length);
+  
+  return dataRows.map(r=>({
     id:normID(r[0]),num:r[1]||'1',estado:r[2]||'',enPeso:r[3]||'',
     nominal:sn(r[4]),prom:r[13]&&r[13]!=='-'?sn(r[13]):null,
     vias:[r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]].map(sn).filter(v=>v>0),
