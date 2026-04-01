@@ -559,7 +559,12 @@ function tick(){
 tick(); setInterval(tick,60000);
 
 function dc(id){ if(CReg[id]){CReg[id].destroy();delete CReg[id];} }
-function sn(v,d=0){ if(v===null||v===undefined||v===''||v==='S/D'||v==='-')return d; const n=parseFloat(String(v).replace(',','.')); return isNaN(n)?d:n; }
+function sn(v,d=0){ 
+  if(v===null||v===undefined||v===''||v==='S/D'||v==='-')return d; 
+  const s = String(v).replace(/\./g,'').replace(',','.');
+  const n = parseFloat(s);
+  return isNaN(n)?d:n;
+}
 function fmtF(s){ if(!s)return '—'; return typeof s==='string'?s:s; }
 function diasEntre(a,b){
   try{
@@ -1084,6 +1089,13 @@ function copyFalt(){
   data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push(`• ${s.molde} — ${labels[c]}: Stock 0`); }); });
   const txt=`LISTA DE FALTANTES — MATRICERÍA CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n`+(falt.length?falt.join('\n'):'Sin faltantes en stock actual.');
   navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada al portapapeles'));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REFRESH
+═══════════════════════════════════════════════════════════ */
+function recargar(){
+  cargarDatos();
 }
 
 /* ═══════════════════════════════════════════════════════════
