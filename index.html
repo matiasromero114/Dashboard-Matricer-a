@@ -424,30 +424,6 @@ tbody tr:hover td{background:var(--bg3)}
 <script>
 'use strict';
 
-/* IMÁGENES INCORPORADAS - Base64 para incrustar directamente */
-const IMAGES = {
-  // Ladrillos - Tipos de bloques
-  ladrillos: {
-    H8: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDQtMDdUMTQ6MTE6MzktMDM6MDAiIHhtcDpNZXRhZGF0YVNvdXJjZT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NvdXJjZURhdGEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgc3RFdnQ6d2hlbj0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiBzdEV2dDp3aGVuPSIyMDI2LTA0LTA3VDE0OjExOjM5LTAzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgHtU7sAAABESURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDYAbYFAAFU9v5oAAAAAElFTkSuQmCC',
-    H12: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDQtMDdUMTQ6MTE6MzktMDM6MDAiIHhtcDpNZXRhZGF0YVNvdXJjZT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NvdXJjZURhdGEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgc3RFdnQ6d2hlbj0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiBzdEV2dDp3aGVuPSIyMDI2LTA0LTA3VDE0OjExOjM5LTAzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgHtU7sAAABESURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDYAbYFAAFU9v5oAAAAAElFTkSuQmCC',
-    // Agregar más ladrillos según las imágenes recibidas
-  },
-  
-  // Laminadoras - Planos técnicos
-  laminadoras: {
-    KLB12: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDQtMDdUMTQ6MTE6MzktMDM6MDAiIHhtcDpNZXRhZGF0YVNvdXJjZT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NvdXJjZURhdGEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgc3RFdnQ6d2hlbj0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiBzdEV2dDp3aGVuPSIyMDI2LTA0LTA3VDE0OjExOjM5LTAzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgHtU7sAAABESURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDYAbYFAAFU9v5oAAAAAElFTkSuQmCC',
-    LM1210: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDQtMDdUMTQ6MTE6MzktMDM6MDAiIHhtcDpNZXRhZGF0YVNvdXJjZT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NvdXJjZURhdGEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgc3RFdnQ6d2hlbj0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiBzdEV2dDp3aGVuPSIyMDI2LTA0LTA3VDE0OjExOjM5LTAzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgHtU7sAAABESURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDYAbYFAAFU9v5oAAAAAElFTkSuQmCC',
-  },
-  
-  // Moldes - Planos técnicos
-  moldes: {
-    // Brasileños, Italianos, etc.
-    placeholder: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAACXBIWXMAAAsTAAALEwEAmpwYAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDQtMDdUMTQ6MTE6MzktMDM6MDAiIHhtcDpNZXRhZGF0YVNvdXJjZT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NvdXJjZURhdGEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuZGlkOjYyN2YxOGI2LTYxOGYtNGIxOC04N2Q3LTcyZDc1OTc2NzgzOCIgc3RFdnQ6d2hlbj0iMjAyNi0wNC0wN1QxNDoxMTozOS0wMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjI3ZjE4YjYtNjE4Zi00YjE4LTg3ZDctNzJkNzU5NzY3ODM4IiBzdEV2dDp3aGVuPSIyMDI2LTA0LTA3VDE0OjExOjM5LTAzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgHtU7sAAABESURBVHja7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDYAbYFAAFU9v5oAAAAAElFTkSuQmCC',
-  }
-};
-
-/* URLS CSV */
-
 /* ═══════════════════════════════════════════════════════════
    URLS CSV — REEMPLAZAR CUANDO ESTÉN PUBLICADOS
    Archivo → Publicar en la web → Elegir hoja → CSV → Publicar
@@ -828,7 +804,6 @@ function buildLam(){
     <div class="kpi kb"><div class="kl">Total mm retirados — Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">mm acumulados · máx evento: ${maxEvL} mm</div></div>
     <div class="kpi kb"><div class="kl">Total mm retirados — Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">mm acumulados · máx evento: ${maxEvR} mm</div></div>
     <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv" style="color:${Math.max(pctL,pctR)>70?'var(--re)':'var(--gr)'}">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial consumido</div></div>
-    <div class="kpi kc" style="cursor:pointer" onclick="showPlano('${STATE.activeLam}')"><div class="kl">Plano técnico</div><div class="kv" style="color:var(--te)">?</div><div class="km">Click para ver plano de ${STATE.activeLam}</div></div>
   `;
 
   // Barras de desgaste
@@ -1021,14 +996,8 @@ function buildMoldes(){
     return `
     <div class="mc">
       <div class="mch">
-        <div style="display:flex;align-items:center;gap:8px">
-          ${IMAGES.ladrillos[m.id] ? `<img src="${IMAGES.ladrillos[m.id]}" style="width:32px;height:32px;border-radius:4px">` : ''}
-          <div><div class="mcn">${m.id}</div><div class="mcnum">N° ${m.num}</div></div>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button onclick="showPlanoMolde('${m.id}')" style="background:var(--bg3);color:var(--t2);border:1px solid var(--b1);padding:2px 6px;border-radius:4px;font-size:10px;cursor:pointer" title="Ver plano técnico">?</button>
-          ${estadoBadge(m.estado)}
-        </div>
+        <div><div class="mcn">${m.id}</div><div class="mcnum">N° ${m.num}</div></div>
+        ${estadoBadge(m.estado)}
       </div>
       <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
       <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom?m.prom.toFixed(3)+' kg':'S/D'}</span></div>
@@ -1147,70 +1116,6 @@ function genFaltantes(){
         </div>`).join('');
   }
   document.getElementById('modal-falt').classList.add('open');
-}
-
-/* Función para mostrar planos de laminadoras */
-function showPlano(laminadora) {
-  const planoSrc = IMAGES.laminadoras[laminadora];
-  if (!planoSrc) {
-    alert('Plano no disponible para ' + laminadora);
-    return;
-  }
-  
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(8,10,13,0.95); z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(8px);
-  `;
-  
-  modal.innerHTML = `
-    <div style="background: var(--bg1); border: 1px solid var(--b1); border-radius: 12px; padding: 20px; max-width: 90vw; max-height: 90vh; overflow: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="color: var(--t0); margin: 0; font-family: var(--fh);">Plano Técnico - ${laminadora}</h3>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background: var(--bg3); color: var(--t0); border: 1px solid var(--b1); padding: 8px 16px; border-radius: 6px; cursor: pointer;">Cerrar</button>
-      </div>
-      <img src="${planoSrc}" style="max-width: 100%; height: auto; border-radius: 8px;" alt="Plano ${laminadora}">
-    </div>
-  `;
-  
-  modal.onclick = (e) => {
-    if (e.target === modal) modal.remove();
-  };
-  
-  document.body.appendChild(modal);
-}
-
-/* Función para mostrar planos de moldes */
-function showPlanoMolde(moldeId) {
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(8,10,13,0.95); z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(8px);
-  `;
-  
-  modal.innerHTML = `
-    <div style="background: var(--bg1); border: 1px solid var(--b1); border-radius: 12px; padding: 20px; max-width: 90vw; max-height: 90vh; overflow: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="color: var(--t0); margin: 0; font-family: var(--fh);">Plano Técnico - Molde ${moldeId}</h3>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background: var(--bg3); color: var(--t0); border: 1px solid var(--b1); padding: 8px 16px; border-radius: 6px; cursor: pointer;">Cerrar</button>
-      </div>
-      <div style="text-align: center; padding: 40px; color: var(--t2);">
-        <div style="font-size: 48px; margin-bottom: 16px;">?</div>
-        <div>Plano técnico del molde ${moldeId}</div>
-        <div style="font-size: 12px; margin-top: 8px;">(Imagen del plano estará disponible próximamente)</div>
-      </div>
-    </div>
-  `;
-  
-  modal.onclick = (e) => {
-    if (e.target === modal) modal.remove();
-  };
-  
-  document.body.appendChild(modal);
 }
 
 function copyFalt(){
