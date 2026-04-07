@@ -1,0 +1,17 @@
+Seguimiento de moldes - CMP Cevil Redondo,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,
+Molde,N°,Estado,¿En peso?,Peso nominal [Kg],Peso vía 1 [Kg],Peso vía 2 [Kg],Peso vía 3 [Kg],Peso vía 4 [Kg],Peso vía 5 [Kg],Peso vía 6 [Kg],Peso vía 7 [Kg],Peso vía 8 [Kg],Peso promedio [Kg],% exceso de peso,Cromado,Observaciones,Fecha actualización
+H8,1,Operativo,Excedido,3.500,3.675,3.625,3.680,3.680,3.610,3.590,3.585,3.580,3.628,,Sí,Molde en procesom de cromado ,17/11/2025
+H8,2,Operativo,Excedido,3.500,3.685,3.620,3.680,3.600,3.660,3.645,3.590,3.690,3.646,,Sí,Listo para produccion,25/3/2026
+H12,1,En calibración,Excedido,4.500,,,,,,,,,-,,No,.Molde listo para pruebas ,4/2/2026
+H12,2,En fabricación,Excedido,4.500,,,,,,,,,-,,No,"Molde con piezas muy gastadas, sin arreglos. ",10/3/2026
+H12,3 BR,Operativo,Óptimo,4.500,4.340,4.280,4.335,4.330,4.355,4.315,,,4.326,,En proceso,"Se madaron acromar piezas, menos dados y boquillas",5/3/2026
+H18,1,No operativo,Excedido,6.300,7.015,6.750,6.990,7.240,,,,,6.999,,No,Se realiza primeras pruebas,1/4/2026
+H18,2,Operativo,Excedido,6.300,6.360,6.420,6.440,6.320,,,,,6.385,,Sí,Reacondicionado,12/12/2025
+P12,1,Operativo,Excedido,5.600,5.985,5.875,,,,,,,5.930,,Sí,Se calibran dados cromas para produccion.,17/11/2025
+P18,1,Operativo,Óptimo,7.800,7.755,7.685,,,,,,,7.720,,Sí,En Produccion,4/2/2026
+L12,1,En calibración,Óptimo,8.000,7.010,6.905,,,,,,,6.958,,No,Se cambiaron los dados por los dados de respuestos originales.,5/3/2026
+L16,1,Operativo,Óptimo,10.200,10.100,10.100,,,,,,,10.100,,No,Pendiente cromado,07/05/2024
+DM20,1,Operativo,Excedido,7.100,8.320,8.360,8.260,8.335,,,,,8.319,,No,Molde listo para produccion.,04/11/2025
+DM27,1,En calibración,Excedido,10.500,,,,,,,,,-,,No,Formato sin mercado,06/05/2024
+KB,1,Operativo,Óptimo,9.800,9.200,9.200,,,,,,,9.200,,No,Formato sin mercado,07/05/2024
