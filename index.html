@@ -431,7 +431,7 @@ tbody tr:hover td{background:var(--bg3)}
 const URLS = {
   CAMISA_KLB12:  'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=2022492499',
   CAMISA_LM1210: 'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=1294970835',
-  MOLDES:        'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=1832927359',
+  MOLDES:        'https://docs.google.com/spreadsheets/d/1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0/export?format=csv&gid=0',
   CROMADO:       'https://docs.google.com/spreadsheets/d/1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0/export?format=csv&gid=2142850839',
   STOCK:         'https://docs.google.com/spreadsheets/d/1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0/export?format=csv&gid=573894203',
 };
@@ -486,7 +486,7 @@ const FB = {
     {id:'H12',num:'1',   estado:'En calibración', enPeso:'Excedido', nominal:4.5,  prom:null,  vias:[],                                                 cromado:'No',         obs:'Molde listo para pruebas',                      fecha:'04/02/2026'},
     {id:'H12',num:'2',   estado:'En fabricación', enPeso:'Excedido', nominal:4.5,  prom:null,  vias:[],                                                 cromado:'No',         obs:'Piezas muy gastadas, sin arreglos',             fecha:'10/03/2026'},
     {id:'H12',num:'3 BR',estado:'Operativo',      enPeso:'Óptimo',   nominal:4.5,  prom:4.326, vias:[4.340,4.280,4.335,4.330,4.355,4.315],              cromado:'En proceso', obs:'Se mandaron acromar piezas, menos dados y boquillas', fecha:'05/03/2026'},
-    {id:'H18',num:'1',   estado:'En calibración', enPeso:'Excedido', nominal:6.3,  prom:null,  vias:[],                                                 cromado:'No',         obs:'Se realizan primeras pruebas',                  fecha:'17/11/2025'},
+    {id:'H18',num:'1',   estado:'No operativo',   enPeso:'Excedido', nominal:6.3,  prom:6.999, vias:[7.015,6.750,6.990,7.240],                          cromado:'No',         obs:'Se realizan primeras pruebas',                  fecha:'01/04/2026'},
     {id:'H18',num:'2',   estado:'Operativo',      enPeso:'Excedido', nominal:6.3,  prom:6.385, vias:[6.360,6.420,6.440,6.320],                          cromado:'Sí',         obs:'Reacondicionado',                               fecha:'12/12/2025'},
     {id:'P12',num:'1',   estado:'Operativo',      enPeso:'Excedido', nominal:5.6,  prom:5.930, vias:[5.985,5.875],                                      cromado:'Sí',         obs:'Se calibran dados para producción',             fecha:'17/11/2025'},
     {id:'P18',num:'1',   estado:'Operativo',      enPeso:'Óptimo',   nominal:7.8,  prom:7.720, vias:[7.755,7.685],                                      cromado:'Sí',         obs:'En producción',                                 fecha:'04/02/2026'},
@@ -584,7 +584,16 @@ async function fetchCSV(url){
     const r = await fetch(url, {cache:'no-store'});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const txt = await r.text();
-    return txt.trim().split('\n').map(l=>l.split(',').map(c=>c.trim().replace(/^"|"$/g,'')));
+    // Parser robusto: maneja campos quoted con comas internas
+    return txt.trim().split('\n').map(line=>{
+      const cells=[], re=/("(?:[^"]|"")*"|[^,]*)(,|$)/g;
+      let m;
+      while((m=re.exec(line))!==null){
+        cells.push(m[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim());
+        if(m[2]==='') break;
+      }
+      return cells;
+    });
   }catch(e){ console.warn('CSV error',url,e); return null; }
 }
 
@@ -610,16 +619,49 @@ function parseCamisa(rows, maq){
 
 /* Parsear Moldes CSV */
 function parseMoldes(rows){
-  if(!rows) return null;
-  const hdr = rows.find(r=>r[0]==='Molde'||r[1]==='Molde');
+  if(!rows||rows.length<3) return null;
+
+  // Buscar fila header: puede tener 'Molde' en col 0 o col 1 (según el sheet)
+  const hdr = rows.find(r=>
+    r.some(c=>(c||'').trim()==='Molde') &&
+    r.some(c=>(c||'').trim().startsWith('Peso'))
+  );
   if(!hdr) return null;
   const hi = rows.indexOf(hdr);
-  return rows.slice(hi+1).filter(r=>r[0]&&r[0].trim()&&r[0]!=='Molde').map(r=>({
-    id:normID(r[0]),num:r[1]||'1',estado:r[2]||'',enPeso:r[3]||'',
-    nominal:sn(r[4]),prom:r[13]&&r[13]!=='-'?sn(r[13]):null,
-    vias:[r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]].map(sn).filter(v=>v>0),
-    cromado:r[15]||'No',obs:r[16]||'',fecha:r[17]||'',
-  }));
+
+  // Detectar si Molde está en col 0 o col 1
+  const moldeCol = hdr.findIndex(c=>(c||'').trim()==='Molde');
+  const offset   = moldeCol; // 0 o 1
+
+  return rows.slice(hi+1)
+    .filter(r => {
+      const id = (r[offset]||'').trim();
+      return id && id !== 'Molde' && id !== '';
+    })
+    .map(r=>{
+      // Columnas relativas al offset
+      const nominal = sn(r[offset+4]);
+      // Vías en cols offset+5 a offset+12 (hasta 8 vías)
+      const vias = [r[offset+5],r[offset+6],r[offset+7],r[offset+8],
+                    r[offset+9],r[offset+10],r[offset+11],r[offset+12]]
+                    .map(v=>sn(v,null))
+                    .filter(v=>v!==null && v>0);
+      // Promedio en col offset+13; puede ser '-' o vacío → null
+      const promRaw = (r[offset+13]||'').trim();
+      const prom    = (promRaw===''||promRaw==='-'||promRaw==='S/D') ? null : sn(promRaw, null);
+      return {
+        id:      normID(r[offset+0]),
+        num:     (r[offset+1]||'1').trim(),
+        estado:  (r[offset+2]||'').trim(),
+        enPeso:  (r[offset+3]||'').trim(),
+        nominal,
+        prom,
+        vias,
+        cromado: (r[offset+15]||'No').trim(),
+        obs:     (r[offset+16]||'').trim(),
+        fecha:   (r[offset+17]||'').trim(),
+      };
+    });
 }
 
 /* Parsear Cromado CSV */
@@ -939,7 +981,7 @@ function buildMoldes(){
 
   // Cards moldes
   function estadoBadge(e){
-    const m={'Operativo':'bg','En calibración':'bb','En fabricación':'br'};
+    const m={'Operativo':'bg','En calibración':'bb','En fabricación':'br','No operativo':'br'};
     return `<span class="badge ${m[e]||'bgr'}">${e}</span>`;
   }
   function cromBadge(c){
