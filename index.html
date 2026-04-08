@@ -423,13 +423,18 @@ tbody tr:hover td{background:var(--bg3)}
 
 <script>
 'use strict';
+
+/* ═══════════════════════════════════════════════════════════
+   URLS CSV — REEMPLAZAR CUANDO ESTÉN PUBLICADOS
+   Archivo → Publicar en la web → Elegir hoja → CSV → Publicar
+═══════════════════════════════════════════════════════════ */
+const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
 const URLS = {
-  // Archivos locales (subidos a GitHub)
-  CAMISA_KLB12:  'data/klb12.csv',
-  CAMISA_LM1210: 'data/lm1210.csv',
-  MOLDES:        'data/moldes.csv',
-  CROMADO:       'data/cromados.csv',
-  STOCK:         'data/stock.csv',
+  CAMISA_KLB12:  GITHUB_BASE + 'klb12.csv',
+  CAMISA_LM1210: GITHUB_BASE + 'lm1210.csv',
+  MOLDES:        GITHUB_BASE + 'moldes.csv',
+  CROMADO:       GITHUB_BASE + 'cromados.csv',
+  STOCK:         GITHUB_BASE + 'stock.csv',
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -519,17 +524,17 @@ const FB = {
     {molde:'H8',      envio:'20/02/2026',recep:'13/03/2026',prov:'Cerámica de Santiago',tIda:'La Sevillanita', det:'48 dados',                                           obs:'Boquilla de 8 salidas'},
   ],
   STOCK: [
-    {molde:'H8',       boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
-    {molde:'H12',      boquillas:0,aranas:0,dados:1,placaBase:0,frenos:0,rev:'10/03/2026'},
+    {molde:'H8',        boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'H12',       boquillas:0,aranas:0,dados:1,placaBase:0,frenos:0,rev:'10/03/2026'},
     {molde:'H12 Brasil',boquillas:1,aranas:1,dados:1,placaBase:1,frenos:1,rev:'21/11/2025'},
-    {molde:'H18',      boquillas:1,aranas:0,dados:2,placaBase:0,frenos:0,rev:'18/12/2025'},
-    {molde:'P12',      boquillas:0,aranas:0,dados:1,placaBase:0,frenos:0,rev:'21/11/2025'},
-    {molde:'P18',      boquillas:0,aranas:1,dados:0,placaBase:0,frenos:0,rev:'18/12/2025'},
-    {molde:'L12',      boquillas:1,aranas:1,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
-    {molde:'L16',      boquillas:1,aranas:1,dados:1,placaBase:0,frenos:0,rev:'21/11/2025'},
-    {molde:'DM20',     boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
-    {molde:'DM27',     boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
-    {molde:'KB',       boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'H18',       boquillas:1,aranas:0,dados:1,placaBase:0,frenos:0,rev:'18/12/2025'},
+    {molde:'P12',       boquillas:0,aranas:0,dados:1,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'P18',       boquillas:0,aranas:1,dados:0,placaBase:0,frenos:0,rev:'18/12/2025'},
+    {molde:'L12',       boquillas:1,aranas:1,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'L16',       boquillas:1,aranas:1,dados:1,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'DM20',      boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'DM27',      boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
+    {molde:'KB',        boquillas:0,aranas:0,dados:0,placaBase:0,frenos:0,rev:'21/11/2025'},
   ]
 };
 
@@ -572,116 +577,161 @@ function diasBadge(d){
 function normID(s){ return (s||'').trim().toUpperCase().replace(/[\s\-_]+/g,''); }
 
 /* ═══════════════════════════════════════════════════════════
-   CSV FETCH
+   CSV FETCH — lee desde GitHub raw, sin cache
 ═══════════════════════════════════════════════════════════ */
 async function fetchCSV(url){
   if(!url) return null;
   try{
-    const r = await fetch(url, {cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const txt = await r.text();
-    // Parser robusto: maneja campos quoted con comas internas
-    return txt.trim().split('\n').map(line=>{
-      const cells=[], re=/("(?:[^"]|"")*"|[^,]*)(,|$)/g;
-      let m;
-      while((m=re.exec(line))!==null){
-        cells.push(m[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim());
-        if(m[2]==='') break;
-      }
-      return cells;
-    });
-  }catch(e){ console.warn('CSV error',url,e); return null; }
+    // cache:'no-store' fuerza descarga fresca cada vez
+    const res = await fetch(url + '?t=' + Date.now(), {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    return parseCSVText(await res.text());
+  }catch(e){ console.warn('CSV fetch error:', url, e.message); return null; }
 }
 
-/* Parsear Camisa CSV: fila 7 (índice 6 base-0) son headers, filas 8+ son datos */
-function parseCamisa(rows, maq){
+/* Parser CSV robusto: maneja campos con saltos de línea y comas dentro de comillas */
+function parseCSVText(txt){
+  const rows = [];
+  let cur = [], field = '', inQ = false;
+  // normalizar \r\n → \n
+  const chars = (txt || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  for(let i=0; i<chars.length; i++){
+    const c=chars[i];
+    if(inQ){
+      if(c==='"' && chars[i+1]==='"'){ field+='"'; i++; }   // "" → "
+      else if(c==='"'){ inQ=false; }
+      else { field+=c; }
+    } else {
+      if(c==='"'){ inQ=true; }
+      else if(c===','){ cur.push(field.trim()); field=''; }
+      else if(c==='\n'){ cur.push(field.trim()); rows.push(cur); cur=[]; field=''; }
+      else { field+=c; }
+    }
+  }
+  if(field||cur.length) { cur.push(field.trim()); rows.push(cur); }
+  return rows;
+}
+
+/* ─── Camisa KLB12 ───
+   Fila 0: encabezado vacío | Lento | Rapido
+   Fila 1: Inicial [mm] | 153 | 143
+   Fila 2: Actual [mm]  | 138.70 | 119.80
+   Fila 3-5: vacías
+   Fila 6: Fecha | Rectificado Lento | Rectificado Rapido | Observaciones | Responsable
+   Fila 7+: datos */
+function parseCamisa_KLB12(rows){
   if(!rows||rows.length<8) return null;
-  // rows[0..5] = metadatos (Inicial, Actual, etc)
-  const iniLento  = sn(rows[1][1]);
-  const iniRapido = sn(rows[1][2]);
-  const actLento  = sn(rows[2][1]);
-  const actRapido = sn(rows[2][2]);
-  // headers en rows[6], datos desde rows[7]
-  const data = rows.slice(7).filter(r=>r[0]&&r[0].trim()).map(r=>({
-    f: r[0]||'',
-    l: sn(r[1]),
-    r: sn(r[2]),
-    obs: r[3]||'',
-    resp: (maq==='LM1210'?r[5]:r[4])||'',
-    prox: (maq==='LM1210'?r[6]:null)||null,
-  }));
-  return {maq, ini:{lento:iniLento,rapido:iniRapido}, act:{lento:actLento,rapido:actRapido}, rows:data};
+  const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
+  const actL=sn(rows[2][1]), actR=sn(rows[2][2]);
+  const data = rows.slice(7)
+    .filter(r=>(r[0]||'').trim() && /\d/.test(r[0]))
+    .map(r=>({
+      f:   r[0].trim(),
+      l:   sn(r[1]),
+      r:   sn(r[2]),
+      obs: (r[3]||'').trim(),
+      resp:(r[4]||'').trim(),
+      prox:null,
+    }));
+  return {maq:'KLB12', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data};
 }
 
-/* Parsear Moldes CSV */
+/* ─── Camisa LM1210 ───
+   Igual que KLB12 pero col 5 = Responsable, col 6 = Proximo_Rectificado */
+function parseCamisa_LM1210(rows){
+  if(!rows||rows.length<8) return null;
+  const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
+  const actL=sn(rows[2][1]), actR=sn(rows[2][2]);
+  const data = rows.slice(7)
+    .filter(r=>(r[0]||'').trim() && /\d/.test(r[0]))
+    .map(r=>({
+      f:   r[0].trim(),
+      l:   sn(r[1]),
+      r:   sn(r[2]),
+      obs: (r[3]||'').trim(),
+      resp:(r[5]||'').trim(),
+      prox:(r[6]||'').trim()||null,
+    }));
+  return {maq:'LM1210', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data};
+}
+
+/* ─── Moldes ───
+   Fila 0: título
+   Fila 1: vacía
+   Fila 2: Molde | N° | Estado | ¿En peso? | Peso nominal | Via1..Via8 | Promedio | %exceso | Cromado | Obs | Fecha
+   Fila 3+: datos */
 function parseMoldes(rows){
-  if(!rows||rows.length<3) return null;
-
-  // Buscar fila header: puede tener 'Molde' en col 0 o col 1 (según el sheet)
-  const hdr = rows.find(r=>
-    r.some(c=>(c||'').trim()==='Molde') &&
-    r.some(c=>(c||'').trim().startsWith('Peso'))
+  if(!rows||rows.length<4) return null;
+  // Encontrar fila header: tiene 'Molde' en col 0 y 'Peso' en alguna col
+  const hi = rows.findIndex(r=>
+    (r[0]||'').trim()==='Molde' && r.some(c=>(c||'').includes('Peso'))
   );
-  if(!hdr) return null;
-  const hi = rows.indexOf(hdr);
-
-  // Detectar si Molde está en col 0 o col 1
-  const moldeCol = hdr.findIndex(c=>(c||'').trim()==='Molde');
-  const offset   = moldeCol; // 0 o 1
-
+  if(hi<0) return null;
   return rows.slice(hi+1)
-    .filter(r => {
-      const id = (r[offset]||'').trim();
-      return id && id !== 'Molde' && id !== '';
-    })
+    .filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde')
     .map(r=>{
-      // Columnas relativas al offset
-      const nominal = sn(r[offset+4]);
-      // Vías en cols offset+5 a offset+12 (hasta 8 vías)
-      const vias = [r[offset+5],r[offset+6],r[offset+7],r[offset+8],
-                    r[offset+9],r[offset+10],r[offset+11],r[offset+12]]
-                    .map(v=>sn(v,null))
-                    .filter(v=>v!==null && v>0);
-      // Promedio en col offset+13; puede ser '-' o vacío → null
-      const promRaw = (r[offset+13]||'').trim();
-      const prom    = (promRaw===''||promRaw==='-'||promRaw==='S/D') ? null : sn(promRaw, null);
+      const promRaw = (r[13]||'').trim();
+      const prom = (promRaw===''||promRaw==='-') ? null : sn(promRaw,null);
+      const vias = [r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]]
+        .map(v=>sn(v,null)).filter(v=>v!==null&&v>0);
       return {
-        id:      normID(r[offset+0]),
-        num:     (r[offset+1]||'1').trim(),
-        estado:  (r[offset+2]||'').trim(),
-        enPeso:  (r[offset+3]||'').trim(),
-        nominal,
-        prom,
-        vias,
-        cromado: (r[offset+15]||'No').trim(),
-        obs:     (r[offset+16]||'').trim(),
-        fecha:   (r[offset+17]||'').trim(),
+        id:      normID(r[0]),
+        num:     (r[1]||'1').trim(),
+        estado:  (r[2]||'').trim(),
+        enPeso:  (r[3]||'').trim(),
+        nominal: sn(r[4]),
+        prom, vias,
+        cromado: (r[15]||'No').trim(),
+        obs:     (r[16]||'').trim(),
+        fecha:   (r[17]||'').trim(),
       };
     });
 }
 
-/* Parsear Cromado CSV */
+/* ─── Cromado ───
+   Fila 0: título
+   Fila 1: vacía
+   Fila 2: Molde | Fecha envío | Fecha recepción | Proveedor | Transp.Ida | Transp.Vuelta | Detalle | Observaciones
+   Fila 3+: datos */
 function parseCromado(rows){
   if(!rows) return null;
-  const hdr = rows.find(r=>r[0]==='Molde');
-  if(!hdr) return null;
-  const hi = rows.indexOf(hdr);
-  return rows.slice(hi+1).filter(r=>r[0]&&r[0].trim()&&r[0]!=='Molde').map(r=>({
-    molde:r[0],envio:r[1],recep:r[2]||null,prov:(r[3]||'').trim(),
-    tIda:r[4]||'',det:r[6]||'',obs:r[7]||'',
-  }));
+  const hi = rows.findIndex(r=>(r[0]||'').trim()==='Molde' && (r[1]||'').includes('envío'));
+  if(hi<0) return null;
+  return rows.slice(hi+1)
+    .filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde')
+    .map(r=>({
+      molde: (r[0]||'').trim(),
+      envio: (r[1]||'').trim(),
+      recep: (r[2]||'').trim()||null,
+      prov:  (r[3]||'').trim(),
+      tIda:  (r[4]||'').trim(),
+      det:   (r[6]||'').trim(),
+      obs:   (r[7]||'').trim(),
+    }));
 }
 
-/* Parsear Stock CSV */
+/* ─── Stock ───
+   El CSV tiene headers con saltos de línea (Arañas\n[juegos])
+   parseCSVText los convierte en filas extra vacías con el texto del header.
+   Estrategia: buscar la primera fila que tenga 'H8','H12',etc. en col 1,
+   o simplemente saltar hasta que col 1 tenga contenido de molde conocido.
+   Col 0: vacía | Col 1: Molde | Col 2: Ladrillo | Col 3: Boquillas |
+   Col 4: Arañas | Col 5: Dados | Col 6: Placa Base | Col 7: Frenos | Col 8: Fecha */
 function parseStock(rows){
   if(!rows) return null;
-  const hdr = rows.find(r=>r.some(c=>c==='Molde'||c==='Boquillas'));
-  if(!hdr) return null;
-  const hi = rows.indexOf(hdr);
-  return rows.slice(hi+1).filter(r=>r[1]&&r[1].trim()).map(r=>({
-    molde:r[1],boquillas:sn(r[3]),aranas:sn(r[4]),dados:sn(r[5]),
-    placaBase:sn(r[6]),frenos:sn(r[7]),rev:r[8]||'',
-  }));
+  // Filtrar filas que tienen un nombre de molde conocido en col 1
+  const MOLDES_CONOCIDOS = /^(H8|H12|H18|P12|P18|L12|L16|DM20|DM27|KB)/i;
+  return rows
+    .filter(r=> MOLDES_CONOCIDOS.test((r[1]||'').trim()))
+    .map(r=>({
+      molde:     (r[1]||'').trim(),
+      boquillas: sn(r[3]),
+      aranas:    sn(r[4]),
+      dados:     sn(r[5]),
+      placaBase: sn(r[6]),
+      frenos:    sn(r[7]),
+      rev:       (r[8]||'').trim(),
+    }));
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -704,34 +754,38 @@ async function cargarDatos(){
     ]);
 
     let live=false;
-    if(r1){ const p=parseCamisa(r1,'KLB12'); if(p&&p.rows.length>0){STATE.data.KLB12=p;live=true;}}
-    if(r2){ const p=parseCamisa(r2,'LM1210'); if(p&&p.rows.length>0){STATE.data.LM1210=p;live=true;}}
-    if(r3){ const p=parseMoldes(r3); if(p&&p.length>0){STATE.data.MOLDES=p;live=true;}}
-    if(r4){ const p=parseCromado(r4); if(p&&p.length>0){STATE.data.CROMADO=p;live=true;}}
-    if(r5){ const p=parseStock(r5); if(p&&p.length>0){STATE.data.STOCK=p;live=true;}}
 
-    // Fallback a hardcoded si no hay live
-    if(!STATE.data.KLB12)  STATE.data.KLB12  = FB.KLB12;
-    if(!STATE.data.LM1210) STATE.data.LM1210 = FB.LM1210;
-    if(!STATE.data.MOLDES) STATE.data.MOLDES = FB.MOLDES;
-    if(!STATE.data.CROMADO)STATE.data.CROMADO= FB.CROMADO;
-    if(!STATE.data.STOCK)  STATE.data.STOCK  = FB.STOCK;
+    if(r1){ const p=parseCamisa_KLB12(r1);  if(p&&p.rows.length>0){STATE.data.KLB12=p; live=true; console.log('✅ KLB12:',p.rows.length,'filas');} else console.warn('⚠ KLB12 parser devolvió vacío'); }
+    if(r2){ const p=parseCamisa_LM1210(r2); if(p&&p.rows.length>0){STATE.data.LM1210=p;live=true; console.log('✅ LM1210:',p.rows.length,'filas');} else console.warn('⚠ LM1210 parser devolvió vacío'); }
+    if(r3){ const p=parseMoldes(r3);         if(p&&p.length>0){STATE.data.MOLDES=p; live=true; console.log('✅ Moldes:',p.length,'filas');} else console.warn('⚠ Moldes parser devolvió vacío'); }
+    if(r4){ const p=parseCromado(r4);        if(p&&p.length>0){STATE.data.CROMADO=p;live=true; console.log('✅ Cromado:',p.length,'filas');} else console.warn('⚠ Cromado parser devolvió vacío'); }
+    if(r5){ const p=parseStock(r5);          if(p&&p.length>0){STATE.data.STOCK=p;  live=true; console.log('✅ Stock:',p.length,'filas');} else console.warn('⚠ Stock parser devolvió vacío'); }
+
+    // Fallback a hardcoded solo si el fetch o parse falló completamente
+    if(!STATE.data.KLB12)  { STATE.data.KLB12  = FB.KLB12;  console.warn('⬇ Usando fallback KLB12'); }
+    if(!STATE.data.LM1210) { STATE.data.LM1210 = FB.LM1210; console.warn('⬇ Usando fallback LM1210'); }
+    if(!STATE.data.MOLDES) { STATE.data.MOLDES = FB.MOLDES;  console.warn('⬇ Usando fallback Moldes'); }
+    if(!STATE.data.CROMADO){ STATE.data.CROMADO= FB.CROMADO; console.warn('⬇ Usando fallback Cromado'); }
+    if(!STATE.data.STOCK)  { STATE.data.STOCK  = FB.STOCK;   console.warn('⬇ Usando fallback Stock'); }
 
     STATE.usingLive = live;
     const now = new Date();
-    const p = v=>String(v).padStart(2,'0');
+    const pad = v=>String(v).padStart(2,'0');
     document.getElementById('last-update').textContent=
-      `Últ. actualización: ${p(now.getHours())}:${p(now.getMinutes())}`;
-    document.getElementById('dstatus').textContent = live?'Datos en tiempo real':'Datos locales';
-    document.querySelector('.dot').style.background = live?'var(--gr)':'var(--am)';
+      `Últ. act: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    document.getElementById('dstatus').textContent = live ? 'Datos en tiempo real ✓' : 'Datos locales';
+    document.querySelector('.dot').style.background = live ? 'var(--gr)' : 'var(--am)';
+    document.querySelector('.dot').style.boxShadow  = live ? '0 0 6px var(--gr)' : '0 0 6px var(--am)';
+
   }catch(e){
-    console.error(e);
+    console.error('cargarDatos error:', e);
     STATE.data.KLB12  = FB.KLB12;
     STATE.data.LM1210 = FB.LM1210;
     STATE.data.MOLDES = FB.MOLDES;
     STATE.data.CROMADO= FB.CROMADO;
     STATE.data.STOCK  = FB.STOCK;
-    document.getElementById('dstatus').textContent='Datos locales (sin conexión)';
+    document.getElementById('dstatus').textContent='Error de conexión — datos locales';
+    document.querySelector('.dot').style.background='var(--re)';
   }
 
   btn.classList.remove('loading');
