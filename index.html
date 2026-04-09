@@ -397,7 +397,7 @@ tbody tr:hover td{background:var(--bg3)}
     <div style="font-size:14px;flex-shrink:0">🔌</div>
     <div class="notice-t">
       <strong>Para conectar datos en tiempo real:</strong> publicar la hoja <code>Stock Repuestos de Moldes</code> como CSV.
-      Pasos: <strong>Archivo → Publicar en la web → elegir hoja → CSV → Publicar → copiar link</strong> y reemplazar <code>URLS.STOCK</code> en el código.
+      Pasos: <strong>Archivo → Publicar en la web → elegir hoja → CSV → Publicar</strong>. El dashboard detecta automáticamente la fuente disponible.
     </div>
   </div>
 </section>
@@ -428,8 +428,41 @@ tbody tr:hover td{background:var(--bg3)}
    URLS CSV — REEMPLAZAR CUANDO ESTÉN PUBLICADOS
    Archivo → Publicar en la web → Elegir hoja → CSV → Publicar
 ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   URLS DE DATOS
+   ─────────────────────────────────────────────────────────
+   FUENTE PRIMARIA: Google Sheets publicados como CSV
+   Para publicar una hoja: Archivo → Publicar en la web
+   → Seleccionar la hoja → Formato CSV → Publicar.
+   Cada vez que guardás datos en el sheet y apretás
+   "Actualizar datos", el dashboard trae los cambios.
+
+   FUENTE SECUNDARIA (fallback): CSVs en GitHub
+   Si el sheet no está publicado o hay error de red,
+   usa los archivos en /data/ del repositorio.
+═══════════════════════════════════════════════════════════ */
+
+// IDs de los dos Google Spreadsheets
+const SHEET_ID_LAM  = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0'; // Control de Estaño - LAMINADORAS
+const SHEET_ID_SEG  = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0'; // Seguimiento moldes y cromado
+
+// Helper para armar URL de exportación CSV desde Google Sheets publicado
+function sheetCSV(sheetId, gid){
+  return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}&gid=${gid}`;
+}
+
+// URLs primarias — Google Sheets (se activan cuando publicás la hoja como CSV público)
+const URLS_SHEETS = {
+  CAMISA_KLB12:  sheetCSV(SHEET_ID_LAM, '2022492499'),
+  CAMISA_LM1210: sheetCSV(SHEET_ID_LAM, '1294970835'),
+  MOLDES:        sheetCSV(SHEET_ID_SEG, '0'),
+  CROMADO:       sheetCSV(SHEET_ID_SEG, '2142850839'),
+  STOCK:         sheetCSV(SHEET_ID_SEG, '216908711'),
+};
+
+// URLs fallback — archivos CSV en GitHub (actualizados manualmente)
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
-const URLS = {
+const URLS_GITHUB = {
   CAMISA_KLB12:  GITHUB_BASE + 'klb12.csv',
   CAMISA_LM1210: GITHUB_BASE + 'lm1210.csv',
   MOLDES:        GITHUB_BASE + 'moldes.csv',
@@ -577,16 +610,46 @@ function diasBadge(d){
 function normID(s){ return (s||'').trim().toUpperCase().replace(/[\s\-_]+/g,''); }
 
 /* ═══════════════════════════════════════════════════════════
-   CSV FETCH — lee desde GitHub raw, sin cache
+   FETCH CON FUENTE DUAL
+   1. Intenta leer desde Google Sheets publicado (tiempo real)
+   2. Si falla, lee desde GitHub (datos del último commit)
 ═══════════════════════════════════════════════════════════ */
-async function fetchCSV(url){
-  if(!url) return null;
+async function fetchCSV(urlSheets, urlGithub){
+  // Intento 1: Google Sheets publicado como CSV
   try{
-    // cache:'no-store' fuerza descarga fresca cada vez
-    const res = await fetch(url + '?t=' + Date.now(), {cache:'no-store'});
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    return parseCSVText(await res.text());
-  }catch(e){ console.warn('CSV fetch error:', url, e.message); return null; }
+    const res = await fetch(urlSheets + '&cachebust=' + Date.now(), {
+      cache: 'no-store',
+      mode:  'cors',
+    });
+    if(res.ok){
+      const txt = await res.text();
+      // Validar que el contenido sea CSV real y no una página de login HTML
+      if(txt && !txt.trim().startsWith('<!') && txt.length > 50){
+        console.log('📡 Google Sheets OK:', urlSheets.split('gid=')[1]);
+        return { rows: parseCSVText(txt), source: 'sheets' };
+      }
+    }
+  }catch(e){
+    console.warn('Google Sheets no disponible, usando GitHub:', e.message);
+  }
+
+  // Intento 2: GitHub raw (fallback)
+  if(urlGithub){
+    try{
+      const res = await fetch(urlGithub + '?t=' + Date.now(), { cache: 'no-store' });
+      if(res.ok){
+        const txt = await res.text();
+        if(txt && !txt.trim().startsWith('<!') && txt.length > 20){
+          console.log('📁 GitHub fallback OK:', urlGithub.split('/').pop());
+          return { rows: parseCSVText(txt), source: 'github' };
+        }
+      }
+    }catch(e){
+      console.warn('GitHub fallback también falló:', e.message);
+    }
+  }
+
+  return null; // ambas fuentes fallaron → usar datos hardcodeados
 }
 
 /* Parser CSV robusto: maneja campos con saltos de línea y comas dentro de comillas */
@@ -744,38 +807,36 @@ async function cargarDatos(){
   ri.classList.add('spinning');
   document.getElementById('dstatus').textContent='Actualizando...';
 
+  let fromSheets=0, fromGithub=0;
+
   try{
+    // Fetch simultáneo — cada llamada prueba Sheets primero, GitHub segundo
     const [r1,r2,r3,r4,r5] = await Promise.all([
-      fetchCSV(URLS.CAMISA_KLB12),
-      fetchCSV(URLS.CAMISA_LM1210),
-      fetchCSV(URLS.MOLDES),
-      fetchCSV(URLS.CROMADO),
-      fetchCSV(URLS.STOCK),
+      fetchCSV(URLS_SHEETS.CAMISA_KLB12,  URLS_GITHUB.CAMISA_KLB12),
+      fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
+      fetchCSV(URLS_SHEETS.MOLDES,        URLS_GITHUB.MOLDES),
+      fetchCSV(URLS_SHEETS.CROMADO,       URLS_GITHUB.CROMADO),
+      fetchCSV(URLS_SHEETS.STOCK,         URLS_GITHUB.STOCK),
     ]);
 
-    let live=false;
+    // Contar fuentes
+    [r1,r2,r3,r4,r5].forEach(r=>{
+      if(r?.source==='sheets') fromSheets++;
+      if(r?.source==='github') fromGithub++;
+    });
 
-    if(r1){ const p=parseCamisa_KLB12(r1);  if(p&&p.rows.length>0){STATE.data.KLB12=p; live=true; console.log('✅ KLB12:',p.rows.length,'filas');} else console.warn('⚠ KLB12 parser devolvió vacío'); }
-    if(r2){ const p=parseCamisa_LM1210(r2); if(p&&p.rows.length>0){STATE.data.LM1210=p;live=true; console.log('✅ LM1210:',p.rows.length,'filas');} else console.warn('⚠ LM1210 parser devolvió vacío'); }
-    if(r3){ const p=parseMoldes(r3);         if(p&&p.length>0){STATE.data.MOLDES=p; live=true; console.log('✅ Moldes:',p.length,'filas');} else console.warn('⚠ Moldes parser devolvió vacío'); }
-    if(r4){ const p=parseCromado(r4);        if(p&&p.length>0){STATE.data.CROMADO=p;live=true; console.log('✅ Cromado:',p.length,'filas');} else console.warn('⚠ Cromado parser devolvió vacío'); }
-    if(r5){ const p=parseStock(r5);          if(p&&p.length>0){STATE.data.STOCK=p;  live=true; console.log('✅ Stock:',p.length,'filas');} else console.warn('⚠ Stock parser devolvió vacío'); }
+    if(r1){ const p=parseCamisa_KLB12(r1.rows);  if(p&&p.rows.length>0){ STATE.data.KLB12=p;  console.log('✅ KLB12:',p.rows.length,'filas ['+r1.source+']');} else console.warn('⚠ KLB12 parser vacío'); }
+    if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length>0){ STATE.data.LM1210=p; console.log('✅ LM1210:',p.rows.length,'filas ['+r2.source+']');} else console.warn('⚠ LM1210 parser vacío'); }
+    if(r3){ const p=parseMoldes(r3.rows);         if(p&&p.length>0){       STATE.data.MOLDES=p;  console.log('✅ Moldes:',p.length,'filas ['+r3.source+']');} else console.warn('⚠ Moldes parser vacío'); }
+    if(r4){ const p=parseCromado(r4.rows);        if(p&&p.length>0){       STATE.data.CROMADO=p; console.log('✅ Cromado:',p.length,'filas ['+r4.source+']');} else console.warn('⚠ Cromado parser vacío'); }
+    if(r5){ const p=parseStock(r5.rows);          if(p&&p.length>0){       STATE.data.STOCK=p;   console.log('✅ Stock:',p.length,'filas ['+r5.source+']');} else console.warn('⚠ Stock parser vacío'); }
 
-    // Fallback a hardcoded solo si el fetch o parse falló completamente
-    if(!STATE.data.KLB12)  { STATE.data.KLB12  = FB.KLB12;  console.warn('⬇ Usando fallback KLB12'); }
-    if(!STATE.data.LM1210) { STATE.data.LM1210 = FB.LM1210; console.warn('⬇ Usando fallback LM1210'); }
-    if(!STATE.data.MOLDES) { STATE.data.MOLDES = FB.MOLDES;  console.warn('⬇ Usando fallback Moldes'); }
-    if(!STATE.data.CROMADO){ STATE.data.CROMADO= FB.CROMADO; console.warn('⬇ Usando fallback Cromado'); }
-    if(!STATE.data.STOCK)  { STATE.data.STOCK  = FB.STOCK;   console.warn('⬇ Usando fallback Stock'); }
-
-    STATE.usingLive = live;
-    const now = new Date();
-    const pad = v=>String(v).padStart(2,'0');
-    document.getElementById('last-update').textContent=
-      `Últ. act: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-    document.getElementById('dstatus').textContent = live ? 'Datos en tiempo real ✓' : 'Datos locales';
-    document.querySelector('.dot').style.background = live ? 'var(--gr)' : 'var(--am)';
-    document.querySelector('.dot').style.boxShadow  = live ? '0 0 6px var(--gr)' : '0 0 6px var(--am)';
+    // Fallback hardcodeado — solo si ambas fuentes fallaron para esa hoja
+    if(!STATE.data.KLB12)  { STATE.data.KLB12  = FB.KLB12;  console.warn('⬇ Fallback local KLB12'); }
+    if(!STATE.data.LM1210) { STATE.data.LM1210 = FB.LM1210; console.warn('⬇ Fallback local LM1210'); }
+    if(!STATE.data.MOLDES) { STATE.data.MOLDES = FB.MOLDES;  console.warn('⬇ Fallback local Moldes'); }
+    if(!STATE.data.CROMADO){ STATE.data.CROMADO= FB.CROMADO; console.warn('⬇ Fallback local Cromado'); }
+    if(!STATE.data.STOCK)  { STATE.data.STOCK  = FB.STOCK;   console.warn('⬇ Fallback local Stock'); }
 
   }catch(e){
     console.error('cargarDatos error:', e);
@@ -784,9 +845,28 @@ async function cargarDatos(){
     STATE.data.MOLDES = FB.MOLDES;
     STATE.data.CROMADO= FB.CROMADO;
     STATE.data.STOCK  = FB.STOCK;
-    document.getElementById('dstatus').textContent='Error de conexión — datos locales';
-    document.querySelector('.dot').style.background='var(--re)';
   }
+
+  // Indicador de fuente
+  const dot = document.querySelector('.dot');
+  let label, color;
+  if(fromSheets > 0){
+    label = `Sheets en vivo ✓ (${fromSheets}/5)`;
+    color = 'var(--gr)';
+  } else if(fromGithub > 0){
+    label = `GitHub (${fromGithub}/5) — publicar sheets para tiempo real`;
+    color = 'var(--am)';
+  } else {
+    label = 'Datos locales — sin conexión';
+    color = 'var(--re)';
+  }
+  dot.style.background = color;
+  dot.style.boxShadow  = `0 0 6px ${color}`;
+  document.getElementById('dstatus').textContent = label;
+
+  const now = new Date(), pad=v=>String(v).padStart(2,'0');
+  document.getElementById('last-update').textContent =
+    `Últ. act: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   btn.classList.remove('loading');
   ri.classList.remove('spinning');
