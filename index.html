@@ -961,9 +961,11 @@ function setF(f,btn){
 
 function renderAll(){ renderTab(STATE.activeTab); }
 function renderTab(id){
-  if(id==='lam')    buildLam();
+  if(id==='lam') buildLam();
   if(id==='moldes') buildMoldes();
-  if(id==='stock')  buildStock();
+  if(id==='stock') buildStock();
+  if(id==='mantenimiento') buildMantenimiento();
+  if(id==='vidaUtil') buildVidaUtil();
 }
 
 /* ═══════════════════════════════════════════════════════════
