@@ -477,22 +477,45 @@ tbody tr:hover td{background:var(--bg3)}
 </div>
 <!-- ═══ TAB 4: MANTENIMIENTO ═══ -->
 <section class="tab-s" id="tab-mantenimiento">
-  <div class="sh"><div><div class="sh-t">Registro de Mantenimiento de Moldes</div><div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div></div></div>
-  <div class="g2">
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución por tipo de tarea</div><div style="position:relative;width:100%;height:250px"><canvas id="chart-tareas"></canvas></div></div>
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Últimas intervenciones</div><div id="ult-mant" style="font-size:11px;color:var(--t1)">Cargando...</div></div>
+  <div class="sh">
+    <div>
+      <div class="sh-t">Registro de Mantenimiento de Moldes</div>
+      <div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div>
+    </div>
   </div>
-  <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Historial completo</div><div class="tw"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
+  
+  <!-- DOS GRÁFICOS DE BARRAS HORIZONTALES -->
+  <div class="g2">
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Distribución por tipo de tarea</div>
+      <div id="chart-tareas-tipo" style="min-height:280px">Cargando...</div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div>
+      <div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div>
+    </div>
+  </div>
+  
+  <!-- ÚLTIMAS INTERVENCIONES -->
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--am)"></div>Últimas intervenciones</div>
+    <div id="ult-mant" style="font-size:11px;color:var(--t1)">Cargando...</div>
+  </div>
+  
+  <!-- HISTORIAL COMPLETO -->
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo</div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr>
+        </thead>
+        <tbody id="tbody-mantenimiento"></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
-<!-- ═══ TAB 5: VIDA ÚTIL ═══ -->
-<section class="tab-s" id="tab-vidaUtil">
-  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 20.000 t · Límite con reparaciones: 30.000 t</div></div></div>
-  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil · <span style="color:var(--am)">Amarillo</span> = zona de extra (requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida</div></div>
-  <div class="mg" id="gauges-container"></div>
-</section>
-<script>
-'use strict';
 
 /* ═══════════════════════════════════════════════════════════
    URLS CSV — REEMPLAZAR CUANDO ESTÉN PUBLICADOS
@@ -1383,12 +1406,12 @@ function buildMantenimiento(){
   if(!data.length){
     document.getElementById('tbody-mantenimiento').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
     document.getElementById('ult-mant').innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
-    const ctx = document.getElementById('chart-tareas');
-    if(ctx && window.chartTareas) window.chartTareas.destroy();
+    document.getElementById('chart-tareas-tipo').innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">Sin datos</div>';
+    document.getElementById('chart-tareas-responsable').innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">Sin datos</div>';
     return;
   }
   
-  // Tabla con estilo mejorado
+  // ===== TABLA COMPLETA =====
   document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `
     <tr style="border-bottom:1px solid var(--b0)">
       <td class="tg" style="white-space:nowrap">${r.fecha}</td>
@@ -1399,7 +1422,7 @@ function buildMantenimiento(){
     </tr>
   `).join('');
   
-  // Últimas 5 intervenciones con mejor diseño
+  // ===== ÚLTIMAS 5 INTERVENCIONES =====
   const ultimas = [...data].reverse().slice(0,5);
   document.getElementById('ult-mant').innerHTML = ultimas.map(r => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">
@@ -1408,45 +1431,69 @@ function buildMantenimiento(){
         ${getTareaBadge(r.tipoTarea)}
       </div>
       <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo}</div>
-      <div style="font-size:11px;color:var(--t2);max-width:200px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${r.responsable}</div>
+      <div style="font-size:11px;color:var(--t2)">${r.responsable}</div>
     </div>
   `).join('');
   
-  // Gráfico de tipos de tarea mejorado
+  // ===== GRÁFICO 1: Cantidad de tareas por tipo (barras horizontales) =====
   const tipos = {};
   data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
-  const ctx = document.getElementById('chart-tareas');
-  if(ctx){
-    if(window.chartTareas) window.chartTareas.destroy();
-    window.chartTareas = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(tipos),
-        datasets: [{ 
-          data: Object.values(tipos), 
-          backgroundColor: ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a'],
-          borderWidth: 0,
-          borderRadius: 8,
-          spacing: 2
-        }]
-      },
-      options: { 
-        responsive: true, 
-        maintainAspectRatio: true,
-        cutout: '60%',
-        plugins: { 
-          legend: { 
-            position: 'bottom', 
-            labels: { color: '#b8c4d8', font: { size: 10, family: "'IBM Plex Mono', monospace" }, usePointStyle: true, pointStyle: 'circle' }
-          },
-          tooltip: { backgroundColor: '#0d1017', titleColor: '#f0f4ff', bodyColor: '#b8c4d8', borderColor: '#f5a623', borderWidth: 1 }
-        }
-      }
-    });
-  }
+  
+  // Ordenar de mayor a menor
+  const tiposOrdenados = Object.entries(tipos).sort((a,b) => b[1] - a[1]);
+  const maxTareas = Math.max(...Object.values(tipos));
+  
+  const coloresTipos = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
+  
+  document.getElementById('chart-tareas-tipo').innerHTML = `
+    <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
+    ${tiposOrdenados.map(([tipo, cantidad], idx) => {
+      const porcentaje = (cantidad / maxTareas) * 100;
+      const color = coloresTipos[idx % coloresTipos.length];
+      return `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span>
+            <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+          </div>
+          <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+            <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `;
+  
+  // ===== GRÁFICO 2: Top responsables por cantidad de tareas =====
+  const responsables = {};
+  data.forEach(r => { responsables[r.responsable] = (responsables[r.responsable] || 0) + 1; });
+  
+  const responsablesOrdenados = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 8);
+  const maxTareasResp = responsablesOrdenados[0]?.[1] || 1;
+  
+  const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#06b6d4'];
+  
+  document.getElementById('chart-tareas-responsable').innerHTML = `
+    <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
+    ${responsablesOrdenados.map(([responsable, cantidad], idx) => {
+      const porcentaje = (cantidad / maxTareasResp) * 100;
+      const color = coloresResp[idx % coloresResp.length];
+      return `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span>
+            <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+          </div>
+          <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+            <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `;
 }
 
-// Función auxiliar para badges de tareas
+// Función auxiliar para badges de tareas (mantener igual)
 function getTareaBadge(tipo){
   const colores = {
     'Desarmado de molde': { bg: 'var(--amd)', color: 'var(--am)', icon: '🔧' },
