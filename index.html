@@ -422,7 +422,22 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
 </div>
+<!-- ═══ TAB 4: MANTENIMIENTO ═══ -->
+<section class="tab-s" id="tab-mantenimiento">
+  <div class="sh"><div><div class="sh-t">Registro de Mantenimiento de Moldes</div><div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div></div></div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución por tipo de tarea</div><div style="position:relative;width:100%;height:250px"><canvas id="chart-tareas"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Últimas intervenciones</div><div id="ult-mant" style="font-size:11px;color:var(--t1)">Cargando...</div></div>
+  </div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Historial completo</div><div class="tw"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
+</section>
 
+<!-- ═══ TAB 5: VIDA ÚTIL ═══ -->
+<section class="tab-s" id="tab-vidaUtil">
+  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 20.000 t · Límite con reparaciones: 30.000 t</div></div></div>
+  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil · <span style="color:var(--am)">Amarillo</span> = zona de extra (requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida</div></div>
+  <div class="mg" id="gauges-container"></div>
+</section>
 <script>
 'use strict';
 
@@ -460,6 +475,8 @@ const URLS_SHEETS = {
   MOLDES:        sheetCSV(SHEET_ID_SEG, '0'),
   CROMADO:       sheetCSV(SHEET_ID_SEG, '2142850839'),
   STOCK:         sheetCSV(SHEET_ID_SEG, '216908711'),
+  VIDA_UTIL:     sheetCSV(SHEET_ID_SEG, '36305866'),
+  MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
 };
 
 // URLs fallback — archivos CSV en GitHub (actualizados manualmente)
@@ -470,6 +487,8 @@ const URLS_GITHUB = {
   MOLDES:        GITHUB_BASE + 'moldes.csv',
   CROMADO:       GITHUB_BASE + 'cromados.csv',
   STOCK:         GITHUB_BASE + 'stock.csv',
+  VIDA_UTIL:     GITHUB_BASE + 'vida_util.csv',
+  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv',
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -580,7 +599,7 @@ let STATE = {
   filter: 'todos',
   activeTab: 'lam',
   activeLam: 'KLB12',
-  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null },
+  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null },
   usingLive: false,
 };
 const CReg = {};
@@ -798,6 +817,40 @@ function parseStock(rows){
       rev:       (r[8]||'').trim(),
     }));
 }
+  /* ─── Vida Útil de Moldes ─── */
+function parseVidaUtil(rows){
+  if(!rows) return null;
+  const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde');
+  if(hi < 0) return null;
+  return rows.slice(hi+1)
+    .filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde')
+    .map(r => ({
+      molde: (r[0]||'').trim(),
+      numero: (r[1]||'').trim(),
+      clave: (r[2]||'').trim(),
+      inicio: (r[3]||'').trim(),
+      fin: (r[4]||'').trim() || null,
+      tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0,
+      horas: (r[6]||'').trim(),
+      pallets: (r[7]||'').trim() || null,
+    }));
+}
+
+/* ─── Mantenimiento de Moldes ─── */
+function parseMantenimiento(rows){
+  if(!rows) return null;
+  const hi = rows.findIndex(r => (r[0]||'').trim() === 'Fecha');
+  if(hi < 0) return null;
+  return rows.slice(hi+1)
+    .filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Fecha')
+    .map(r => ({
+      fecha: (r[0]||'').trim(),
+      responsable: (r[1]||'').trim(),
+      moldeEquipo: (r[2]||'').trim(),
+      tipoTarea: (r[3]||'').trim(),
+      descripcion: (r[4]||'').trim(),
+    }));
+}
 
 /* ═══════════════════════════════════════════════════════════
    CARGA DE DATOS
@@ -813,14 +866,15 @@ async function cargarDatos(){
 
   try{
     // Fetch simultáneo — cada llamada prueba Sheets primero, GitHub segundo
-    const [r1,r2,r3,r4,r5] = await Promise.all([
-      fetchCSV(URLS_SHEETS.CAMISA_KLB12,  URLS_GITHUB.CAMISA_KLB12),
-      fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
-      fetchCSV(URLS_SHEETS.MOLDES,        URLS_GITHUB.MOLDES),
-      fetchCSV(URLS_SHEETS.CROMADO,       URLS_GITHUB.CROMADO),
-      fetchCSV(URLS_SHEETS.STOCK,         URLS_GITHUB.STOCK),
-    ]);
-
+    const [r1,r2,r3,r4,r5,r6,r7] = await Promise.all([
+  fetchCSV(URLS_SHEETS.CAMISA_KLB12,  URLS_GITHUB.CAMISA_KLB12),
+  fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
+  fetchCSV(URLS_SHEETS.MOLDES,        URLS_GITHUB.MOLDES),
+  fetchCSV(URLS_SHEETS.CROMADO,       URLS_GITHUB.CROMADO),
+  fetchCSV(URLS_SHEETS.STOCK,         URLS_GITHUB.STOCK),
+  fetchCSV(URLS_SHEETS.VIDA_UTIL,     URLS_GITHUB.VIDA_UTIL),
+  fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO),
+]);
     // Contar fuentes
     [r1,r2,r3,r4,r5].forEach(r=>{
       if(r?.source==='sheets') fromSheets++;
@@ -832,13 +886,17 @@ async function cargarDatos(){
     if(r3){ const p=parseMoldes(r3.rows);         if(p&&p.length>0){       STATE.data.MOLDES=p;  console.log('✅ Moldes:',p.length,'filas ['+r3.source+']');} else console.warn('⚠ Moldes parser vacío'); }
     if(r4){ const p=parseCromado(r4.rows);        if(p&&p.length>0){       STATE.data.CROMADO=p; console.log('✅ Cromado:',p.length,'filas ['+r4.source+']');} else console.warn('⚠ Cromado parser vacío'); }
     if(r5){ const p=parseStock(r5.rows);          if(p&&p.length>0){       STATE.data.STOCK=p;   console.log('✅ Stock:',p.length,'filas ['+r5.source+']');} else console.warn('⚠ Stock parser vacío'); }
-
+    if(r6){ const p=parseVidaUtil(r6.rows); if(p&&p.length>0){ STATE.data.VIDA_UTIL=p; console.log('✅ VidaUtil:',p.length); } }
+    if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length>0){ STATE.data.MANTENIMIENTO=p; console.log('✅ Mantenimiento:',p.length); } }
+    
     // Fallback hardcodeado — solo si ambas fuentes fallaron para esa hoja
     if(!STATE.data.KLB12)  { STATE.data.KLB12  = FB.KLB12;  console.warn('⬇ Fallback local KLB12'); }
     if(!STATE.data.LM1210) { STATE.data.LM1210 = FB.LM1210; console.warn('⬇ Fallback local LM1210'); }
     if(!STATE.data.MOLDES) { STATE.data.MOLDES = FB.MOLDES;  console.warn('⬇ Fallback local Moldes'); }
     if(!STATE.data.CROMADO){ STATE.data.CROMADO= FB.CROMADO; console.warn('⬇ Fallback local Cromado'); }
     if(!STATE.data.STOCK)  { STATE.data.STOCK  = FB.STOCK;   console.warn('⬇ Fallback local Stock'); }
+    if(!STATE.data.VIDA_UTIL)  { STATE.data.VIDA_UTIL = []; }
+    if(!STATE.data.MANTENIMIENTO) { STATE.data.MANTENIMIENTO = []; }
 
   }catch(e){
     console.error('cargarDatos error:', e);
@@ -1266,8 +1324,14 @@ function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
   document.getElementById('tn4').textContent = data.length;
   
+  if(!data.length){
+    document.getElementById('tbody-mantenimiento').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+    document.getElementById('ult-mant').innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+    return;
+  }
+  
   // Tabla completa
-  document.getElementById('tbody-mantenimiento').innerHTML = data.length ? data.map(r => `
+  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `
     <tr>
       <td class="tg">${r.fecha}</td>
       <td>${r.responsable}</td>
@@ -1275,31 +1339,33 @@ function buildMantenimiento(){
       <td><span class="badge ba">${r.tipoTarea}</span></td>
       <td style="max-width:300px">${r.descripcion}</td>
     </tr>
-  `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+  `).join('');
   
   // Últimas 5 intervenciones
   const ultimas = [...data].reverse().slice(0,5);
-  document.getElementById('ult-mant').innerHTML = ultimas.length ? ultimas.map(r => `
+  document.getElementById('ult-mant').innerHTML = ultimas.map(r => `
     <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)">
       <span style="color:var(--t0)">${r.fecha}</span>
       <span><span class="badge ba">${r.tipoTarea}</span></span>
       <span style="color:var(--t2)">${r.moldeEquipo}</span>
     </div>
-  `).join('') : '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+  `).join('');
   
   // Gráfico de tipos de tarea
   const tipos = {};
   data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
-  const ctx = document.getElementById('chart-tareas').getContext('2d');
-  if(window.chartTareas) window.chartTareas.destroy();
-  window.chartTareas = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: Object.keys(tipos),
-      datasets: [{ data: Object.values(tipos), backgroundColor: ['#3dd68c','#f5a623','#60a5fa','#f05252','#2dd4bf','#fb923c'] }]
-    },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
-  });
+  const ctx = document.getElementById('chart-tareas');
+  if(ctx){
+    if(window.chartTareas) window.chartTareas.destroy();
+    window.chartTareas = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(tipos),
+        datasets: [{ data: Object.values(tipos), backgroundColor: ['#3dd68c','#f5a623','#60a5fa','#f05252','#2dd4bf','#fb923c'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1311,16 +1377,14 @@ function buildVidaUtil(){
   document.getElementById('tn5').textContent = data.length;
   const LIMITE_NORMAL = 20000;
   const LIMITE_EXTRA = 30000;
-  
   const container = document.getElementById('gauges-container');
-  if(!container) return;
-  container.innerHTML = '';
   
   if(!data.length){
     container.innerHTML = '<div class="al alg"><div class="aico">📊</div><div><div class="at">Sin datos de vida útil</div><div class="ad">No hay registros de producción acumulada por molde.</div></div></div>';
     return;
   }
   
+  container.innerHTML = '';
   data.forEach(molde => {
     const tn = molde.tnProducidas;
     const porcentaje = Math.min((tn / LIMITE_EXTRA) * 100, 100);
