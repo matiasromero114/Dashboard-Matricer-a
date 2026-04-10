@@ -247,6 +247,8 @@ tbody tr:hover td{background:var(--bg3)}
   <button class="navtab active" onclick="switchTab('lam',this)">01 · Laminadoras<span class="tn" id="tn1">30</span></button>
   <button class="navtab" onclick="switchTab('moldes',this)">02 · Moldes y Cromado<span class="tn" id="tn2">14</span></button>
   <button class="navtab" onclick="switchTab('stock',this)">03 · Stock de Repuestos<span class="tn" id="tn3">11</span></button>
+  <button class="navtab" onclick="switchTab('mantenimiento',this)">04 · Mantenimiento<span class="tn" id="tn4">0</span></button>
+  <button class="navtab" onclick="switchTab('vidaUtil',this)">05 · Vida Útil<span class="tn" id="tn5">0</span></button>
 </nav>
 
 <main class="main">
@@ -1256,6 +1258,167 @@ function copyFalt(){
   data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push(`• ${s.molde} — ${labels[c]}: Stock 0`); }); });
   const txt=`LISTA DE FALTANTES — MATRICERÍA CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n`+(falt.length?falt.join('\n'):'Sin faltantes en stock actual.');
   navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada al portapapeles'));
+}
+/* ═══════════════════════════════════════════════════════════
+   TAB 4 — MANTENIMIENTO
+═══════════════════════════════════════════════════════════ */
+function buildMantenimiento(){
+  const data = STATE.data.MANTENIMIENTO || [];
+  document.getElementById('tn4').textContent = data.length;
+  
+  // Tabla completa
+  document.getElementById('tbody-mantenimiento').innerHTML = data.length ? data.map(r => `
+    <tr>
+      <td class="tg">${r.fecha}</td>
+      <td>${r.responsable}</td>
+      <td>${r.moldeEquipo}</td>
+      <td><span class="badge ba">${r.tipoTarea}</span></td>
+      <td style="max-width:300px">${r.descripcion}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+  
+  // Últimas 5 intervenciones
+  const ultimas = [...data].reverse().slice(0,5);
+  document.getElementById('ult-mant').innerHTML = ultimas.length ? ultimas.map(r => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)">
+      <span style="color:var(--t0)">${r.fecha}</span>
+      <span><span class="badge ba">${r.tipoTarea}</span></span>
+      <span style="color:var(--t2)">${r.moldeEquipo}</span>
+    </div>
+  `).join('') : '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+  
+  // Gráfico de tipos de tarea
+  const tipos = {};
+  data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
+  const ctx = document.getElementById('chart-tareas').getContext('2d');
+  if(window.chartTareas) window.chartTareas.destroy();
+  window.chartTareas = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: Object.keys(tipos),
+      datasets: [{ data: Object.values(tipos), backgroundColor: ['#3dd68c','#f5a623','#60a5fa','#f05252','#2dd4bf','#fb923c'] }]
+    },
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 5 — VIDA ÚTIL (con gauges semicirculares)
+   Límite normal: 20.000 t | Límite con reparaciones: 30.000 t
+═══════════════════════════════════════════════════════════ */
+function buildVidaUtil(){
+  const data = STATE.data.VIDA_UTIL || [];
+  document.getElementById('tn5').textContent = data.length;
+  const LIMITE_NORMAL = 20000;
+  const LIMITE_EXTRA = 30000;
+  
+  const container = document.getElementById('gauges-container');
+  if(!container) return;
+  container.innerHTML = '';
+  
+  if(!data.length){
+    container.innerHTML = '<div class="al alg"><div class="aico">📊</div><div><div class="at">Sin datos de vida útil</div><div class="ad">No hay registros de producción acumulada por molde.</div></div></div>';
+    return;
+  }
+  
+  data.forEach(molde => {
+    const tn = molde.tnProducidas;
+    const porcentaje = Math.min((tn / LIMITE_EXTRA) * 100, 100);
+    let status = '', statusText = '', color = '';
+    
+    if(tn >= LIMITE_EXTRA) {
+      status = 'critical'; statusText = '⚠ Vida útil EXCEDIDA'; color = '#f05252';
+    } else if(tn >= LIMITE_NORMAL) {
+      status = 'warning'; statusText = '⚠ Zona de extra (requiere reparaciones)'; color = '#f5a623';
+    } else {
+      status = 'ok'; statusText = '✓ Dentro de vida útil'; color = '#3dd68c';
+    }
+    
+    const canvasId = `gauge-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
+    const card = document.createElement('div');
+    card.className = 'gauge-container';
+    card.innerHTML = `
+      <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
+      <canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas>
+      <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} t</div>
+      <div class="gauge-label">Producidas · Límite ${LIMITE_NORMAL.toLocaleString()} t (extra +${(LIMITE_EXTRA-LIMITE_NORMAL).toLocaleString()} t)</div>
+      <div class="gauge-status ${status === 'ok' ? 'status-ok' : (status === 'warning' ? 'status-warning' : 'status-critical')}">${statusText}</div>
+    `;
+    container.appendChild(card);
+    
+    setTimeout(() => drawGauge(canvasId, porcentaje, color), 10);
+  });
+}
+
+function drawGauge(canvasId, percent, color){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width = 200, h = canvas.height = 120;
+  ctx.clearRect(0, 0, w, h);
+  
+  const startAngle = -Math.PI / 1.8;
+  const endAngle = Math.PI / 1.8;
+  const radius = 70;
+  const centerX = w/2, centerY = h - 15;
+  
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.strokeStyle = '#2d3a50';
+  ctx.lineWidth = 18;
+  ctx.stroke();
+  
+  const angle = startAngle + (percent / 100) * (endAngle - startAngle);
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, angle);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 18;
+  ctx.stroke();
+  
+  ctx.font = 'bold 16px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#f0f4ff';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 5);
+  ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#6e7d96';
+  ctx.fillText('vida útil', centerX, centerY + 12);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GRÁFICOS CIRCULARES para pestaña MOLDES
+═══════════════════════════════════════════════════════════ */
+function buildGraficosCirculares(){
+  const data = STATE.data.MOLDES || FB.MOLDES;
+  
+  // Gráfico de Estados
+  const estados = {};
+  data.forEach(m => { estados[m.estado] = (estados[m.estado] || 0) + 1; });
+  const ctxEstado = document.getElementById('chart-estado')?.getContext('2d');
+  if(ctxEstado){
+    if(window.chartEstado) window.chartEstado.destroy();
+    window.chartEstado = new Chart(ctxEstado, {
+      type: 'pie',
+      data: { labels: Object.keys(estados), datasets: [{ data: Object.values(estados), backgroundColor: ['#3dd68c','#f5a623','#60a5fa','#f05252'] }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+    });
+  }
+  
+  // Gráfico de Cromado
+  const cromados = { 'Cromado (Sí)': 0, 'En proceso': 0, 'Sin cromado': 0 };
+  data.forEach(m => {
+    if(m.cromado === 'Sí') cromados['Cromado (Sí)']++;
+    else if(m.cromado === 'En proceso') cromados['En proceso']++;
+    else cromados['Sin cromado']++;
+  });
+  const ctxCromado = document.getElementById('chart-cromado')?.getContext('2d');
+  if(ctxCromado){
+    if(window.chartCromado) window.chartCromado.destroy();
+    window.chartCromado = new Chart(ctxCromado, {
+      type: 'pie',
+      data: { labels: Object.keys(cromados), datasets: [{ data: Object.values(cromados), backgroundColor: ['#3dd68c','#f5a623','#6e7d96'] }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
