@@ -643,7 +643,6 @@ const FB = {
    STATE
 ═══════════════════════════════════════════════════════════ */
 let STATE = {
- let STATE = {
   filter: 'todos',
   activeTab: 'lam',
   activeLam: 'KLB12',
@@ -1533,6 +1532,19 @@ function buildGraficosCirculares(){
    INIT
 ═══════════════════════════════════════════════════════════ */
 cargarDatos();
+  function buildMantenimiento(){
+  document.getElementById('tab-mantenimiento').innerHTML = '<div class="card"><div class="ct">📋 Mantenimiento</div><div style="padding:20px;text-align:center">Próximamente: registro de mantenimiento de moldes</div></div>';
+}
+function buildVidaUtil(){
+  document.getElementById('tab-vidaUtil').innerHTML = '<div class="card"><div class="ct">📊 Vida Útil</div><div style="padding:20px;text-align:center">Próximamente: vida útil de moldes con gauges</div></div>';
+}
+function renderTab(id){
+  if(id==='lam') buildLam();
+  if(id==='moldes') buildMoldes();
+  if(id==='stock') buildStock();
+  if(id==='mantenimiento') buildMantenimiento();
+  if(id==='vidaUtil') buildVidaUtil();
+}
 </script>
 </body>
 </html>
