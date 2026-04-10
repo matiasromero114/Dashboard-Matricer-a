@@ -26,6 +26,53 @@ html{font-size:14px}
 body{background:var(--bg0);color:var(--t0);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:9999}
 button{cursor:pointer;font-family:inherit;border:none;background:none}
+  .gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg3);
+  border-radius: var(--rl);
+  padding: 15px;
+  transition: all .2s;
+}
+.gauge-container:hover {
+  border-color: var(--b2);
+  transform: translateY(-1px);
+}
+.gauge-title {
+  font-family: var(--fh);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--t0);
+}
+.gauge-canvas {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+}
+.gauge-value {
+  font-family: var(--fm);
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.gauge-label {
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t2);
+  margin-top: 4px;
+}
+.gauge-status {
+  font-family: var(--fm);
+  font-size: 11px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.status-ok { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
+.status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
+.status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
 
 /* TOPBAR */
 .topbar{background:var(--bg1);border-bottom:1px solid var(--b1);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200}
@@ -247,6 +294,8 @@ tbody tr:hover td{background:var(--bg3)}
   <button class="navtab active" onclick="switchTab('lam',this)">01 · Laminadoras<span class="tn" id="tn1">30</span></button>
   <button class="navtab" onclick="switchTab('moldes',this)">02 · Moldes y Cromado<span class="tn" id="tn2">14</span></button>
   <button class="navtab" onclick="switchTab('stock',this)">03 · Stock de Repuestos<span class="tn" id="tn3">11</span></button>
+  <button class="navtab" onclick="switchTab('mantenimiento',this)">04 · Mantenimiento<span class="tn" id="tn4">0</span></button>
+  <button class="navtab" onclick="switchTab('vidaUtil',this)">05 · Vida Útil<span class="tn" id="tn5">0</span></button>
 </nav>
 
 <main class="main">
@@ -401,7 +450,22 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
 </section>
+<!-- ═══ TAB 4: MANTENIMIENTO ═══ -->
+<section class="tab-s" id="tab-mantenimiento">
+  <div class="sh"><div><div class="sh-t">Registro de Mantenimiento de Moldes</div><div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div></div></div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución por tipo de tarea</div><div style="position:relative;width:100%;height:250px"><canvas id="chart-tareas"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Últimas intervenciones</div><div id="ult-mant" style="font-size:11px;color:var(--t1)">Cargando...</div></div>
+  </div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Historial completo</div><div class="tw"><tr><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
+</section>
 
+<!-- ═══ TAB 5: VIDA ÚTIL ═══ -->
+<section class="tab-s" id="tab-vidaUtil">
+  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 20.000 t · Límite con reparaciones: 30.000 t</div></div></div>
+  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil · <span style="color:var(--am)">Amarillo</span> = zona de extra (requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida</div></div>
+  <div class="mg" id="gauges-container"></div>
+</section>
 </main>
 
 <footer class="footer">CEVIL · Sistema de Control de Producción v3 · CMP Cevil Redondo · Datos: Google Sheets</footer>
@@ -458,6 +522,8 @@ const URLS_SHEETS = {
   MOLDES:        sheetCSV(SHEET_ID_SEG, '0'),
   CROMADO:       sheetCSV(SHEET_ID_SEG, '2142850839'),
   STOCK:         sheetCSV(SHEET_ID_SEG, '573894203'),
+  VIDA_UTIL:     sheetCSV(SHEET_ID_SEG, '36305866'),
+  MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
 };
 
 // URLs fallback — archivos CSV en GitHub (actualizados manualmente)
@@ -468,6 +534,8 @@ const URLS_GITHUB = {
   MOLDES:        GITHUB_BASE + 'moldes.csv',
   CROMADO:       GITHUB_BASE + 'cromados.csv',
   STOCK:         GITHUB_BASE + 'stock.csv',
+  VIDA_UTIL:     GITHUB_BASE + 'vida_util.csv',
+  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv',
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -575,10 +643,11 @@ const FB = {
    STATE
 ═══════════════════════════════════════════════════════════ */
 let STATE = {
+ let STATE = {
   filter: 'todos',
   activeTab: 'lam',
   activeLam: 'KLB12',
-  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null },
+  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null },
   usingLive: false,
 };
 const CReg = {};
@@ -795,6 +864,39 @@ function parseStock(rows){
       frenos:    sn(r[7]),
       rev:       (r[8]||'').trim(),
     }));
+/* ─── Vida Útil de Moldes ─── */
+function parseVidaUtil(rows){
+  if(!rows) return null;
+  const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde');
+  if(hi < 0) return null;
+  return rows.slice(hi+1)
+    .filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde')
+    .map(r => ({
+      molde: (r[0]||'').trim(),
+      numero: (r[1]||'').trim(),
+      clave: (r[2]||'').trim(),
+      inicio: (r[3]||'').trim(),
+      fin: (r[4]||'').trim() || null,
+      tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0,
+      horas: (r[6]||'').trim(),
+      pallets: (r[7]||'').trim() || null,
+    }));
+}
+
+/* ─── Mantenimiento de Moldes ─── */
+function parseMantenimiento(rows){
+  if(!rows) return null;
+  const hi = rows.findIndex(r => (r[0]||'').trim() === 'Fecha');
+  if(hi < 0) return null;
+  return rows.slice(hi+1)
+    .filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Fecha')
+    .map(r => ({
+      fecha: (r[0]||'').trim(),
+      responsable: (r[1]||'').trim(),
+      moldeEquipo: (r[2]||'').trim(),
+      tipoTarea: (r[3]||'').trim(),
+      descripcion: (r[4]||'').trim(),
+    }));
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -811,14 +913,15 @@ async function cargarDatos(){
 
   try{
     // Fetch simultáneo — cada llamada prueba Sheets primero, GitHub segundo
-    const [r1,r2,r3,r4,r5] = await Promise.all([
-      fetchCSV(URLS_SHEETS.CAMISA_KLB12,  URLS_GITHUB.CAMISA_KLB12),
-      fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
-      fetchCSV(URLS_SHEETS.MOLDES,        URLS_GITHUB.MOLDES),
-      fetchCSV(URLS_SHEETS.CROMADO,       URLS_GITHUB.CROMADO),
-      fetchCSV(URLS_SHEETS.STOCK,         URLS_GITHUB.STOCK),
-    ]);
-
+   const [r1,r2,r3,r4,r5,r6,r7] = await Promise.all([
+  fetchCSV(URLS_SHEETS.CAMISA_KLB12,  URLS_GITHUB.CAMISA_KLB12),
+  fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
+  fetchCSV(URLS_SHEETS.MOLDES,        URLS_GITHUB.MOLDES),
+  fetchCSV(URLS_SHEETS.CROMADO,       URLS_GITHUB.CROMADO),
+  fetchCSV(URLS_SHEETS.STOCK,         URLS_GITHUB.STOCK),
+  fetchCSV(URLS_SHEETS.VIDA_UTIL,     URLS_GITHUB.VIDA_UTIL),
+  fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO),
+]);
     // Contar fuentes
     [r1,r2,r3,r4,r5].forEach(r=>{
       if(r?.source==='sheets') fromSheets++;
@@ -829,7 +932,9 @@ async function cargarDatos(){
     if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length>0){ STATE.data.LM1210=p; console.log('✅ LM1210:',p.rows.length,'filas ['+r2.source+']');} else console.warn('⚠ LM1210 parser vacío'); }
     if(r3){ const p=parseMoldes(r3.rows);         if(p&&p.length>0){       STATE.data.MOLDES=p;  console.log('✅ Moldes:',p.length,'filas ['+r3.source+']');} else console.warn('⚠ Moldes parser vacío'); }
     if(r4){ const p=parseCromado(r4.rows);        if(p&&p.length>0){       STATE.data.CROMADO=p; console.log('✅ Cromado:',p.length,'filas ['+r4.source+']');} else console.warn('⚠ Cromado parser vacío'); }
-    if(r5){ const p=parseStock(r5.rows);          if(p&&p.length>0){       STATE.data.STOCK=p;   console.log('✅ Stock:',p.length,'filas ['+r5.source+']');} else console.warn('⚠ Stock parser vacío'); }
+    if(r5){ const p=parseStock(r5.rows);          if(p&&p.length>0){       STATE.data.STOCK=p;   console.log('✅ Stock:',p.length,'filas
+    if(r6){ const p=parseVidaUtil(r6.rows); if(p&&p.length>0){ STATE.data.VIDA_UTIL=p; console.log('✅ VidaUtil:',p.length); } else console.warn('⚠ VidaUtil parser vacío'); }
+    if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length>0){ STATE.data.MANTENIMIENTO=p; console.log('✅ Mantenimiento:',p.length); } else console.warn('⚠ Mantenimiento parser vacío'); }
 
     // Fallback hardcodeado — solo si ambas fuentes fallaron para esa hoja
     if(!STATE.data.KLB12)  { STATE.data.KLB12  = FB.KLB12;  console.warn('⬇ Fallback local KLB12'); }
@@ -837,6 +942,8 @@ async function cargarDatos(){
     if(!STATE.data.MOLDES) { STATE.data.MOLDES = FB.MOLDES;  console.warn('⬇ Fallback local Moldes'); }
     if(!STATE.data.CROMADO){ STATE.data.CROMADO= FB.CROMADO; console.warn('⬇ Fallback local Cromado'); }
     if(!STATE.data.STOCK)  { STATE.data.STOCK  = FB.STOCK;   console.warn('⬇ Fallback local Stock'); }
+    if(!STATE.data.VIDA_UTIL)  { STATE.data.VIDA_UTIL = []; console.warn('⬇ Fallback local VidaUtil vacío'); }
+    if(!STATE.data.MANTENIMIENTO) { STATE.data.MANTENIMIENTO = []; console.warn('⬇ Fallback local Mantenimiento vacío'); }
 
   }catch(e){
     console.error('cargarDatos error:', e);
@@ -904,6 +1011,8 @@ function renderTab(id){
   if(id==='lam')    buildLam();
   if(id==='moldes') buildMoldes();
   if(id==='stock')  buildStock();
+  if(id==='mantenimiento') buildMantenimiento();
+  if(id==='vidaUtil') buildVidaUtil();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1067,6 +1176,7 @@ function buildMoldes(){
     <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div>
     <div class="kpi ka"><div class="kl">Exceden +100g nominal</div><div class="kv" style="color:var(--am)">${data.filter(m=>m.prom&&(m.prom-m.nominal)*1000>100).length}</div><div class="km">moldes con sobrepeso crítico</div></div>
   `;
+  buildGraficosCirculares();
 
   // Gráfico pesos
   dc('pesos');
@@ -1256,6 +1366,167 @@ function copyFalt(){
   data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push(`• ${s.molde} — ${labels[c]}: Stock 0`); }); });
   const txt=`LISTA DE FALTANTES — MATRICERÍA CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n`+(falt.length?falt.join('\n'):'Sin faltantes en stock actual.');
   navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada al portapapeles'));
+}
+  /* ═══════════════════════════════════════════════════════════
+   TAB 4 — MANTENIMIENTO
+═══════════════════════════════════════════════════════════ */
+function buildMantenimiento(){
+  const data = STATE.data.MANTENIMIENTO || [];
+  document.getElementById('tn4').textContent = data.length;
+  
+  // Tabla completa
+  document.getElementById('tbody-mantenimiento').innerHTML = data.length ? data.map(r => `
+    <tr>
+      <td class="tg">${r.fecha}</td>
+      <td>${r.responsable}</td>
+      <td>${r.moldeEquipo}</td>
+      <td><span class="badge ba">${r.tipoTarea}</span></td>
+      <td style="max-width:300px">${r.descripcion}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+  
+  // Últimas 5 intervenciones
+  const ultimas = [...data].reverse().slice(0,5);
+  document.getElementById('ult-mant').innerHTML = ultimas.length ? ultimas.map(r => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)">
+      <span style="color:var(--t0)">${r.fecha}</span>
+      <span><span class="badge ba">${r.tipoTarea}</span></span>
+      <span style="color:var(--t2)">${r.moldeEquipo}</span>
+    </div>
+  `).join('') : '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+  
+  // Gráfico de tipos de tarea
+  const tipos = {};
+  data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
+  const ctx = document.getElementById('chart-tareas').getContext('2d');
+  if(window.chartTareas) window.chartTareas.destroy();
+  window.chartTareas = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: Object.keys(tipos),
+      datasets: [{ data: Object.values(tipos), backgroundColor: ['#3dd68c','#f5a623','#60a5fa','#f05252','#2dd4bf','#fb923c'] }]
+    },
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 5 — VIDA ÚTIL (con gauges semicirculares)
+   Límite normal: 20.000 t | Límite con reparaciones: 30.000 t
+═══════════════════════════════════════════════════════════ */
+function buildVidaUtil(){
+  const data = STATE.data.VIDA_UTIL || [];
+  document.getElementById('tn5').textContent = data.length;
+  const LIMITE_NORMAL = 20000;
+  const LIMITE_EXTRA = 30000;
+  
+  const container = document.getElementById('gauges-container');
+  if(!container) return;
+  container.innerHTML = '';
+  
+  if(!data.length){
+    container.innerHTML = '<div class="al alg"><div class="aico">📊</div><div><div class="at">Sin datos de vida útil</div><div class="ad">No hay registros de producción acumulada por molde.</div></div></div>';
+    return;
+  }
+  
+  data.forEach(molde => {
+    const tn = molde.tnProducidas;
+    const porcentaje = Math.min((tn / LIMITE_EXTRA) * 100, 100);
+    let status = '', statusText = '', color = '';
+    
+    if(tn >= LIMITE_EXTRA) {
+      status = 'critical'; statusText = '⚠ Vida útil EXCEDIDA'; color = '#f05252';
+    } else if(tn >= LIMITE_NORMAL) {
+      status = 'warning'; statusText = '⚠ Zona de extra (requiere reparaciones)'; color = '#f5a623';
+    } else {
+      status = 'ok'; statusText = '✓ Dentro de vida útil'; color = '#3dd68c';
+    }
+    
+    const canvasId = `gauge-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
+    const card = document.createElement('div');
+    card.className = 'gauge-container';
+    card.innerHTML = `
+      <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
+      <canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas>
+      <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} t</div>
+      <div class="gauge-label">Producidas · Límite ${LIMITE_NORMAL.toLocaleString()} t (extra +${(LIMITE_EXTRA-LIMITE_NORMAL).toLocaleString()} t)</div>
+      <div class="gauge-status ${status === 'ok' ? 'status-ok' : (status === 'warning' ? 'status-warning' : 'status-critical')}">${statusText}</div>
+    `;
+    container.appendChild(card);
+    
+    setTimeout(() => drawGauge(canvasId, porcentaje, color), 10);
+  });
+}
+
+function drawGauge(canvasId, percent, color){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width = 200, h = canvas.height = 120;
+  ctx.clearRect(0, 0, w, h);
+  
+  const startAngle = -Math.PI / 1.8;
+  const endAngle = Math.PI / 1.8;
+  const radius = 70;
+  const centerX = w/2, centerY = h - 15;
+  
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.strokeStyle = '#2d3a50';
+  ctx.lineWidth = 18;
+  ctx.stroke();
+  
+  const angle = startAngle + (percent / 100) * (endAngle - startAngle);
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, angle);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 18;
+  ctx.stroke();
+  
+  ctx.font = 'bold 16px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#f0f4ff';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 5);
+  ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#6e7d96';
+  ctx.fillText('vida útil', centerX, centerY + 12);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GRÁFICOS CIRCULARES para pestaña MOLDES
+═══════════════════════════════════════════════════════════ */
+function buildGraficosCirculares(){
+  const data = STATE.data.MOLDES || FB.MOLDES;
+  
+  // Gráfico de Estados
+  const estados = {};
+  data.forEach(m => { estados[m.estado] = (estados[m.estado] || 0) + 1; });
+  const ctxEstado = document.getElementById('chart-estado')?.getContext('2d');
+  if(ctxEstado){
+    if(window.chartEstado) window.chartEstado.destroy();
+    window.chartEstado = new Chart(ctxEstado, {
+      type: 'pie',
+      data: { labels: Object.keys(estados), datasets: [{ data: Object.values(estados), backgroundColor: ['#3dd68c','#f5a623','#60a5fa','#f05252'] }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+    });
+  }
+  
+  // Gráfico de Cromado
+  const cromados = { 'Cromado (Sí)': 0, 'En proceso': 0, 'Sin cromado': 0 };
+  data.forEach(m => {
+    if(m.cromado === 'Sí') cromados['Cromado (Sí)']++;
+    else if(m.cromado === 'En proceso') cromados['En proceso']++;
+    else cromados['Sin cromado']++;
+  });
+  const ctxCromado = document.getElementById('chart-cromado')?.getContext('2d');
+  if(ctxCromado){
+    if(window.chartCromado) window.chartCromado.destroy();
+    window.chartCromado = new Chart(ctxCromado, {
+      type: 'pie',
+      data: { labels: Object.keys(cromados), datasets: [{ data: Object.values(cromados), backgroundColor: ['#3dd68c','#f5a623','#6e7d96'] }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
