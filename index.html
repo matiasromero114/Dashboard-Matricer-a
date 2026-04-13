@@ -346,7 +346,7 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="card"><div class="ct"><div class="ctd" style="background:var(--gr)"></div>Distribución por tipo de tarea</div><div id="chart-tareas-tipo" style="min-height:280px">Cargando...</div></div>
     <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div><div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div></div>
   </div>
-  <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Últimas intervenciones</div><div id="ult-mant" style="font-size:11px;color:var(--t1)">Cargando...</div></div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Todas las intervenciones · Total: <span id="total-intervenciones">0</span></div><div id="ult-mant" style="font-size:11px;color:var(--t1);max-height:500px;overflow-y:auto">Cargando...</div></div>
   <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo</div><div class="tw"></table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
 </section>
 
@@ -983,6 +983,7 @@ function buildMantenimiento(){
   console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
   
   document.getElementById('tn4').textContent = data.length;
+  document.getElementById('total-intervenciones').textContent = data.length;
   
   const containerTipo = document.getElementById('chart-tareas-tipo');
   const containerResp = document.getElementById('chart-tareas-responsable');
@@ -990,7 +991,7 @@ function buildMantenimiento(){
   const containerTabla = document.getElementById('tbody-mantenimiento');
   
   if(!data.length){
-    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ No hay datos de mantenimiento. Verificar publicación del CSV.</div>';
+    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ No hay datos de mantenimiento.</div>';
     if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">Sin datos</div>';
     if(containerUlt) containerUlt.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
     if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros</td></tr>';
@@ -1010,18 +1011,19 @@ function buildMantenimiento(){
     `).join('');
   }
   
-  // ===== TODAS LAS INTERVENCIONES (antes eran solo las últimas 5) =====
+  // ===== TODAS LAS INTERVENCIONES (con descripción) =====
   if(containerUlt){
-    // Ahora mostramos TODAS, ordenadas por fecha descendente (más recientes primero)
+    // Mostrar TODAS, ordenadas por fecha descendente (más recientes primero)
     const todas = [...data].reverse();
     containerUlt.innerHTML = todas.map(r => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2)">${r.fecha || '—'}</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b0);gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:200px">
+          <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2);white-space:nowrap">${r.fecha || '—'}</div>
           ${getTareaBadge(r.tipoTarea || 'Otros')}
           <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
           <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
         </div>
+        <div style="color:var(--t1);font-size:11px;flex:1;min-width:200px;text-align:left">${r.descripcion || '—'}</div>
       </div>
     `).join('');
   }
