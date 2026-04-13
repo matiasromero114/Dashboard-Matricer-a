@@ -820,7 +820,7 @@ function buildMantenimiento(){
     return;
   }
   
-  // TABLA COMPLETA
+  // ===== TABLA COMPLETA (Historial completo) =====
   if(containerTabla){
     containerTabla.innerHTML = data.map(r => `
       <tr style="border-bottom:1px solid var(--b0)">
@@ -833,22 +833,23 @@ function buildMantenimiento(){
     `).join('');
   }
   
-  // ÚLTIMAS 5 INTERVENCIONES
+  // ===== TODAS LAS INTERVENCIONES (antes eran solo las últimas 5) =====
   if(containerUlt){
-    const ultimas = [...data].reverse().slice(0,5);
-    containerUlt.innerHTML = ultimas.map(r => `
+    // Ahora mostramos TODAS, ordenadas por fecha descendente (más recientes primero)
+    const todas = [...data].reverse();
+    containerUlt.innerHTML = todas.map(r => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">
-        <div style="display:flex;align-items:center;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2)">${r.fecha || '—'}</div>
           ${getTareaBadge(r.tipoTarea || 'Otros')}
+          <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
+          <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
         </div>
-        <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
-        <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
       </div>
     `).join('');
   }
   
-  // GRÁFICO 1: Distribución por tipo de tarea
+  // ===== GRÁFICO 1: Distribución por tipo de tarea =====
   if(containerTipo){
     const tipos = {};
     data.forEach(r => { 
@@ -878,7 +879,7 @@ function buildMantenimiento(){
     `;
   }
   
-  // GRÁFICO 2: Top responsables
+  // ===== GRÁFICO 2: Top responsables =====
   if(containerResp){
     const responsables = {};
     data.forEach(r => { 
