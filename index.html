@@ -352,8 +352,8 @@ tbody tr:hover td{background:var(--bg3)}
 
 <!-- TAB 5: VIDA ÚTIL -->
 <section class="tab-s" id="tab-vidaUtil">
-  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 20.000 t · Límite con reparaciones: 30.000 t</div></div></div>
-  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil · <span style="color:var(--am)">Amarillo</span> = zona de extra · <span style="color:var(--re)">Rojo</span> = vida útil excedida</div></div>
+  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 15.000 t · Extra por reparaciones: +10.000 t (total 25.000 t)</div>
+ <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil (hasta 15.000 t) · <span style="color:var(--am)">Amarillo</span> = zona de extra (15.000 a 25.000 t, requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida (más de 25.000 t)</div></div>
   <div class="mg" id="gauges-container"></div>
 </section>
 
@@ -1093,39 +1093,114 @@ function buildMantenimiento(){
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
-  const LIMITE_NORMAL = 20000, LIMITE_EXTRA = 30000;
+  
+  // NUEVOS LÍMITES
+  const LIMITE_NORMAL = 15000;    // 15.000 toneladas - vida útil normal
+  const LIMITE_EXTRA = 10000;     // 10.000 toneladas extra por reparaciones
+  const LIMITE_TOTAL = LIMITE_NORMAL + LIMITE_EXTRA; // 25.000 toneladas totales
+  
   const container = document.getElementById('gauges-container');
-  if(!data.length){ container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>'; return; }
+  
+  if(!data.length){
+    container.innerHTML = '<div class="al alg"><div class="aico">📊</div><div><div class="at">Sin datos de vida útil</div><div class="ad">No hay registros de producción acumulada por molde.</div></div></div>';
+    return;
+  }
+  
   container.innerHTML = '';
+  
   data.forEach(molde => {
     const tn = molde.tnProducidas;
-    const porcentaje = Math.min((tn / LIMITE_EXTRA) * 100, 100);
+    const porcentaje = Math.min((tn / LIMITE_TOTAL) * 100, 100);
     let status = '', statusText = '', color = '';
-    if(tn >= LIMITE_EXTRA){ status='critical'; statusText='⚠ EXCEDIDA'; color='#f05252'; }
-    else if(tn >= LIMITE_NORMAL){ status='warning'; statusText='⚠ Zona de extra'; color='#f5a623'; }
-    else{ status='ok'; statusText='✓ Dentro de vida útil'; color='#3dd68c'; }
+    
+    if(tn >= LIMITE_TOTAL) {
+      status = 'critical'; 
+      statusText = '⚠ VIDA ÚTIL EXCEDIDA'; 
+      color = '#f05252';
+    } else if(tn >= LIMITE_NORMAL) {
+      status = 'warning'; 
+      statusText = '⚠ ZONA DE EXTRA (requiere reparaciones)'; 
+      color = '#f5a623';
+    } else {
+      status = 'ok'; 
+      statusText = '✓ DENTRO DE VIDA ÚTIL'; 
+      color = '#3dd68c';
+    }
+    
     const canvasId = `gauge-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
-    const card = document.createElement('div'); card.className = 'gauge-container';
-    card.innerHTML = `<div class="gauge-title">${molde.molde} ${molde.numero||''}</div><canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas><div class="gauge-value" style="color:${color}">${tn.toLocaleString()} t</div><div class="gauge-label">Límite ${LIMITE_NORMAL.toLocaleString()} t</div><div class="gauge-status status-${status}">${statusText}</div>`;
+    const card = document.createElement('div');
+    card.className = 'gauge-container';
+    card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
+    card.innerHTML = `
+      <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div>
+      <canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas>
+      <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
+      <div class="gauge-label">Vida útil normal: ${LIMITE_NORMAL.toLocaleString()} t</div>
+      <div class="gauge-label" style="color:var(--t3)">Extra por reparaciones: +${LIMITE_EXTRA.toLocaleString()} t</div>
+      <div class="gauge-label" style="color:var(--t2);margin-top:4px">Límite total: ${LIMITE_TOTAL.toLocaleString()} t</div>
+      <div class="gauge-status ${status === 'ok' ? 'status-ok' : (status === 'warning' ? 'status-warning' : 'status-critical')}" style="margin-top:12px">${statusText}</div>
+    `;
     container.appendChild(card);
-    setTimeout(() => drawGauge(canvasId, porcentaje, color), 10);
+    
+    setTimeout(() => drawGauge(canvasId, porcentaje, color, LIMITE_NORMAL, LIMITE_TOTAL), 10);
   });
 }
 
-function drawGauge(canvasId, percent, color){
+unction drawGauge(canvasId, percent, color, limiteNormal, limiteTotal){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width = 200, h = canvas.height = 120;
   ctx.clearRect(0, 0, w, h);
-  const startAngle = -Math.PI / 1.8, endAngle = Math.PI / 1.8, radius = 70, centerX = w/2, centerY = h - 15;
-  ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, endAngle); ctx.strokeStyle = '#2d3a50'; ctx.lineWidth = 14; ctx.stroke();
+  
+  const startAngle = -Math.PI / 1.8;
+  const endAngle = Math.PI / 1.8;
+  const radius = 70;
+  const centerX = w/2, centerY = h - 15;
+  
+  // Fondo del gauge (track)
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.strokeStyle = '#2d3a50';
+  ctx.lineWidth = 14;
+  ctx.stroke();
+  
+  // Calcular ángulo para el límite normal (15,000 t)
+  const normalPorcentaje = (limiteNormal / limiteTotal) * 100;
+  const normalAngle = startAngle + (normalPorcentaje / 100) * (endAngle - startAngle);
+  
+  // Línea de límite normal (15,000 t)
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius + 4, normalAngle - 0.03, normalAngle + 0.03);
+  ctx.strokeStyle = '#f5a623';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // Barra de progreso
   const angle = startAngle + (percent / 100) * (endAngle - startAngle);
-  ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, angle); ctx.strokeStyle = color; ctx.lineWidth = 14; ctx.stroke();
-  ctx.font = 'bold 16px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f0f4ff'; ctx.textAlign = 'center'; ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 5);
-  ctx.font = '9px "IBM Plex Mono", monospace'; ctx.fillStyle = '#6e7d96'; ctx.fillText('vida útil', centerX, centerY + 12);
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, angle);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 14;
+  ctx.stroke();
+  
+  // Texto central
+  ctx.font = 'bold 20px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#f0f4ff';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 3);
+  ctx.font = '9px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#6e7d96';
+  ctx.fillText('vida útil', centerX, centerY + 14);
+  
+  // Marca de límite normal (15k)
+  ctx.font = '8px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#f5a623';
+  const markX = centerX + Math.cos(normalAngle) * (radius + 12);
+  const markY = centerY + Math.sin(normalAngle) * (radius + 12);
+  ctx.fillText('15k', markX - 8, markY - 3);
 }
-
 cargarDatos();
 </script>
 </body>
