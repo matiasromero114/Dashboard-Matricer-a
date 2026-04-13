@@ -539,12 +539,39 @@ function parseVidaUtil(rows){
 }
 
 function parseMantenimiento(rows){
-  if(!rows) return null;
-  const hi = rows.findIndex(r => (r[0]||'').trim() === 'Fecha');
-  if(hi < 0) return null;
-  return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Fecha').map(r => ({
-    fecha: (r[0]||'').trim(), responsable: (r[1]||'').trim(), moldeEquipo: (r[2]||'').trim(), tipoTarea: (r[3]||'').trim(), descripcion: (r[4]||'').trim()
-  }));
+  if(!rows || rows.length < 2) return null;
+  
+  // Buscar la fila que contiene "Fecha" en la primera columna (ignorando mayúsculas/minúsculas)
+  let headerIndex = -1;
+  for(let i = 0; i < Math.min(rows.length, 10); i++){
+    const firstCol = (rows[i][0] || '').trim().toLowerCase();
+    if(firstCol === 'fecha' || firstCol.startsWith('fecha')){
+      headerIndex = i;
+      break;
+    }
+  }
+  
+  if(headerIndex === -1) return null;
+  
+  const datos = [];
+  for(let i = headerIndex + 1; i < rows.length; i++){
+    const row = rows[i];
+    if(!row || row.length < 3) continue;
+    
+    const fecha = (row[0] || '').trim();
+    if(!fecha || fecha === '' || fecha === 'Fecha') continue;
+    
+    datos.push({
+      fecha: fecha,
+      responsable: (row[1] || '').trim(),
+      moldeEquipo: (row[2] || '').trim(),
+      tipoTarea: (row[3] || '').trim(),
+      descripcion: (row[4] || '').trim()
+    });
+  }
+  
+  console.log('📋 Mantenimiento parseado:', datos.length, 'registros');
+  return datos;
 }
 async function cargarDatos(){
   const btn = document.getElementById('btn-refresh');
@@ -771,19 +798,92 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
+  console.log('🔧 buildMantenimiento - datos:', data.length);
   document.getElementById('tn4').textContent = data.length;
-  if(!data.length){ document.getElementById('tbody-mantenimiento').innerHTML='<tr><td colspan="5">Sin datos</td></tr>'; document.getElementById('ult-mant').innerHTML='Sin registros'; return; }
-  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r=>`<tr><td class="tg">${r.fecha}</td><td>${r.responsable}</td><td>${r.moldeEquipo}</td><td>${getTareaBadge(r.tipoTarea)}</td><td style="max-width:300px">${r.descripcion}</td></tr>`).join('');
+  
+  if(!data.length){
+    document.getElementById('tbody-mantenimiento').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+    document.getElementById('ult-mant').innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+    document.getElementById('chart-tareas-tipo').innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">Sin datos</div>';
+    document.getElementById('chart-tareas-responsable').innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">Sin datos</div>';
+    return;
+  }
+  
+  // TABLA COMPLETA
+  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `
+    <tr style="border-bottom:1px solid var(--b0)">
+      <td class="tg" style="white-space:nowrap">${r.fecha}</td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable}</td>
+      <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo}</td>
+      <td>${getTareaBadge(r.tipoTarea)}</td>
+      <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
+    </tr>
+  `).join('');
+  
+  // ÚLTIMAS 5 INTERVENCIONES
   const ultimas = [...data].reverse().slice(0,5);
-  document.getElementById('ult-mant').innerHTML = ultimas.map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)"><span>${r.fecha}</span>${getTareaBadge(r.tipoTarea)}<span>${r.moldeEquipo}</span></div>`).join('');
-  const tipos = {}; data.forEach(r=>{ tipos[r.tipoTarea] = (tipos[r.tipoTarea]||0)+1; });
-  const tiposHtml = Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${t}</span><span style="color:var(--am)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/data.length)*100}%;height:100%;background:var(--am);border-radius:4px"></div></div></div>`).join('');
-  document.getElementById('chart-tareas-tipo').innerHTML = `<div style="margin-bottom:12px">📊 Cantidad de tareas por tipo</div>${tiposHtml}`;
-  const resp = {}; data.forEach(r=>{ resp[r.responsable] = (resp[r.responsable]||0)+1; });
-  const respHtml = Object.entries(resp).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([r,c])=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${r}</span><span style="color:var(--bl)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/data.length)*100}%;height:100%;background:var(--bl);border-radius:4px"></div></div></div>`).join('');
-  document.getElementById('chart-tareas-responsable').innerHTML = `<div style="margin-bottom:12px">👥 Top responsables</div>${respHtml}`;
+  document.getElementById('ult-mant').innerHTML = ultimas.map(r => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2)">${r.fecha}</div>
+        ${getTareaBadge(r.tipoTarea)}
+      </div>
+      <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo}</div>
+      <div style="font-size:11px;color:var(--t2)">${r.responsable}</div>
+    </div>
+  `).join('');
+  
+  // GRÁFICO 1: Distribución por tipo de tarea (barras horizontales)
+  const tipos = {};
+  data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
+  const maxTareas = Math.max(...Object.values(tipos));
+  const coloresTipos = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a'];
+  
+  document.getElementById('chart-tareas-tipo').innerHTML = `
+    <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
+    ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
+      const porcentaje = (cantidad / maxTareas) * 100;
+      const color = coloresTipos[idx % coloresTipos.length];
+      return `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span>
+            <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+          </div>
+          <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+            <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `;
+  
+  // GRÁFICO 2: Top responsables
+  const responsables = {};
+  data.forEach(r => { responsables[r.responsable] = (responsables[r.responsable] || 0) + 1; });
+  const responsablesOrdenados = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
+  const maxResp = responsablesOrdenados[0]?.[1] || 1;
+  const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
+  
+  document.getElementById('chart-tareas-responsable').innerHTML = `
+    <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
+    ${responsablesOrdenados.map(([responsable, cantidad], idx) => {
+      const porcentaje = (cantidad / maxResp) * 100;
+      const color = coloresResp[idx % coloresResp.length];
+      return `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span>
+            <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+          </div>
+          <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+            <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `;
 }
-
 // ==================== VIDA ÚTIL ====================
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
