@@ -500,15 +500,77 @@ function parseCamisa_LM1210(rows){
 }
 
 function parseMoldes(rows){
-  if(!rows||rows.length<4) return null;
-  const hi = rows.findIndex(r=> (r[0]||'').trim()==='Molde' && r.some(c=>(c||'').includes('Peso')));
-  if(hi<0) return null;
-  return rows.slice(hi+1).filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde').map(r=>{
-    const promRaw = (r[13]||'').trim();
-    const prom = (promRaw===''||promRaw==='-') ? null : sn(promRaw,null);
-    const vias = [r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12]].map(v=>sn(v,null)).filter(v=>v!==null&&v>0);
-    return { id: normID(r[0]), num: (r[1]||'1').trim(), estado: (r[2]||'').trim(), enPeso: (r[3]||'').trim(), nominal: sn(r[4]), prom, vias, cromado: (r[15]||'No').trim(), obs: (r[16]||'').trim(), fecha: (r[17]||'').trim() };
-  });
+  if(!rows || rows.length < 4) return [];
+  
+  // Buscar la fila que contiene "Molde" en la primera columna
+  let headerIndex = -1;
+  for(let i = 0; i < Math.min(rows.length, 20); i++){
+    const firstCol = (rows[i][0] || '').trim();
+    if(firstCol === 'Molde'){
+      headerIndex = i;
+      break;
+    }
+  }
+  
+  if(headerIndex === -1){
+    console.warn('No se encontró la fila header "Molde"');
+    return [];
+  }
+  
+  const resultados = [];
+  
+  for(let i = headerIndex + 1; i < rows.length; i++){
+    const row = rows[i];
+    if(!row || row.length < 5) continue;
+    
+    const moldeId = (row[0] || '').trim();
+    if(!moldeId || moldeId === '' || moldeId === 'Molde') continue;
+    
+    // Columna E (índice 4) - Peso nominal
+    const nominal = parseFloat(String(row[4] || '0').replace(',', '.'));
+    
+    // Columnas F a M (índices 5 a 12) - Vías 1 a 8
+    const vias = [];
+    for(let v = 5; v <= 12; v++){
+      const val = row[v] ? parseFloat(String(row[v]).replace(',', '.')) : null;
+      if(val !== null && !isNaN(val) && val > 0){
+        vias.push(val);
+      }
+    }
+    
+    // Columna N (índice 13) - Peso promedio
+    let promedio = null;
+    const promRaw = (row[13] || '').trim();
+    if(promRaw && promRaw !== '' && promRaw !== '-' && promRaw !== 'S/D'){
+      promedio = parseFloat(String(promRaw).replace(',', '.'));
+      if(isNaN(promedio)) promedio = null;
+    }
+    
+    // Si no hay promedio pero hay vías, calcular promedio
+    if(!promedio && vias.length > 0){
+      promedio = vias.reduce((a,b) => a + b, 0) / vias.length;
+    }
+    
+    resultados.push({
+      id: normID(moldeId),
+      num: (row[1] || '1').trim(),
+      estado: (row[2] || '').trim(),
+      enPeso: (row[3] || '').trim(),
+      nominal: isNaN(nominal) ? 0 : nominal,
+      prom: promedio,
+      vias: vias,
+      cromado: (row[15] || 'No').trim(),
+      obs: (row[16] || '').trim(),
+      fecha: (row[17] || '').trim()
+    });
+  }
+  
+  console.log('📊 Moldes parseados:', resultados.length, 'registros');
+  if(resultados.length > 0){
+    console.log('📊 Primer molde:', resultados[0]);
+    console.log('📊 Vías del primer molde:', resultados[0].vias);
+  }
+  return resultados;
 }
 
 function parseCromado(rows){
@@ -714,38 +776,153 @@ function buildLam(){
 }
 
 // ==================== MOLDES ====================
-function pesoColor(prom,nominal){ if(prom===null) return '#555a68'; const dif=(prom-nominal)*1000; if(dif<0) return '#3dd68c'; if(dif<=100) return '#f5a623'; return '#f05252'; }
-
+function pesoColor(prom, nominal){
+  if(prom === null || prom === undefined) return '#555a68';
+  const dif = (prom - nominal) * 1000; // diferencia en gramos
+  if(dif < 0) return '#3dd68c';      // verde: por debajo del nominal
+  if(dif <= 100) return '#f5a623';   // amarillo: dentro de ±100g
+  return '#f05252';                   // rojo: más de +300g sobre nominal
+}
 function buildMoldes(){
   const F = STATE.filter;
   const data = STATE.data.MOLDES || [];
-  const filtered = F==='todos'?data:data.filter(m=>m.id===F||m.id===normID(F));
-  const ops = data.filter(m=>m.estado==='Operativo').length;
-  const cal = data.filter(m=>m.estado==='En calibración').length;
-  const fab = data.filter(m=>m.estado==='En fabricación').length;
-  const crom = data.filter(m=>m.cromado==='Sí'||m.cromado==='En proceso').length;
+  const filtered = F === 'todos' ? data : data.filter(m => m.id === F || m.id === normID(F));
+  
+  // Estadísticas para KPIs
+  const ops = data.filter(m => m.estado === 'Operativo').length;
+  const cal = data.filter(m => m.estado === 'En calibración' || m.estado === 'En laboratorio').length;
+  const fab = data.filter(m => m.estado === 'En fabricación').length;
+  const crom = data.filter(m => m.cromado === 'Sí' || m.cromado === 'En proceso').length;
+  const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 100).length;
 
   document.getElementById('kpi-moldes').innerHTML = `
-    <div class="kpi kg"><div class="kl">Operativos</div><div class="kv">${ops}</div></div>
-    <div class="kpi kb"><div class="kl">Cromado/Calibración</div><div class="kv">${crom+cal}</div></div>
-    <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv">${fab}</div></div>
-    <div class="kpi ka"><div class="kl">Exceden +100g</div><div class="kv">${data.filter(m=>m.prom&&(m.prom-m.nominal)*1000>100).length}</div></div>
+    <div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div>
+    <div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div>
+    <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div>
+    <div class="kpi ka"><div class="kl">Exceden +100g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
   `;
 
+  // Gráfico de pesos
   dc('pesos');
-  new Chart(document.getElementById('ch-pesos'),{ type:'bar', data:{ labels:filtered.map(m=>`${m.id} #${m.num}`), datasets:[{label:'Peso real',data:filtered.map(m=>m.prom||0),backgroundColor:filtered.map(m=>pesoColor(m.prom,m.nominal)+'bb')},{label:'Nominal',data:filtered.map(m=>m.nominal),backgroundColor:'rgba(245,166,35,.15)'}] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false } });
+  new Chart(document.getElementById('ch-pesos'), {
+    type: 'bar',
+    data: {
+      labels: filtered.map(m => `${m.id} #${m.num}`),
+      datasets: [
+        {
+          label: 'Peso real promedio',
+          data: filtered.map(m => m.prom || 0),
+          backgroundColor: filtered.map(m => pesoColor(m.prom, m.nominal) + 'bb'),
+          borderColor: filtered.map(m => pesoColor(m.prom, m.nominal)),
+          borderWidth: 1,
+          borderRadius: 4
+        },
+        {
+          label: 'Nominal',
+          data: filtered.map(m => m.nominal),
+          backgroundColor: 'rgba(245,166,35,.15)',
+          borderColor: 'rgba(245,166,35,.4)',
+          borderWidth: 1.5,
+          borderRadius: 4,
+          type: 'bar'
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'kg', color: '#6e7d96' }, ticks: { color: '#6e7d96' } },
+        y: { ticks: { color: '#b8c4d8' } }
+      }
+    }
+  });
 
-  let alHtml='';
-  filtered.filter(m=>m.estado==='En fabricación').forEach(m=>{ alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs}</div></div></div>`; });
-  filtered.filter(m=>m.prom&&(m.prom-m.nominal)*1000>100).forEach(m=>{ alHtml+=`<div class="al alr"><div class="aico">◆</div><div><div class="at">${m.id} #${m.num} — Sobrepeso</div></div></div>`; });
-  if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas</div></div></div>`;
+  // Alertas
+  let alHtml = '';
+  filtered.filter(m => m.estado === 'En fabricación').forEach(m => {
+    alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`;
+  });
+  filtered.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 100).forEach(m => {
+    const dif = ((m.prom - m.nominal) * 1000).toFixed(0);
+    alHtml += `<div class="al alr"><div class="aico">◆</div><div><div class="at">${m.id} #${m.num} — Sobrepeso +${dif} g</div><div class="ad">Real: ${m.prom.toFixed(3)} kg · Nominal: ${m.nominal.toFixed(1)} kg</div></div></div>`;
+  });
+  filtered.filter(m => m.estado === 'Operativo' && m.cromado === 'No').forEach(m => {
+    alHtml += `<div class="al ala"><div class="aico">◇</div><div><div class="at">${m.id} #${m.num} — Cromado pendiente</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`;
+  });
+  if (!alHtml) alHtml = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('alerts-moldes').innerHTML = alHtml;
 
-  document.getElementById('molde-cards').innerHTML = filtered.map(m=>{ const col=pesoColor(m.prom,m.nominal); return `<div class="mc"><div class="mch"><div><div class="mcn">${m.id}</div><div class="mcnum">N° ${m.num}</div></div><span class="badge ${m.estado==='Operativo'?'bg':m.estado==='En calibración'?'bb':'br'}">${m.estado}</span></div><div class="mr"><span>Nominal</span><span>${m.nominal.toFixed(1)} kg</span></div><div class="mr"><span>Promedio</span><span style="color:${col}">${m.prom?m.prom.toFixed(3)+' kg':'S/D'}</span></div><div class="mobs">${m.obs}</div></div>`; }).join('');
+  // Badges
+  function estadoBadge(e) {
+    const m = { 'Operativo': 'bg', 'En calibración': 'bb', 'En laboratorio': 'bb', 'En fabricación': 'br', 'No operativo': 'br' };
+    return `<span class="badge ${m[e] || 'bgr'}">${e}</span>`;
+  }
+  function cromBadge(c) {
+    if (c === 'Sí') return '<span class="badge bg">Cromado</span>';
+    if (c === 'En proceso') return '<span class="badge ba">En proceso</span>';
+    return '<span class="badge bgr">Sin cromado</span>';
+  }
 
+  // TARJETAS DE MOLDES - CON LAS VÍAS DE PESO
+  document.getElementById('molde-cards').innerHTML = filtered.map(m => {
+    const col = pesoColor(m.prom, m.nominal);
+    const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
+    const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
+    
+    return `
+      <div class="mc">
+        <div class="mch">
+          <div>
+            <div class="mcn">${m.id}</div>
+            <div class="mcnum">N° ${m.num}</div>
+          </div>
+          ${estadoBadge(m.estado)}
+        </div>
+        
+        <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
+        <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
+        ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
+        ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
+        
+        <!-- ===== VÍAS DE PESO (COLUMNAS F A M) ===== -->
+        ${m.vias && m.vias.length > 0 ? `
+          <div style="margin-top: 10px; margin-bottom: 8px;">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);margin-bottom:5px;">📊 Pesos por vía:</div>
+            <div class="vpills">
+              ${m.vias.map((v, i) => `<span class="vp" style="background:var(--bg4);padding:4px 8px;border-radius:4px;font-size:10px;">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}
+            </div>
+          </div>
+        ` : '<div class="mobs" style="color:var(--t3);font-size:9px;margin-top:8px;">⚠️ Sin registros de vías</div>'}
+        
+        <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
+        <div class="mobs">${m.obs || 'Sin observaciones'}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Tabla de cromados
   const cromData = STATE.data.CROMADO || [];
-  const filtCrom = F==='todos'?cromData:cromData.filter(c=>normID(c.molde).includes(normID(F)));
-  document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c=>{ const pend=!c.recep; const dias=c.recep?diasEntre(c.envio,c.recep):null; return `<tr class="${pend?'crom-pend':''}"><td>${c.molde}</td><td>${c.envio}</td><td>${c.recep||'⏳ En proceso'}</td><td class="tr">${diasBadge(dias)}</td><td>${c.prov}</td><td>${c.tIda}</td><td>${c.det}</td><td>${c.obs||'—'}</td></tr>`; }).join('');
+  const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
+  document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c => {
+    const pend = !c.recep;
+    const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
+    const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
+    return `
+      <tr class="${pend ? 'crom-pend' : ''}">
+        <td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td>
+        <td class="tg">${c.envio || '—'}</td>
+        <td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td>
+        <td class="tr">${diasBadge(dias)}</td>
+        <td>${provBadge}</td>
+        <td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td>
+        <td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td>
+        <td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td>
+      </table>
+    `;
+  }).join('');
 }
 
 // ==================== STOCK ====================
