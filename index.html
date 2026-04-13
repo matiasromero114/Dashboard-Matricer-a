@@ -318,7 +318,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="g7030">
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
-      <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±100 g</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +100 g sobre nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,166,35,.22)"></div>Nominal</div></div>
+      <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,166,35,.22)"></div>Nominal</div></div>
       <div style="position:relative;width:100%;height:300px"><canvas id="ch-pesos"></canvas></div>
     </div>
     <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div><div id="alerts-moldes"></div></div>
@@ -779,9 +779,9 @@ function buildLam(){
 function pesoColor(prom, nominal){
   if(prom === null || prom === undefined) return '#555a68';
   const dif = (prom - nominal) * 1000; // diferencia en gramos
-  if(dif < 0) return '#3dd68c';      // verde: por debajo del nominal
-  if(dif <= 100) return '#f5a623';   // amarillo: dentro de ±100g
-  return '#f05252';                   // rojo: más de +300g sobre nominal
+  if(dif < 0) return '#3dd68c';        // verde: por debajo del nominal
+  if(dif <= 300) return '#f5a623';     // amarillo: dentro de ±300g
+  return '#f05252';                     // rojo: más de +300g sobre nominal
 }
 function buildMoldes(){
   const F = STATE.filter;
@@ -793,7 +793,7 @@ function buildMoldes(){
   const cal = data.filter(m => m.estado === 'En calibración' || m.estado === 'En laboratorio').length;
   const fab = data.filter(m => m.estado === 'En fabricación').length;
   const crom = data.filter(m => m.cromado === 'Sí' || m.cromado === 'En proceso').length;
-  const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 100).length;
+  const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).length;
 
   document.getElementById('kpi-moldes').innerHTML = `
     <div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div>
@@ -845,7 +845,7 @@ function buildMoldes(){
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => {
     alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`;
   });
-  filtered.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 100).forEach(m => {
+  filtered.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).forEach(m => {
     const dif = ((m.prom - m.nominal) * 1000).toFixed(0);
     alHtml += `<div class="al alr"><div class="aico">◆</div><div><div class="at">${m.id} #${m.num} — Sobrepeso +${dif} g</div><div class="ad">Real: ${m.prom.toFixed(3)} kg · Nominal: ${m.nominal.toFixed(1)} kg</div></div></div>`;
   });
