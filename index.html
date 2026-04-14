@@ -376,7 +376,7 @@ const URLS_SHEETS = {
   CAMISA_LM1210: sheetCSV(SHEET_ID_LAM, '1294970835'),
   MOLDES: sheetCSV(SHEET_ID_SEG, '0'),
   CROMADO: sheetCSV(SHEET_ID_SEG, '2142850839'),
-  STOCK: sheetCSV(SHEET_ID_SEG, '216908711'),
+  STOCK: sheetCSV(SHEET_ID_SEG, '573894203'),
   VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
   MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513')
 };
@@ -397,7 +397,20 @@ const FB = {
   LM1210: { maq:'LM1210', ini:{lento:153,rapido:143}, act:{lento:137.7,rapido:128.8}, rows:[] },
   MOLDES: [],
   CROMADO: [],
-  STOCK: [],
+  STOCK: [
+    { molde:'H8', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'H12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'10/03/2026' },
+    { molde:'H12 Brasil', boquillas:1, aranas:1, dados:1, placaBase:1, frenos:1, rev:'21/11/2025' },
+    { molde:'H18', boquillas:1, aranas:0, dados:1, placaBase:0, frenos:0, rev:'18/12/2025' },
+    { molde:'H18 Brasil', boquillas:1, aranas:1, dados:1, placaBase:1, frenos:1, rev:'09/04/2026' },
+    { molde:'P12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'P18', boquillas:0, aranas:1, dados:0, placaBase:0, frenos:0, rev:'18/12/2025' },
+    { molde:'L12', boquillas:1, aranas:1, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'L16', boquillas:1, aranas:1, dados:1, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'DM20', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'DM27', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'KB', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }
+  ],
   VIDA_UTIL: [],
   MANTENIMIENTO: []
 };
@@ -583,13 +596,42 @@ function parseCromado(rows){
 }
 
 function parseStock(rows){
-  if(!rows) return null;
-  const MOLDES_CONOCIDOS = /^(H8|H12|H18|P12|P18|L12|L16|DM20|DM27|KB)/i;
-  return rows.filter(r=> MOLDES_CONOCIDOS.test((r[1]||'').trim())).map(r=>({
-    molde: (r[1]||'').trim(), boquillas: sn(r[3]), aranas: sn(r[4]), dados: sn(r[5]), placaBase: sn(r[6]), frenos: sn(r[7]), rev: (r[8]||'').trim()
-  }));
+  if(!rows) return [];
+  
+  const resultados = [];
+  
+  // Recorrer todas las filas buscando datos válidos
+  for(let i = 0; i < rows.length; i++){
+    const row = rows[i];
+    if(!row || row.length < 3) continue;
+    
+    // La columna 1 (índice 1) contiene el nombre del molde
+    let molde = (row[1] || '').trim();
+    if(!molde || molde === '' || molde === 'Molde') continue;
+    
+    // Limpiar el nombre del molde (quitar comillas, espacios extra)
+    molde = molde.replace(/^["']|["']$/g, '').trim();
+    
+    // Verificar que sea un molde válido (no vacío y no es un header)
+    if(molde.length > 0 && molde !== 'Ladrilo'){
+      resultados.push({
+        molde: molde,
+        boquillas: sn(row[3]),
+        aranas: sn(row[4]),
+        dados: sn(row[5]),
+        placaBase: sn(row[6]),
+        frenos: sn(row[7]),
+        rev: (row[8] || '').trim()
+      });
+    }
+  }
+  
+  console.log('📦 Stock parseado:', resultados.length, 'registros');
+  if(resultados.length > 0){
+    console.log('📦 Primer registro de stock:', resultados[0]);
+  }
+  return resultados;
 }
-
 function parseVidaUtil(rows){
   if(!rows) return null;
   const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde');
@@ -928,7 +970,15 @@ function buildMoldes(){
 // ==================== STOCK ====================
 let STOCK_FILTERED = [];
 function stockCls(v){ if(v===0) return 'zero'; if(v===1) return 'low'; return 'ok-stock'; }
-function stockEstado(row){ const vals=[row.boquillas,row.aranas,row.dados,row.placaBase,row.frenos]; const zeros=vals.filter(v=>v===0).length; if(zeros===5) return '<span class="badge br">Sin stock</span>'; if(zeros>0) return '<span class="badge ba">Stock parcial</span>'; return '<span class="badge bg">Completo</span>'; }
+function stockEstado(row){
+  const vals = [row.boquillas, row.aranas, row.dados, row.placaBase, row.frenos];
+  const zeros = vals.filter(v => v === 0).length;
+  const total = vals.length;
+  
+  if(zeros === total) return '<span class="badge br">Sin stock</span>';
+  if(zeros > 0) return '<span class="badge ba">Stock parcial</span>';
+  return '<span class="badge bg">Completo</span>';
+}
 
 function buildStock(){
   const F = STATE.filter;
@@ -944,12 +994,37 @@ function filterStock(){ const q=document.getElementById('stock-search').value.tr
 
 function genFaltantes(){
   const data = STATE.data.STOCK || [];
-  const cols=['boquillas','aranas','dados','placaBase','frenos'];
-  const labels={'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
-  const falt=[]; data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push({molde:s.molde,rep:labels[c]}); }); });
-  const mc=document.getElementById('modal-content');
-  if(!falt.length){ mc.innerHTML=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin faltantes</div></div></div>`; }
-  else { mc.innerHTML = `<div style="margin-bottom:12px">${falt.length} ítem(s) en cero</div>` + falt.map(f=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)"><div><strong>${f.molde}</strong><br><span style="font-size:11px">${f.rep}</span></div><span class="badge br">Stock: 0</span></div>`).join(''); }
+  const cols = ['boquillas', 'aranas', 'dados', 'placaBase', 'frenos'];
+  const labels = {'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
+  const falt = [];
+  
+  data.forEach(s => {
+    cols.forEach(c => { 
+      if(s[c] === 0) falt.push({molde: s.molde, rep: labels[c]}); 
+    });
+  });
+  
+  const mc = document.getElementById('modal-content');
+  const now = new Date().toLocaleDateString('es-AR');
+  
+  if(!falt.length){
+    mc.innerHTML = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin faltantes</div><div class="ad">Todos los repuestos tienen al menos una unidad en stock.</div></div></div>`;
+  } else {
+    // Agrupar faltantes por molde para mejor visualización
+    const porMolde = {};
+    falt.forEach(f => {
+      if(!porMolde[f.molde]) porMolde[f.molde] = [];
+      porMolde[f.molde].push(f.rep);
+    });
+    
+    mc.innerHTML = `<div style="font-family:var(--fm);font-size:11px;color:var(--t2);margin-bottom:12px">${falt.length} ítem(s) en cero — ${now}</div>`;
+    mc.innerHTML += Object.entries(porMolde).map(([molde, reps]) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b0)">
+        <div><div style="font-weight:600;font-size:13px;color:var(--t0)">${molde}</div><div style="font-size:11px;color:var(--t2)">${reps.join(', ')}</div></div>
+        <span class="badge br">Stock: 0</span>
+      </div>
+    `).join('');
+  }
   document.getElementById('modal-falt').classList.add('open');
 }
 
