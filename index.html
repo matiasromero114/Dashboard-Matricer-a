@@ -762,14 +762,11 @@ function setF(f,btn){
 function renderAll(){ renderTab(STATE.activeTab); }
 
 function renderTab(id){
-  if(id==='lam') buildLam();
-  if(id==='moldes') {
-    buildMoldes();
-    dibujarGraficoCromado();  // ← Agregar esta línea
-  }
-  if(id==='stock') buildStock();
-  if(id==='mantenimiento') buildMantenimiento();
-  if(id==='vidaUtil') buildVidaUtil();
+  if(id === 'lam') buildItem('lam');
+  if(id === 'moldes') buildModels();
+  if(id === 'stock') buildStock();
+  if(id === 'mantenimiento') buildMantenimiento();
+  if(id === 'vidaUtil') buildVidaUtil();
 }
 
 // ==================== LAMINADORAS ====================
