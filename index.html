@@ -315,6 +315,13 @@ tbody tr:hover td{background:var(--bg3)}
 <section class="tab-s" id="tab-moldes">
   <div class="sh"><div><div class="sh-t">Seguimiento de Moldes y Cromado</div><div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div></div></div>
   <div class="krow" id="kpi-moldes"></div>
+  <!-- GRÁFICO CIRCULAR DE CROMADO -->
+<div class="card">
+  <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
+  <div style="position:relative;width:100%;height:250px">
+    <canvas id="chart-cromado-estado"></canvas>
+  </div>
+</div>
   <div class="g7030">
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
@@ -979,7 +986,82 @@ function stockEstado(row){
   if(zeros > 0) return '<span class="badge ba">Stock parcial</span>';
   return '<span class="badge bg">Completo</span>';
 }
-
+function dibujarGraficoCromado(){
+  const data = STATE.data.MOLDES || [];
+  
+  // Contar moldes por estado de cromado
+  let cromadoSi = 0;
+  let cromadoNo = 0;
+  let cromadoProceso = 0;
+  
+  data.forEach(molde => {
+    const cromado = (molde.cromado || '').toString().toLowerCase().trim();
+    if(cromado === 'sí' || cromado === 'si' || cromado === 's') {
+      cromadoSi++;
+    } else if(cromado === 'en proceso' || cromado === 'proceso') {
+      cromadoProceso++;
+    } else {
+      cromadoNo++;
+    }
+  });
+  
+  const total = cromadoSi + cromadoNo + cromadoProceso;
+  
+  console.log('📊 Estado de cromado:', { cromadoSi, cromadoNo, cromadoProceso, total });
+  
+  const ctx = document.getElementById('chart-cromado-estado');
+  if(!ctx) return;
+  
+  // Destruir gráfico anterior si existe
+  if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
+  
+  window.chartCromadoEstado = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Cromado', 'Sin cromado', 'En proceso'],
+      datasets: [{
+        data: [cromadoSi, cromadoNo, cromadoProceso],
+        backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'],
+        borderWidth: 0,
+        borderRadius: 8,
+        spacing: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#b8c4d8',
+            font: { size: 11, family: "'IBM Plex Mono', monospace" },
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        },
+        tooltip: {
+          backgroundColor: '#0d1017',
+          titleColor: '#f0f4ff',
+          bodyColor: '#b8c4d8',
+          borderColor: '#f5a623',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const porcentaje = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+              return `${label}: ${value} molde(s) (${porcentaje}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+  // Dibujar gráfico circular de cromado
+dibujarGraficoCromado();
+}
 function buildStock(){
   const F = STATE.filter;
   const data = STATE.data.STOCK || [];
