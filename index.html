@@ -987,9 +987,14 @@ function stockEstado(row){
   return '<span class="badge bg">Completo</span>';
 }
 function dibujarGraficoCromado(){
-  const data = STATE.data.MOLDES || [];
+  console.log('🎨 Dibujando gráfico de cromado...');
   
-  // Contar moldes por estado de cromado
+  const data = STATE.data.MOLDES || [];
+  if(!data.length){
+    console.warn('No hay datos de moldes');
+    return;
+  }
+  
   let cromadoSi = 0;
   let cromadoNo = 0;
   let cromadoProceso = 0;
@@ -1005,17 +1010,21 @@ function dibujarGraficoCromado(){
     }
   });
   
-  const total = cromadoSi + cromadoNo + cromadoProceso;
+  console.log('📊 Datos cromado:', { cromadoSi, cromadoNo, cromadoProceso });
   
-  console.log('📊 Estado de cromado:', { cromadoSi, cromadoNo, cromadoProceso, total });
-  
-  const ctx = document.getElementById('chart-cromado-estado');
-  if(!ctx) return;
+  const canvas = document.getElementById('chart-cromado-estado');
+  if(!canvas){
+    console.error('❌ Canvas chart-cromado-estado no encontrado');
+    return;
+  }
   
   // Destruir gráfico anterior si existe
-  if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
+  if(window.chartCromadoEstado){
+    window.chartCromadoEstado.destroy();
+    window.chartCromadoEstado = null;
+  }
   
-  window.chartCromadoEstado = new Chart(ctx, {
+  window.chartCromadoEstado = new Chart(canvas, {
     type: 'doughnut',
     data: {
       labels: ['Cromado', 'Sin cromado', 'En proceso'],
@@ -1023,8 +1032,7 @@ function dibujarGraficoCromado(){
         data: [cromadoSi, cromadoNo, cromadoProceso],
         backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'],
         borderWidth: 0,
-        borderRadius: 8,
-        spacing: 2
+        borderRadius: 8
       }]
     },
     options: {
@@ -1032,35 +1040,24 @@ function dibujarGraficoCromado(){
       maintainAspectRatio: true,
       cutout: '60%',
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: '#b8c4d8',
-            font: { size: 11, family: "'IBM Plex Mono', monospace" },
-            usePointStyle: true,
-            pointStyle: 'circle'
-          }
+        legend: { 
+          position: 'bottom', 
+          labels: { color: '#b8c4d8', font: { size: 11, family: "'IBM Plex Mono', monospace" }, usePointStyle: true, pointStyle: 'circle' }
         },
         tooltip: {
-          backgroundColor: '#0d1017',
-          titleColor: '#f0f4ff',
-          bodyColor: '#b8c4d8',
-          borderColor: '#f5a623',
-          borderWidth: 1,
           callbacks: {
             label: function(context) {
-              const label = context.label || '';
-              const value = context.raw || 0;
-              const porcentaje = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-              return `${label}: ${value} molde(s) (${porcentaje}%)`;
+              const total = cromadoSi + cromadoNo + cromadoProceso;
+              const porcentaje = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+              return `${context.label}: ${context.raw} molde(s) (${porcentaje}%)`;
             }
           }
         }
       }
     }
   });
-  // Dibujar gráfico circular de cromado
-dibujarGraficoCromado();
+  
+  console.log('✅ Gráfico de cromado dibujado');
 }
 function buildStock(){
   const F = STATE.filter;
