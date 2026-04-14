@@ -318,8 +318,8 @@ tbody tr:hover td{background:var(--bg3)}
   <!-- GRÁFICO CIRCULAR DE CROMADO -->
 <div class="card">
   <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
-  <div style="position:relative;width:100%;height:250px">
-    <canvas id="chart-cromado-estado"></canvas>
+  <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
+    <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
   </div>
 </div>
   <div class="g7030">
@@ -991,7 +991,7 @@ function stockEstado(row){
   return '<span class="badge bg">Completo</span>';
 }
 function dibujarGraficoCromado(){
-  console.log('🎨 Dibujando gráfico de cromado...');
+  console.log('🎨 Dibujando gráfico de cromado estilo "Comparativa por Flota"...');
   
   const data = STATE.data.MOLDES || [];
   if(!data.length){
@@ -1014,7 +1014,7 @@ function dibujarGraficoCromado(){
     }
   });
   
-  console.log('📊 Datos cromado:', { cromadoSi, cromadoNo, cromadoProceso });
+  const total = cromadoSi + cromadoNo + cromadoProceso;
   
   const canvas = document.getElementById('chart-cromado-estado');
   if(!canvas){
@@ -1025,9 +1025,9 @@ function dibujarGraficoCromado(){
   // Destruir gráfico anterior si existe
   if(window.chartCromadoEstado){
     window.chartCromadoEstado.destroy();
-    window.chartCromadoEstado = null;
   }
   
+  // Crear gráfico circular estilo doughnut con diseño profesional
   window.chartCromadoEstado = new Chart(canvas, {
     type: 'doughnut',
     data: {
@@ -1036,32 +1036,72 @@ function dibujarGraficoCromado(){
         data: [cromadoSi, cromadoNo, cromadoProceso],
         backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'],
         borderWidth: 0,
-        borderRadius: 8
+        borderRadius: 10,
+        spacing: 5,
+        cutout: '65%'
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      cutout: '60%',
       plugins: {
-        legend: { 
-          position: 'bottom', 
-          labels: { color: '#b8c4d8', font: { size: 11, family: "'IBM Plex Mono', monospace" }, usePointStyle: true, pointStyle: 'circle' }
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#b8c4d8',
+            font: { size: 12, family: "'IBM Plex Mono', monospace", weight: '500' },
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 15
+          }
         },
         tooltip: {
+          backgroundColor: '#0d1017',
+          titleColor: '#f0f4ff',
+          bodyColor: '#b8c4d8',
+          borderColor: '#f5a623',
+          borderWidth: 1,
           callbacks: {
             label: function(context) {
-              const total = cromadoSi + cromadoNo + cromadoProceso;
-              const porcentaje = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
-              return `${context.label}: ${context.raw} molde(s) (${porcentaje}%)`;
+              const value = context.raw;
+              const porcentaje = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+              return `${context.label}: ${value} molde(s) (${porcentaje}%)`;
             }
           }
         }
+      },
+      // Configuración para que el gráfico sea más atractivo
+      elements: {
+        arc: {
+          borderWidth: 0
+        }
+      },
+      // Animación
+      animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 800
       }
     }
   });
-  
-  console.log('✅ Gráfico de cromado dibujado');
+  const originalDraw = window.chartCromadoEstado.draw;
+  window.chartCromadoEstado.draw = function() {
+    originalDraw.apply(this, arguments);
+    const ctx = this.ctx;
+    const width = this.width;
+    const height = this.height;
+    ctx.font = 'bold 22px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#f0f4ff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(total, width / 2, height / 2);
+    ctx.font = '9px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#6e7d96';
+    ctx.fillText('moldes', width / 2, height / 2 + 22);
+  };
+  window.chartCromadoEstado.update();
+}
+  console.log('✅ Gráfico de cromado estilo "Comparativa por Flota" dibujado');
 }
 function buildStock(){
   const F = STATE.filter;
