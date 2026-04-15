@@ -275,6 +275,7 @@ tbody tr:hover td{background:var(--bg3)}
   <button class="navtab" onclick="switchTab('stock',this)">03 · Stock de Repuestos<span class="tn" id="tn3">11</span></button>
   <button class="navtab" onclick="switchTab('mantenimiento',this)">04 · Mantenimiento<span class="tn" id="tn4">0</span></button>
   <button class="navtab" onclick="switchTab('vidaUtil',this)">05 · Vida Útil<span class="tn" id="tn5">0</span></button>
+  <button class="navtab" onclick="switchTab('planos',this)">06 · Planos y Referencias<span class="tn" id="tn6">10</span></button>
 </nav>
 
 <main class="main">
@@ -364,13 +365,48 @@ tbody tr:hover td{background:var(--bg3)}
  </div><div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil (hasta 15.000 t) · <span style="color:var(--am)">Amarillo</span> = zona de extra (15.000 a 25.000 t, requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida (más de 25.000 t)</div></div>
   <div class="mg" id="gauges-container"></div>
 </section>
+<!-- ═══ TAB 6: PLANOS Y REFERENCIAS ═══ -->
+<section class="tab-s" id="tab-planos">
+  <div class="sh">
+    <div>
+      <div class="sh-t">Planos y Referencias Técnicas</div>
+      <div class="sh-s">Tipos de ladrillos · Planos de moldes · Documentación técnica</div>
+    </div>
+  </div>
 
+  <!-- Tipos de ladrillos -->
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Tipos de Ladrillos · Referencia visual</div>
+    <div class="mg" id="ladrillos-gallery"></div>
+  </div>
+
+  <!-- Planos de moldes -->
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Planos de Moldes · Hacer clic para ampliar</div>
+    <div class="mg" id="planos-moldes-gallery"></div>
+  </div>
+</section>
 </main>
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
 <div class="modal-ov" id="modal-falt"><div class="modal-box"><div class="modal-head"><div class="modal-title">Lista de Faltantes — Compras</div><button class="mclose" onclick="document.getElementById('modal-falt').classList.remove('open')">✕</button></div><div id="modal-content"></div><div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-g" onclick="copyFalt()">Copiar texto</button><button class="btn btn-a" onclick="document.getElementById('modal-falt').classList.remove('open')">Cerrar</button></div></div></div>
-
+<!-- MODAL PARA VER PLANOS -->
+<div class="modal-ov" id="modal-plano">
+  <div class="modal-box" style="max-width:800px">
+    <div class="modal-head">
+      <div class="modal-title" id="plano-title">Plano</div>
+      <button class="mclose" onclick="document.getElementById('modal-plano').classList.remove('open')">✕</button>
+    </div>
+    <div id="plano-content" style="text-align:center">
+      <img id="plano-img" src="" style="max-width:100%;max-height:60vh;border-radius:var(--r)">
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-g" onclick="window.open(document.getElementById('plano-img').src,'_blank')">Abrir en nueva pestaña</button>
+      <button class="btn btn-a" onclick="document.getElementById('modal-plano').classList.remove('open')">Cerrar</button>
+    </div>
+  </div>
+</div>
 <script>
 'use strict';
 
@@ -718,8 +754,9 @@ function renderTab(id){
     if(STATE.data.VIDA_UTIL) buildVidaUtil();
     else setTimeout(() => renderTab('vidaUtil'), 100);
   }
+  if(id === 'planos') buildPlanos();
 }
-
+}
 function switchTab(id, btn){
   document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -849,22 +886,35 @@ function buildMoldes(){
   function cromBadge(c) { if (c === 'Sí') return '<span class="badge bg">Cromado</span>'; if (c === 'En proceso') return '<span class="badge ba">En proceso</span>'; return '<span class="badge bgr">Sin cromado</span>'; }
 
   document.getElementById('molde-cards').innerHTML = filtered.map(m => {
-    const col = pesoColor(m.prom, m.nominal);
-    const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
-    const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
-    return `
-      <div class="mc">
-        <div class="mch"><div><div class="mcn">${m.id}</div><div class="mcnum">N° ${m.num}</div></div>${estadoBadge(m.estado)}</div>
-        <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
-        <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
-        ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
-        ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
-        ${m.vias && m.vias.length > 0 ? `<div style="margin-top: 10px; margin-bottom: 8px;"><div style="font-family:var(--fm);font-size:9px;color:var(--t2);margin-bottom:5px;">📊 Pesos por vía:</div><div class="vpills">${m.vias.map((v, i) => `<span class="vp" style="background:var(--bg4);padding:4px 8px;border-radius:4px;font-size:10px;">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div></div>` : '<div class="mobs" style="color:var(--t3);font-size:9px;margin-top:8px;">⚠️ Sin registros de vías</div>'}
-        <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
-        <div class="mobs">${m.obs || 'Sin observaciones'}</div>
+  const col = pesoColor(m.prom, m.nominal);
+  const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
+  const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
+  const imgUrl = `img/ladrillos/${m.id}.png`;
+  
+  return `
+    <div class="mc" onclick="verPlano('img/planos/molde-${m.id}.jpg', 'Plano - ${m.id} #${m.num}')" style="cursor:pointer">
+      <div class="mch">
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="${imgUrl}" alt="${m.id}" 
+               style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain"
+               onerror="this.style.display='none'">
+          <div>
+            <div class="mcn">${m.id}</div>
+            <div class="mcnum">N° ${m.num}</div>
+          </div>
+        </div>
+        ${estadoBadge(m.estado)}
       </div>
-    `;
-  }).join('');
+      <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
+      <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
+      ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
+      ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
+      ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : ''}
+      <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
+      <div class="mobs">${m.obs || 'Sin observaciones'}</div>
+    </div>
+  `;
+}).join('');
 
   const cromData = STATE.data.CROMADO || [];
   const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
@@ -1070,7 +1120,71 @@ function buildVidaUtil(){
     setTimeout(() => drawGauge(canvasId, porcentaje, color, LIMITE_NORMAL, LIMITE_TOTAL), 10);
   });
 }
+// ==================== PLANOS Y REFERENCIAS ====================
+function buildPlanos(){
+  // Tipos de ladrillos
+  const tiposLadrillos = [
+    { id: 'H8', nombre: 'H8 - 8 agujeros', img: 'img/ladrillos/H8.png' },
+    { id: 'H12', nombre: 'H12 - 12 agujeros', img: 'img/ladrillos/H12.png' },
+    { id: 'H18', nombre: 'H18 - 18 agujeros', img: 'img/ladrillos/H18.png' },
+    { id: 'P12', nombre: 'P12 - Portante 12', img: 'img/ladrillos/P12.png' },
+    { id: 'P18', nombre: 'P18 - Portante 18', img: 'img/ladrillos/P18.png' },
+    { id: 'L12', nombre: 'L12 - Ladrillón 12', img: 'img/ladrillos/L12.png' },
+    { id: 'L16', nombre: 'L16 - Ladrillón 16', img: 'img/ladrillos/L16.png' },
+    { id: 'DM20', nombre: 'DM20 - Dimensional 20', img: 'img/ladrillos/DM20.png' },
+    { id: 'DM27', nombre: 'DM27 - Dimensional 27', img: 'img/ladrillos/DM27.png' },
+    { id: 'KB', nombre: 'KB - Bloque', img: 'img/ladrillos/KB.png' }
+  ];
+  
+  const galeriaLadrillos = tiposLadrillos.map(t => `
+    <div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="${t.img}" alt="${t.nombre}" 
+             style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:contain"
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
+        <div>
+          <div class="mcn">${t.nombre}</div>
+          <div class="mcnum">Referencia visual</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('ladrillos-gallery').innerHTML = galeriaLadrillos;
+  
+  // Planos de moldes
+  const planosMoldes = tiposLadrillos.map(t => `
+    <div class="mc" onclick="verPlano('img/planos/molde-${t.id}.jpg', 'Plano - ${t.nombre}')" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="img/planos/molde-${t.id}.jpg" alt="Plano ${t.nombre}" 
+             style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover"
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
+        <div>
+          <div class="mcn">${t.nombre}</div>
+          <div class="mcnum">Plano técnico - click para ampliar</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('planos-moldes-gallery').innerHTML = planosMoldes;
+  document.getElementById('tn6').textContent = tiposLadrillos.length;
+}
 
+// Función para ver plano en modal
+function verPlano(imgUrl, titulo){
+  document.getElementById('plano-title').textContent = titulo;
+  const imgElement = document.getElementById('plano-img');
+  imgElement.src = imgUrl;
+  imgElement.onerror = () => {
+    imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%236e7d96"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ctext x="12" y="16" text-anchor="middle" fill="%236e7d96" font-size="10"%3EPlano no disponible%3C/text%3E%3C/svg%3E';
+  };
+  document.getElementById('modal-plano').classList.add('open');
+}
+
+// Agregar miniaturas a las tarjetas de moldes (modificar buildMoldes)
+// Buscar la función buildMoldes y modificar la parte de las tarjetas
+  
 function drawGauge(canvasId, percent, color, limiteNormal, limiteTotal){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
