@@ -1443,12 +1443,13 @@ function recargar(){
   cargarDatos();
 }
 
-function forzarGraficoCromado(){
+ffunction forzarGraficoCromado(){
   setTimeout(() => {
     const canvas = document.getElementById('chart-cromado-estado');
     if(canvas) dibujarGraficoCromado();
   }, 200);
 }
+
 cargarDatos();
 </script>
 </body>
