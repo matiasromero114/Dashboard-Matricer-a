@@ -734,15 +734,28 @@ async function cargarDatos(){
   dibujarGraficoCromado(); 
   renderAll();
   forzarGraficoCromado();
+  
+  // Forzar construcción de todas las pestañas después de cargar datos
+  renderAll();
+  
+  // Forzar específicamente vida útil si es la pestaña activa
+  if(STATE.activeTab === 'vidaUtil') {
+    setTimeout(buildVidaUtil, 200);
+  }
 }
 
 function recargar(){ cargarDatos(); }
 
 // Función para cambiar entre pestañas
 function switchTab(id, btn){
-  // Actualizar clases de los botones
   document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  document.querySelectorAll('.tab-s').forEach(s => s.classList.remove('active'));
+  const tabToShow = document.getElementById('tab-' + id);
+  if(tabToShow) tabToShow.classList.add('active');
+  STATE.activeTab = id;
+  renderTab(id);
+  
   
   // Ocultar todas las secciones y mostrar la seleccionada
   document.querySelectorAll('.tab-s').forEach(s => s.classList.remove('active'));
@@ -786,6 +799,15 @@ function renderTab(id){
   
  // Forzar gráfico de cromado si estamos en la pestaña moldes
   if(STATE.activeTab === 'moldes'){
+    setTimeout(dibujarGraficoCromado, 200);
+ // Forzar construcción cuando se cambia a una pestaña
+  if(id === 'vidaUtil') {
+    setTimeout(function() {
+      if(STATE.data.VIDA_UTIL) buildVidaUtil();
+      else console.log('⏳ Esperando datos de vida útil...');
+    }, 200);
+  }
+  if(id === 'moldes') {
     setTimeout(dibujarGraficoCromado, 200);
   }
 }
@@ -1444,6 +1466,14 @@ function switchTab(id, btn){
   if(tabToShow) tabToShow.classList.add('active');
   STATE.activeTab = id;
   renderTab(id);
+
+    if(id === 'vidaUtil') {
+    setTimeout(buildVidaUtil, 200);
+  }
+  if(id === 'moldes') {
+    setTimeout(dibujarGraficoCromado, 200);
+  }
+}
   
   // Forzar gráfico de cromado si es la pestaña moldes
   if(id === 'moldes') setTimeout(dibujarGraficoCromado, 200);
@@ -1475,6 +1505,31 @@ function forzarGraficoCromado(){
     if(canvas) dibujarGraficoCromado();
   }, 200);
 }
+  // Forzar carga de datos cuando la página está completamente cargada
+window.addEventListener('load', function() {
+  console.log('📄 Página cargada, iniciando dashboard...');
+  
+  // Esperar a que los datos estén listos
+  setTimeout(function() {
+    if(STATE.data.KLB12 && STATE.data.LM1210) {
+      buildLam();
+    } else {
+      console.log('⏳ Esperando datos de laminadoras...');
+      setTimeout(function() {
+        if(STATE.data.KLB12) buildLam();
+      }, 500);
+    }
+    
+    if(STATE.data.MOLDES) {
+      buildMoldes();
+      setTimeout(dibujarGraficoCromado, 200);
+    }
+    
+    if(STATE.data.STOCK) buildStock();
+    if(STATE.data.MANTENIMIENTO) buildMantenimiento();
+    if(STATE.data.VIDA_UTIL) buildVidaUtil();
+  }, 300);
+});
 
 // Inicializar
 renderAll();
