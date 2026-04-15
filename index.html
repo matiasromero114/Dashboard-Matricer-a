@@ -773,6 +773,7 @@ function setF(f, btn){
 // Función para actualizar datos
 function recargar(){
   cargarDatos();
+   renderAll();
 }
 
 // Asegurar que renderTab ejecute las funciones correctas
@@ -1405,15 +1406,31 @@ function renderAll(){
 }
 
 function renderTab(id){
-  if(id === 'lam') buildLam();
-  if(id === 'moldes') {
-    buildMoldes();
-    setTimeout(dibujarGraficoCromado, 200);
+  if(id === 'lam') {
+    if(STATE.data.KLB12 && STATE.data.LM1210) buildLam();
+    else setTimeout(() => renderTab('lam'), 100);
   }
-  if(id === 'stock') buildStock();
-  if(id === 'mantenimiento') buildMantenimiento();
-  if(id === 'vidaUtil') buildVidaUtil();
+  if(id === 'moldes') {
+    if(STATE.data.MOLDES) {
+      buildMoldes();
+      setTimeout(dibujarGraficoCromado, 100);
+    }
+    else setTimeout(() => renderTab('moldes'), 100);
+  }
+  if(id === 'stock') {
+    if(STATE.data.STOCK) buildStock();
+    else setTimeout(() => renderTab('stock'), 100);
+  }
+  if(id === 'mantenimiento') {
+    if(STATE.data.MANTENIMIENTO) buildMantenimiento();
+    else setTimeout(() => renderTab('mantenimiento'), 100);
+  }
+  if(id === 'vidaUtil') {
+    if(STATE.data.VIDA_UTIL) buildVidaUtil();
+    else setTimeout(() => renderTab('vidaUtil'), 100);
+  }
 }
+
 
 function renderAll(){
   renderTab(STATE.activeTab);
@@ -1427,6 +1444,11 @@ function switchTab(id, btn){
   if(tabToShow) tabToShow.classList.add('active');
   STATE.activeTab = id;
   renderTab(id);
+  
+  // Forzar gráfico de cromado si es la pestaña moldes
+  if(id === 'moldes') setTimeout(dibujarGraficoCromado, 200);
+  // Forzar gauges si es la pestaña vidaUtil
+  if(id === 'vidaUtil') setTimeout(buildVidaUtil, 200);
 }
 
 function switchLam(m, btn){
