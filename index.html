@@ -732,6 +732,8 @@ async function cargarDatos(){
   ri.classList.remove('spinning');
   renderAll();
   dibujarGraficoCromado(); 
+  renderAll();
+  forzarGraficoCromado();
 }
 
 function recargar(){ cargarDatos(); }
@@ -780,6 +782,11 @@ function renderTab(id){
   if(id === 'stock') buildStock();
   if(id === 'mantenimiento') buildMantenimiento();
   if(id === 'vidaUtil') buildVidaUtil();
+  
+ // Forzar gráfico de cromado si estamos en la pestaña moldes
+  if(STATE.activeTab === 'moldes'){
+    setTimeout(dibujarGraficoCromado, 200);
+  }
 }
 
 // ==================== LAMINADORAS ====================
@@ -1392,6 +1399,55 @@ function drawGauge(canvasId, percent, color, limiteNormal, limiteTotal){
   const markX = centerX + Math.cos(normalAngle) * (radius + 12);
   const markY = centerY + Math.sin(normalAngle) * (radius + 12);
   ctx.fillText('15k', markX - 8, markY - 3);
+  // ===== FUNCIONES PARA NAVEGACIÓN Y RENDERIZADO =====
+function renderAll(){
+  renderTab(STATE.activeTab);
+}
+
+function renderTab(id){
+  if(id === 'lam') buildLam();
+  if(id === 'moldes') {
+    buildMoldes();
+    setTimeout(dibujarGraficoCromado, 100);
+  }
+  if(id === 'stock') buildStock();
+  if(id === 'mantenimiento') buildMantenimiento();
+  if(id === 'vidaUtil') buildVidaUtil();
+}
+
+function switchTab(id, btn){
+  document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.tab-s').forEach(s => s.classList.remove('active'));
+  const tabToShow = document.getElementById('tab-' + id);
+  if(tabToShow) tabToShow.classList.add('active');
+  STATE.activeTab = id;
+  renderTab(id);
+}
+
+function switchLam(m, btn){
+  document.querySelectorAll('.ltb').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  STATE.activeLam = m;
+  if(STATE.activeTab === 'lam') buildLam();
+}
+
+function setF(f, btn){
+  STATE.filter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderTab(STATE.activeTab);
+}
+
+function recargar(){
+  cargarDatos();
+}
+
+function forzarGraficoCromado(){
+  setTimeout(() => {
+    const canvas = document.getElementById('chart-cromado-estado');
+    if(canvas) dibujarGraficoCromado();
+  }, 200);
 }
 cargarDatos();
 </script>
