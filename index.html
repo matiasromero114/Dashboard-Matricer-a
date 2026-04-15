@@ -124,7 +124,7 @@ tbody tr:hover td{background:var(--bg3)}
 .ltb.active{background:var(--am);border-color:var(--am);color:var(--bg0)}
 .ltb:hover:not(.active){color:var(--t1);border-color:var(--b3)}
 
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin-top:4px}
+.mg {display: grid;grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));gap: 15px;margin-top: 4px;width: 100%;}
 .mc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;transition:all .2s}
 .mc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .mch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
@@ -189,6 +189,7 @@ tbody tr:hover td{background:var(--bg3)}
   border-radius: var(--rl);
   padding: 15px;
   transition: all .2s;
+  width: 100%;
 }
 .gauge-container:hover {
   transform: translateY(-2px);
@@ -943,20 +944,109 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
+  console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
+  
   document.getElementById('tn4').textContent = data.length;
-  document.getElementById('total-intervenciones').textContent = data.length;
-  if(!data.length){ document.getElementById('tbody-mantenimiento').innerHTML='<tr><td colspan="5" style="text-align:center">No hay registros</td></tr>'; document.getElementById('ult-mant').innerHTML='Sin registros'; document.getElementById('chart-tareas-tipo').innerHTML='Sin datos'; document.getElementById('chart-tareas-responsable').innerHTML='Sin datos'; return; }
-  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `<tr><td class="tg">${r.fecha}</td><td>${r.responsable}</td><td>${r.moldeEquipo}</td><td>${getTareaBadge(r.tipoTarea)}</td><td>${r.descripcion}</td></tr>`).join('');
-  const todas = [...data].reverse();
-  document.getElementById('ult-mant').innerHTML = todas.map(r => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0)"><div style="display:flex;gap:10px"><span>${r.fecha}</span>${getTareaBadge(r.tipoTarea)}<span>${r.moldeEquipo}</span></div><span>${r.responsable}</span></div>`).join('');
-  const tipos = {}; data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
-  const maxTareas = Math.max(...Object.values(tipos));
-  document.getElementById('chart-tareas-tipo').innerHTML = `<div>📊 CANTIDAD DE TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,c]) => `<div><div>${t}</div><div style="background:#2d3a50;border-radius:4px;height:20px"><div style="width:${(c/maxTareas)*100}%;height:100%;background:#f5a623;border-radius:4px"></div></div><div>${c}</div></div>`).join('');
-  const resp = {}; data.forEach(r => { resp[r.responsable] = (resp[r.responsable] || 0) + 1; });
-  const maxResp = Math.max(...Object.values(resp));
-  document.getElementById('chart-tareas-responsable').innerHTML = `<div>👥 TOP RESPONSABLES</div>` + Object.entries(resp).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([r,c]) => `<div><div>${r}</div><div style="background:#2d3a50;border-radius:4px;height:20px"><div style="width:${(c/maxResp)*100}%;height:100%;background:#60a5fa;border-radius:4px"></div></div><div>${c}</div></div>`).join('');
+  const totalSpan = document.getElementById('total-intervenciones');
+  if(totalSpan) totalSpan.textContent = data.length;
+  
+  const containerTabla = document.getElementById('tbody-mantenimiento');
+  const containerUlt = document.getElementById('ult-mant');
+  const containerTipo = document.getElementById('chart-tareas-tipo');
+  const containerResp = document.getElementById('chart-tareas-responsable');
+  
+  if(!data.length){
+    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+    if(containerUlt) containerUlt.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
+    if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
+    return;
+  }
+  
+  // TABLA COMPLETA
+  if(containerTabla){
+    containerTabla.innerHTML = data.map(r => `
+      <tr style="border-bottom:1px solid var(--b0)">
+        <td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td>
+        <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td>
+        <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
+        <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
+        <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
+      </tr>
+    `).join('');
+  }
+  
+  // TODAS LAS INTERVENCIONES
+  if(containerUlt){
+    const todas = [...data].reverse();
+    containerUlt.innerHTML = todas.map(r => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2)">${r.fecha || '—'}</div>
+          ${getTareaBadge(r.tipoTarea || 'Otros')}
+          <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
+        </div>
+        <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
+        <div style="color:var(--t1);font-size:11px;flex:1;min-width:200px">${r.descripcion || '—'}</div>
+      </div>
+    `).join('');
+  }
+  
+  // GRÁFICO TIPOS DE TAREA
+  if(containerTipo){
+    const tipos = {};
+    data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
+    const maxTareas = Math.max(...Object.values(tipos));
+    const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c'];
+    
+    containerTipo.innerHTML = `
+      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2)">📊 CANTIDAD DE TAREAS POR TIPO</div>
+      ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
+        const porcentaje = (cantidad / maxTareas) * 100;
+        const color = colores[idx % colores.length];
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:11px;color:var(--t1)">${tipo}</span>
+              <span style="font-size:11px;font-weight:600;color:${color}">${cantidad}</span>
+            </div>
+            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
+  
+  // GRÁFICO RESPONSABLES
+  if(containerResp){
+    const responsables = {};
+    data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
+    const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
+    const maxResp = topResp[0]?.[1] || 1;
+    const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
+    
+    containerResp.innerHTML = `
+      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2)">👥 TOP RESPONSABLES</div>
+      ${topResp.map(([responsable, cantidad], idx) => {
+        const porcentaje = (cantidad / maxResp) * 100;
+        const color = coloresResp[idx % coloresResp.length];
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:11px;color:var(--t1)">${responsable}</span>
+              <span style="font-size:11px;font-weight:600;color:${color}">${cantidad}</span>
+            </div>
+            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
 }
-
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
