@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CEVIL · Control de Producción v3</title>
+<title>Matriceria Planta Cevil · Control de Producción</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -28,9 +28,8 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 
 .topbar{background:var(--bg1);border-bottom:1px solid var(--b1);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:32px;height:32px;background:var(--am);border-radius:var(--r);display:grid;place-items:center;font-family:var(--fh);font-weight:700;font-size:13px;color:var(--bg0);flex-shrink:0}
+.logo-icon{width:32px;height:32px;border-radius:var(--r);object-fit:contain}
 .logo-main{font-family:var(--fh);font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.logo-sub{font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.06em}
 .topbar-r{display:flex;align-items:center;gap:12px}
 .swrap{display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:11px;color:var(--t2)}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--gr);box-shadow:0 0 6px var(--gr);animation:blink 3s ease-in-out infinite}
@@ -124,7 +123,7 @@ tbody tr:hover td{background:var(--bg3)}
 .ltb.active{background:var(--am);border-color:var(--am);color:var(--bg0)}
 .ltb:hover:not(.active){color:var(--t1);border-color:var(--b3)}
 
-.mg {display: grid;grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));gap: 15px;margin-top: 4px;width: 100%;}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:4px;width:100%}
 .mc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;transition:all .2s}
 .mc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .mch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
@@ -166,7 +165,7 @@ tbody tr:hover td{background:var(--bg3)}
 
 .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center}
 .modal-ov.open{display:flex}
-.modal-box{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rl);padding:24px;max-width:500px;width:92%;max-height:82vh;overflow-y:auto}
+.modal-box{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rl);padding:24px;max-width:800px;width:92%;max-height:82vh;overflow-y:auto}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .modal-title{font-family:var(--fh);font-size:16px;font-weight:700}
 .mclose{color:var(--t2);font-size:18px;background:none;border:none;cursor:pointer}
@@ -180,7 +179,6 @@ tbody tr:hover td{background:var(--bg3)}
 
 .dias-ok{color:var(--gr)}.dias-warn{color:var(--am)}.dias-crit{color:var(--re)}
 
-/* GAUGE STYLES */
 .gauge-container {
   display: flex;
   flex-direction: column;
@@ -236,11 +234,10 @@ tbody tr:hover td{background:var(--bg3)}
 
 <header class="topbar">
   <div class="logo">
-    <img src="logo.png" alt="Logo" class="logo-icon" style="width:32px;height:32px;object-fit:contain">
-   <div>
-  <div class="logo-main">Matriceria Planta Cevil</div>
-  <div class="logo-sub">CMP Cevil </div>
-</div>
+    <img src="logo.png" alt="Logo" class="logo-icon" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="logo-main">Matriceria Planta Cevil</div>
+    </div>
   </div>
   <div class="topbar-r">
     <div class="swrap"><div class="dot"></div><span id="dstatus">Cargando...</span></div>
@@ -309,7 +306,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw"></table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
+    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></tr></div>
   </div>
 </section>
 
@@ -317,13 +314,12 @@ tbody tr:hover td{background:var(--bg3)}
 <section class="tab-s" id="tab-moldes">
   <div class="sh"><div><div class="sh-t">Seguimiento de Moldes y Cromado</div><div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div></div></div>
   <div class="krow" id="kpi-moldes"></div>
-  <!-- GRÁFICO CIRCULAR DE CROMADO -->
-<div class="card">
-  <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
-  <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
-    <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
+    <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
+      <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
+    </div>
   </div>
-</div>
   <div class="g7030">
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
@@ -336,7 +332,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial de Cromados · <span style="color:var(--re)">■</span> fila resaltada = aún en proceso</div>
     <div class="notice" style="margin-bottom:11px"><div style="font-size:14px;flex-shrink:0">ℹ</div><div class="notice-t">Filas <strong style="color:var(--re)">resaltadas en rojo</strong> = moldes enviados a cromado <strong>sin fecha de recepción</strong></div></div>
-    <div class="tw"><table><thead><tr><th>Molde</th><th>Fecha Envío</th><th>Fecha Recepción</th><th class="tr">Días</th><th>Proveedor</th><th>Transporte Ida</th><th>Detalle</th><th>Observaciones</th></tr></thead><tbody id="tbody-cromado"></tbody></table></div>
+    <div class="tw"></table><thead><tr><th>Molde</th><th>Fecha Envío</th><th>Fecha Recepción</th><th class="tr">Días</th><th>Proveedor</th><th>Transporte Ida</th><th>Detalle</th><th>Observaciones</th></tr></thead><tbody id="tbody-cromado"></tbody></table></div>
   </div>
 </section>
 
@@ -356,16 +352,17 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div><div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div></div>
   </div>
   <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Todas las intervenciones · Total: <span id="total-intervenciones">0</span></div><div id="ult-mant" style="font-size:11px;color:var(--t1);max-height:500px;overflow-y:auto">Cargando...</div></div>
-  <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo</div><div class="tw"></table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo</div><div class="tw"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
 </section>
 
 <!-- TAB 5: VIDA ÚTIL -->
 <section class="tab-s" id="tab-vidaUtil">
-  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 15.000 t · Extra por reparaciones: +10.000 t (total 25.000 t)</div>
- </div><div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil (hasta 15.000 t) · <span style="color:var(--am)">Amarillo</span> = zona de extra (15.000 a 25.000 t, requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida (más de 25.000 t)</div></div>
+  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 15.000 t · Extra por reparaciones: +10.000 t (total 25.000 t)</div></div></div>
+  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil (hasta 15.000 t) · <span style="color:var(--am)">Amarillo</span> = zona de extra (15.000 a 25.000 t, requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida (más de 25.000 t)</div></div>
   <div class="mg" id="gauges-container"></div>
 </section>
-<!-- ═══ TAB 6: PLANOS Y REFERENCIAS ═══ -->
+
+<!-- TAB 6: PLANOS Y REFERENCIAS -->
 <section class="tab-s" id="tab-planos">
   <div class="sh">
     <div>
@@ -373,27 +370,38 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="sh-s">Tipos de ladrillos · Planos de moldes · Documentación técnica</div>
     </div>
   </div>
-
-  <!-- Tipos de ladrillos -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Tipos de Ladrillos · Referencia visual</div>
     <div class="mg" id="ladrillos-gallery"></div>
   </div>
-
-  <!-- Planos de moldes -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Planos de Moldes · Hacer clic para ampliar</div>
     <div class="mg" id="planos-moldes-gallery"></div>
   </div>
 </section>
+
 </main>
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
-<div class="modal-ov" id="modal-falt"><div class="modal-box"><div class="modal-head"><div class="modal-title">Lista de Faltantes — Compras</div><button class="mclose" onclick="document.getElementById('modal-falt').classList.remove('open')">✕</button></div><div id="modal-content"></div><div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-g" onclick="copyFalt()">Copiar texto</button><button class="btn btn-a" onclick="document.getElementById('modal-falt').classList.remove('open')">Cerrar</button></div></div></div>
+<!-- MODAL FALTANTES -->
+<div class="modal-ov" id="modal-falt">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-head">
+      <div class="modal-title">Lista de Faltantes — Compras</div>
+      <button class="mclose" onclick="document.getElementById('modal-falt').classList.remove('open')">✕</button>
+    </div>
+    <div id="modal-content"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-g" onclick="copyFalt()">Copiar texto</button>
+      <button class="btn btn-a" onclick="document.getElementById('modal-falt').classList.remove('open')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL PARA VER PLANOS -->
 <div class="modal-ov" id="modal-plano">
-  <div class="modal-box" style="max-width:800px">
+  <div class="modal-box">
     <div class="modal-head">
       <div class="modal-title" id="plano-title">Plano</div>
       <button class="mclose" onclick="document.getElementById('modal-plano').classList.remove('open')">✕</button>
@@ -407,6 +415,7 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
 </div>
+
 <script>
 'use strict';
 
@@ -756,7 +765,7 @@ function renderTab(id){
   }
   if(id === 'planos') buildPlanos();
 }
-}
+
 function switchTab(id, btn){
   document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -825,15 +834,15 @@ function buildLam(){
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
 
-  dc('camisa');
-  new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
+  if(window.chartCamisa) window.chartCamisa.destroy();
+  window.chartCamisa = new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
   
   let acumL=0,acumR=0, acumLArr=[],acumRArr=[];
   rows.forEach(r=>{ acumL+=r.l; acumR+=r.r; acumLArr.push(acumL); acumRArr.push(acumR); });
-  dc('acum');
-  new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
+  if(window.chartAcum) window.chartAcum.destroy();
+  window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
 
-  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td>${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td>${r.resp}</td>${STATE.activeLam==='LM1210'?`<td>${r.prox||'—'}</td>`:''}</tr>`).join('');
+  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td style="max-width:200px">${r.obs||'—'}</td><td>${r.resp}</td>${STATE.activeLam==='LM1210'?`<td>${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
 function pesoColor(prom, nominal){
@@ -862,8 +871,8 @@ function buildMoldes(){
     <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
   `;
 
-  dc('pesos');
-  new Chart(document.getElementById('ch-pesos'), {
+  if(window.chartPesos) window.chartPesos.destroy();
+  window.chartPesos = new Chart(document.getElementById('ch-pesos'), {
     type: 'bar',
     data: {
       labels: filtered.map(m => `${m.id} #${m.num}`),
@@ -886,35 +895,32 @@ function buildMoldes(){
   function cromBadge(c) { if (c === 'Sí') return '<span class="badge bg">Cromado</span>'; if (c === 'En proceso') return '<span class="badge ba">En proceso</span>'; return '<span class="badge bgr">Sin cromado</span>'; }
 
   document.getElementById('molde-cards').innerHTML = filtered.map(m => {
-  const col = pesoColor(m.prom, m.nominal);
-  const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
-  const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
-  const imgUrl = `img/ladrillos/${m.id}.png`;
-  
-  return `
-    <div class="mc" onclick="verPlano('img/planos/molde-${m.id}.jpg', 'Plano - ${m.id} #${m.num}')" style="cursor:pointer">
-      <div class="mch">
-        <div style="display:flex;align-items:center;gap:10px">
-          <img src="${imgUrl}" alt="${m.id}" 
-               style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain"
-               onerror="this.style.display='none'">
-          <div>
-            <div class="mcn">${m.id}</div>
-            <div class="mcnum">N° ${m.num}</div>
+    const col = pesoColor(m.prom, m.nominal);
+    const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
+    const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
+    const imgUrl = `img/ladrillos/${m.id}.png`;
+    return `
+      <div class="mc" onclick="verPlano('img/planos/molde-${m.id}.jpg', 'Plano - ${m.id} #${m.num}')" style="cursor:pointer">
+        <div class="mch">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="${imgUrl}" alt="${m.id}" style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.display='none'">
+            <div>
+              <div class="mcn">${m.id}</div>
+              <div class="mcnum">N° ${m.num}</div>
+            </div>
           </div>
+          ${estadoBadge(m.estado)}
         </div>
-        ${estadoBadge(m.estado)}
+        <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
+        <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
+        ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
+        ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
+        ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : '<div class="mobs" style="color:var(--t3);font-size:9px">⚠️ Sin registros de vías</div>'}
+        <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
+        <div class="mobs">${m.obs || 'Sin observaciones'}</div>
       </div>
-      <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
-      <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
-      ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
-      ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
-      ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : ''}
-      <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
-      <div class="mobs">${m.obs || 'Sin observaciones'}</div>
-    </div>
-  `;
-}).join('');
+    `;
+  }).join('');
 
   const cromData = STATE.data.CROMADO || [];
   const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
@@ -922,7 +928,7 @@ function buildMoldes(){
     const pend = !c.recep;
     const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
     const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
-    return `<tr class="${pend ? 'crom-pend' : ''}"> <td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
+    return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
   }).join('');
   dibujarGraficoCromado();
 }
@@ -948,6 +954,58 @@ function dibujarGraficoCromado(){
   });
 }
 
+function buildPlanos(){
+  const tiposLadrillos = [
+    { id: 'H8', nombre: 'H8 - 8 agujeros', img: 'img/ladrillos/H8.png' },
+    { id: 'H12', nombre: 'H12 - 12 agujeros', img: 'img/ladrillos/H12.png' },
+    { id: 'H18', nombre: 'H18 - 18 agujeros', img: 'img/ladrillos/H18.png' },
+    { id: 'P12', nombre: 'P12 - Portante 12', img: 'img/ladrillos/P12.png' },
+    { id: 'P18', nombre: 'P18 - Portante 18', img: 'img/ladrillos/P18.png' },
+    { id: 'L12', nombre: 'L12 - Ladrillón 12', img: 'img/ladrillos/L12.png' },
+    { id: 'L16', nombre: 'L16 - Ladrillón 16', img: 'img/ladrillos/L16.png' },
+    { id: 'DM20', nombre: 'DM20 - Dimensional 20', img: 'img/ladrillos/DM20.png' },
+    { id: 'DM27', nombre: 'DM27 - Dimensional 27', img: 'img/ladrillos/DM27.png' },
+    { id: 'KB', nombre: 'KB - Bloque', img: 'img/ladrillos/KB.png' }
+  ];
+  
+  const galeriaLadrillos = tiposLadrillos.map(t => `
+    <div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="${t.img}" alt="${t.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
+        <div>
+          <div class="mcn">${t.nombre}</div>
+          <div class="mcnum">Referencia visual</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('ladrillos-gallery').innerHTML = galeriaLadrillos;
+  
+  const planosMoldes = tiposLadrillos.map(t => `
+    <div class="mc" onclick="verPlano('img/planos/molde-${t.id}.jpg', 'Plano - ${t.nombre}')" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="img/planos/molde-${t.id}.jpg" alt="Plano ${t.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
+        <div>
+          <div class="mcn">${t.nombre}</div>
+          <div class="mcnum">Plano técnico - click para ampliar</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('planos-moldes-gallery').innerHTML = planosMoldes;
+  document.getElementById('tn6').textContent = tiposLadrillos.length;
+}
+
+function verPlano(imgUrl, titulo){
+  document.getElementById('plano-title').textContent = titulo;
+  const imgElement = document.getElementById('plano-img');
+  imgElement.src = imgUrl;
+  imgElement.onerror = () => {
+    imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%236e7d96"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ctext x="12" y="16" text-anchor="middle" fill="%236e7d96" font-size="10"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
+  };
+  document.getElementById('modal-plano').classList.add('open');
+}
+
 let STOCK_FILTERED = [];
 function stockCls(v){ if(v===0) return 'zero'; if(v===1) return 'low'; return 'ok-stock'; }
 function stockEstado(row){ const vals = [row.boquillas, row.aranas, row.dados, row.placaBase, row.frenos]; const zeros = vals.filter(v => v === 0).length; if(zeros === vals.length) return '<span class="badge br">Sin stock</span>'; if(zeros > 0) return '<span class="badge ba">Stock parcial</span>'; return '<span class="badge bg">Completo</span>'; }
@@ -958,11 +1016,11 @@ function buildStock(){
   STOCK_FILTERED = F==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(F)));
   const total=data.length, sinStock=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, parcial=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].some(v=>v===0)&&![s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, completo=total-sinStock-parcial;
   document.getElementById('kpi-stock').innerHTML = `<div class="kpi ka"><div class="kl">Tipos</div><div class="kv">${total}</div></div><div class="kpi kg"><div class="kl">Completo</div><div class="kv">${completo}</div></div><div class="kpi ka"><div class="kl">Parcial</div><div class="kv">${parcial}</div></div><div class="kpi kr"><div class="kl">Sin stock</div><div class="kv">${sinStock}</div></div>`;
-  document.getElementById('tbody-stock').innerHTML = STOCK_FILTERED.map(s=>{ const crit=[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0); return `<tr class="${crit?'crit-row':''}"> <td>${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`; }).join('');
+  document.getElementById('tbody-stock').innerHTML = STOCK_FILTERED.map(s=>{ const crit=[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0); return `<tr class="${crit?'crit-row':''}"><td style="font-weight:700">${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`; }).join('');
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
 }
 
-function filterStock(){ const q=document.getElementById('stock-search').value.trim().toLowerCase(); const data=STATE.data.STOCK||[]; const src=STATE.filter==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(STATE.filter))); STOCK_FILTERED=q?src.filter(s=>s.molde.toLowerCase().includes(q)):src; document.getElementById('tbody-stock').innerHTML=STOCK_FILTERED.map(s=>`<tr> <td>${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`).join(''); document.getElementById('stock-count').textContent=`${STOCK_FILTERED.length} de ${src.length} moldes`; }
+function filterStock(){ const q=document.getElementById('stock-search').value.trim().toLowerCase(); const data=STATE.data.STOCK||[]; const src=STATE.filter==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(STATE.filter))); STOCK_FILTERED=q?src.filter(s=>s.molde.toLowerCase().includes(q)):src; document.getElementById('tbody-stock').innerHTML=STOCK_FILTERED.map(s=>`<tr><td style="font-weight:700">${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`).join(''); document.getElementById('stock-count').textContent=`${STOCK_FILTERED.length} de ${src.length} moldes`; }
 
 function genFaltantes(){
   const data = STATE.data.STOCK || [];
@@ -994,109 +1052,20 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
-  console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
-  
   document.getElementById('tn4').textContent = data.length;
-  const totalSpan = document.getElementById('total-intervenciones');
-  if(totalSpan) totalSpan.textContent = data.length;
-  
-  const containerTabla = document.getElementById('tbody-mantenimiento');
-  const containerUlt = document.getElementById('ult-mant');
-  const containerTipo = document.getElementById('chart-tareas-tipo');
-  const containerResp = document.getElementById('chart-tareas-responsable');
-  
-  if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
-    if(containerUlt) containerUlt.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
-    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
-    if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
-    return;
-  }
-  
-  // TABLA COMPLETA
-  if(containerTabla){
-    containerTabla.innerHTML = data.map(r => `
-      <tr style="border-bottom:1px solid var(--b0)">
-        <td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td>
-        <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td>
-        <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
-        <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
-        <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
-      </tr>
-    `).join('');
-  }
-  
-  // TODAS LAS INTERVENCIONES
-  if(containerUlt){
-    const todas = [...data].reverse();
-    containerUlt.innerHTML = todas.map(r => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:8px">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2)">${r.fecha || '—'}</div>
-          ${getTareaBadge(r.tipoTarea || 'Otros')}
-          <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
-        </div>
-        <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
-        <div style="color:var(--t1);font-size:11px;flex:1;min-width:200px">${r.descripcion || '—'}</div>
-      </div>
-    `).join('');
-  }
-  
-  // GRÁFICO TIPOS DE TAREA
-  if(containerTipo){
-    const tipos = {};
-    data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
-    const maxTareas = Math.max(...Object.values(tipos));
-    const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c'];
-    
-    containerTipo.innerHTML = `
-      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2)">📊 CANTIDAD DE TAREAS POR TIPO</div>
-      ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
-        const porcentaje = (cantidad / maxTareas) * 100;
-        const color = colores[idx % colores.length];
-        return `
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:11px;color:var(--t1)">${tipo}</span>
-              <span style="font-size:11px;font-weight:600;color:${color}">${cantidad}</span>
-            </div>
-            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
-  }
-  
-  // GRÁFICO RESPONSABLES
-  if(containerResp){
-    const responsables = {};
-    data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
-    const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
-    const maxResp = topResp[0]?.[1] || 1;
-    const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
-    
-    containerResp.innerHTML = `
-      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2)">👥 TOP RESPONSABLES</div>
-      ${topResp.map(([responsable, cantidad], idx) => {
-        const porcentaje = (cantidad / maxResp) * 100;
-        const color = coloresResp[idx % coloresResp.length];
-        return `
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:11px;color:var(--t1)">${responsable}</span>
-              <span style="font-size:11px;font-weight:600;color:${color}">${cantidad}</span>
-            </div>
-            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
-  }
+  document.getElementById('total-intervenciones').textContent = data.length;
+  if(!data.length){ document.getElementById('tbody-mantenimiento').innerHTML='<table><td colspan="5" style="text-align:center">No hay registros</td></tr>'; document.getElementById('ult-mant').innerHTML='Sin registros'; document.getElementById('chart-tareas-tipo').innerHTML='Sin datos'; document.getElementById('chart-tareas-responsable').innerHTML='Sin datos'; return; }
+  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `<tr><td class="tg">${r.fecha}</td><td>${r.responsable}</td><td style="font-weight:500">${r.moldeEquipo}</td><td>${getTareaBadge(r.tipoTarea)}</td><td style="max-width:350px">${r.descripcion}</td></tr>`).join('');
+  const todas = [...data].reverse();
+  document.getElementById('ult-mant').innerHTML = todas.map(r => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:8px"><div style="display:flex;gap:10px;flex-wrap:wrap"><span style="background:var(--bg4);padding:2px 6px;border-radius:4px">${r.fecha}</span>${getTareaBadge(r.tipoTarea)}<span style="font-weight:600">${r.moldeEquipo}</span></div><div>${r.responsable}</div><div style="color:var(--t2);font-size:11px">${r.descripcion}</div></div>`).join('');
+  const tipos = {}; data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
+  const maxTareas = Math.max(...Object.values(tipos));
+  document.getElementById('chart-tareas-tipo').innerHTML = `<div style="margin-bottom:12px">📊 CANTIDAD DE TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${t}</span><span style="color:var(--am)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxTareas)*100}%;height:100%;background:var(--am);border-radius:4px"></div></div></div>`).join('');
+  const resp = {}; data.forEach(r => { resp[r.responsable] = (resp[r.responsable] || 0) + 1; });
+  const maxResp = Math.max(...Object.values(resp));
+  document.getElementById('chart-tareas-responsable').innerHTML = `<div style="margin-bottom:12px">👥 TOP RESPONSABLES</div>` + Object.entries(resp).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([r,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${r}</span><span style="color:var(--bl)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxResp)*100}%;height:100%;background:var(--bl);border-radius:4px"></div></div></div>`).join('');
 }
+
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
@@ -1120,71 +1089,7 @@ function buildVidaUtil(){
     setTimeout(() => drawGauge(canvasId, porcentaje, color, LIMITE_NORMAL, LIMITE_TOTAL), 10);
   });
 }
-// ==================== PLANOS Y REFERENCIAS ====================
-function buildPlanos(){
-  // Tipos de ladrillos
-  const tiposLadrillos = [
-    { id: 'H8', nombre: 'H8 - 8 agujeros', img: 'img/ladrillos/H8.png' },
-    { id: 'H12', nombre: 'H12 - 12 agujeros', img: 'img/ladrillos/H12.png' },
-    { id: 'H18', nombre: 'H18 - 18 agujeros', img: 'img/ladrillos/H18.png' },
-    { id: 'P12', nombre: 'P12 - Portante 12', img: 'img/ladrillos/P12.png' },
-    { id: 'P18', nombre: 'P18 - Portante 18', img: 'img/ladrillos/P18.png' },
-    { id: 'L12', nombre: 'L12 - Ladrillón 12', img: 'img/ladrillos/L12.png' },
-    { id: 'L16', nombre: 'L16 - Ladrillón 16', img: 'img/ladrillos/L16.png' },
-    { id: 'DM20', nombre: 'DM20 - Dimensional 20', img: 'img/ladrillos/DM20.png' },
-    { id: 'DM27', nombre: 'DM27 - Dimensional 27', img: 'img/ladrillos/DM27.png' },
-    { id: 'KB', nombre: 'KB - Bloque', img: 'img/ladrillos/KB.png' }
-  ];
-  
-  const galeriaLadrillos = tiposLadrillos.map(t => `
-    <div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer">
-      <div style="display:flex;align-items:center;gap:12px">
-        <img src="${t.img}" alt="${t.nombre}" 
-             style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:contain"
-             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
-        <div>
-          <div class="mcn">${t.nombre}</div>
-          <div class="mcnum">Referencia visual</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
-  
-  document.getElementById('ladrillos-gallery').innerHTML = galeriaLadrillos;
-  
-  // Planos de moldes
-  const planosMoldes = tiposLadrillos.map(t => `
-    <div class="mc" onclick="verPlano('img/planos/molde-${t.id}.jpg', 'Plano - ${t.nombre}')" style="cursor:pointer">
-      <div style="display:flex;align-items:center;gap:12px">
-        <img src="img/planos/molde-${t.id}.jpg" alt="Plano ${t.nombre}" 
-             style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover"
-             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
-        <div>
-          <div class="mcn">${t.nombre}</div>
-          <div class="mcnum">Plano técnico - click para ampliar</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
-  
-  document.getElementById('planos-moldes-gallery').innerHTML = planosMoldes;
-  document.getElementById('tn6').textContent = tiposLadrillos.length;
-}
 
-// Función para ver plano en modal
-function verPlano(imgUrl, titulo){
-  document.getElementById('plano-title').textContent = titulo;
-  const imgElement = document.getElementById('plano-img');
-  imgElement.src = imgUrl;
-  imgElement.onerror = () => {
-    imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%236e7d96"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ctext x="12" y="16" text-anchor="middle" fill="%236e7d96" font-size="10"%3EPlano no disponible%3C/text%3E%3C/svg%3E';
-  };
-  document.getElementById('modal-plano').classList.add('open');
-}
-
-// Agregar miniaturas a las tarjetas de moldes (modificar buildMoldes)
-// Buscar la función buildMoldes y modificar la parte de las tarjetas
-  
 function drawGauge(canvasId, percent, color, limiteNormal, limiteTotal){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
@@ -1205,8 +1110,9 @@ function drawGauge(canvasId, percent, color, limiteNormal, limiteTotal){
   ctx.fillText('15k', markX - 8, markY - 3);
 }
 
-window.addEventListener('load', function() { setTimeout(() => { renderAll(); }, 500); });
-cargarDatos();
+document.addEventListener('DOMContentLoaded', function() {
+  cargarDatos();
+});
 </script>
 </body>
 </html>
