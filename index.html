@@ -1408,11 +1408,15 @@ function renderTab(id){
   if(id === 'lam') buildLam();
   if(id === 'moldes') {
     buildMoldes();
-    setTimeout(dibujarGraficoCromado, 100);
+    setTimeout(dibujarGraficoCromado, 200);
   }
   if(id === 'stock') buildStock();
   if(id === 'mantenimiento') buildMantenimiento();
   if(id === 'vidaUtil') buildVidaUtil();
+}
+
+function renderAll(){
+  renderTab(STATE.activeTab);
 }
 
 function switchTab(id, btn){
@@ -1443,12 +1447,15 @@ function recargar(){
   cargarDatos();
 }
 
-ffunction forzarGraficoCromado(){
+function forzarGraficoCromado(){
   setTimeout(() => {
     const canvas = document.getElementById('chart-cromado-estado');
     if(canvas) dibujarGraficoCromado();
   }, 200);
 }
+
+// Inicializar
+renderAll();
 
 cargarDatos();
 </script>
