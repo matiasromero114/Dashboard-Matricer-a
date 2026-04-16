@@ -123,7 +123,7 @@ tbody tr:hover td{background:var(--bg3)}
 .ltb.active{background:var(--am);border-color:var(--am);color:var(--bg0)}
 .ltb:hover:not(.active){color:var(--t1);border-color:var(--b3)}
 
-.mg {display:grid;grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));gap: 15px;margin-top: 4px;width: 100%;}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:4px;width:100%}
 .mc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;transition:all .2s}
 .mc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .mch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
@@ -228,33 +228,13 @@ tbody tr:hover td{background:var(--bg3)}
 .status-ok { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
 .status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
 .status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
-  /* FORZAR VISIBILIDAD DE TARJETAS DE MOLDES */
-#molde-cards {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-  gap: 15px !important;
-  width: 100% !important;
-}
-
-.mc {
-  display: block !important;
-  background: var(--bg3) !important;
-  border: 1px solid var(--b1) !important;
-  border-radius: var(--rl) !important;
-  padding: 13px 15px !important;
-}
-
-.mc:hover {
-  border-color: var(--b2) !important;
-  transform: translateY(-1px) !important;
-}
 </style>
 </head>
 <body>
 
 <header class="topbar">
   <div class="logo">
-    <img src="logo.png" alt="Logo" class="logo-icon" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <img src="logo.png" alt="Logo" class="logo-icon" onerror="this.style.display='none'">
     <div style="display:flex;align-items:center;gap:10px">
       <div class="logo-main">Matriceria Planta Cevil</div>
     </div>
@@ -326,7 +306,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></tr></div>
+    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
   </div>
 </section>
 
@@ -338,19 +318,13 @@ tbody tr:hover td{background:var(--bg3)}
       <div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div>
     </div>
   </div>
-
-  <!-- KPIs -->
   <div class="krow" id="kpi-moldes"></div>
-
-  <!-- Gráfico circular de cromado -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
     <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
       <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
     </div>
   </div>
-
-  <!-- Gráfico de pesos y alertas -->
   <div class="g7030">
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
@@ -367,14 +341,10 @@ tbody tr:hover td{background:var(--bg3)}
       <div id="alerts-moldes"></div>
     </div>
   </div>
-
-  <!-- Tarjetas de moldes -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Detalle por molde</div>
     <div class="mg" id="molde-cards"></div>
   </div>
-
-  <!-- Historial de cromados -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial de Cromados · <span style="color:var(--re)">■</span> fila resaltada = aún en proceso</div>
     <div class="notice" style="margin-bottom:11px">
@@ -745,7 +715,8 @@ function parseMantenimiento(rows){
   console.log('📋 Mantenimiento encontrado:', datos.length, 'registros');
   return datos;
 }
-  async function cargarDatos(){
+
+async function cargarDatos(){
   const btn = document.getElementById('btn-refresh');
   const ri = document.getElementById('ri');
   btn.classList.add('loading');
@@ -805,29 +776,11 @@ function renderAll(){
 }
 
 function renderTab(id){
-  if(id === 'lam') {
-    if(STATE.data.KLB12 && STATE.data.LM1210) buildLam();
-    else setTimeout(() => renderTab('lam'), 100);
-  }
-  if(id === 'moldes') {
-    if(STATE.data.MOLDES) {
-      buildMoldes();
-      setTimeout(dibujarGraficoCromado, 100);
-    }
-    else setTimeout(() => renderTab('moldes'), 100);
-  }
-  if(id === 'stock') {
-    if(STATE.data.STOCK) buildStock();
-    else setTimeout(() => renderTab('stock'), 100);
-  }
-  if(id === 'mantenimiento') {
-    if(STATE.data.MANTENIMIENTO) buildMantenimiento();
-    else setTimeout(() => renderTab('mantenimiento'), 100);
-  }
-  if(id === 'vidaUtil') {
-    if(STATE.data.VIDA_UTIL) buildVidaUtil();
-    else setTimeout(() => renderTab('vidaUtil'), 100);
-  }
+  if(id === 'lam') buildLam();
+  if(id === 'moldes') buildMoldes();
+  if(id === 'stock') buildStock();
+  if(id === 'mantenimiento') buildMantenimiento();
+  if(id === 'vidaUtil') buildVidaUtil();
   if(id === 'planos') buildPlanos();
 }
 
@@ -853,6 +806,14 @@ function setF(f, btn){
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if(btn) btn.classList.add('active');
   renderTab(STATE.activeTab);
+}
+
+function pesoColor(prom, nominal){
+  if(prom === null || prom === undefined) return '#555a68';
+  const dif = (prom - nominal) * 1000;
+  if(dif < 0) return '#3dd68c';
+  if(dif <= 300) return '#f5a623';
+  return '#f05252';
 }
 
 function buildLam(){
@@ -907,15 +868,7 @@ function buildLam(){
   if(window.chartAcum) window.chartAcum.destroy();
   window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
 
-  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td style="max-width:200px">${r.obs||'—'}</td><td>${r.resp}</td>${STATE.activeLam==='LM1210'?`<td>${r.prox||'—'}</td>`:''}</tr>`).join('');
-}
-
-function pesoColor(prom, nominal){
-  if(prom === null || prom === undefined) return '#555a68';
-  const dif = (prom - nominal) * 1000;
-  if(dif < 0) return '#3dd68c';
-  if(dif <= 300) return '#f5a623';
-  return '#f05252';
+  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}<td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
 function buildMoldes(){
@@ -968,7 +921,6 @@ function buildMoldes(){
       const col = pesoColor(m.prom, m.nominal);
       const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
       const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
-      // VERSIÓN SIN IMÁGENES
       return `
         <div class="mc">
           <div class="mch">
@@ -1003,10 +955,10 @@ function buildMoldes(){
   
   dibujarGraficoCromado();
 }
+
 function dibujarGraficoCromado(){
   const data = STATE.data.MOLDES || [];
   if(!data.length) return;
-  
   let cromadoSi = 0, cromadoNo = 0, cromadoProceso = 0;
   data.forEach(molde => {
     const cromado = (molde.cromado || '').toString().toLowerCase().trim();
@@ -1014,44 +966,13 @@ function dibujarGraficoCromado(){
     else if(cromado === 'en proceso' || cromado === 'proceso') cromadoProceso++;
     else cromadoNo++;
   });
-  
-  const total = cromadoSi + cromadoNo + cromadoProceso;
   const canvas = document.getElementById('chart-cromado-estado');
   if(!canvas) return;
-  
   if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
-  
   window.chartCromadoEstado = new Chart(canvas, {
     type: 'doughnut',
-    data: { 
-      labels: ['Cromado', 'Sin cromado', 'En proceso'], 
-      datasets: [{ 
-        data: [cromadoSi, cromadoNo, cromadoProceso], 
-        backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], 
-        borderWidth: 0, 
-        borderRadius: 10, 
-        spacing: 5, 
-        cutout: '65%' 
-      }]
-    },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: true, 
-      plugins: { 
-        legend: { 
-          position: 'bottom', 
-          labels: { color: '#b8c4d8', font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' } 
-        }, 
-        tooltip: { 
-          callbacks: { 
-            label: (ctx) => { 
-              const porcentaje = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : 0; 
-              return `${ctx.label}: ${ctx.raw} molde(s) (${porcentaje}%)`; 
-            } 
-          } 
-        } 
-      } 
-    }
+    data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] },
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
   });
 }
 
@@ -1121,7 +1042,7 @@ function buildStock(){
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
 }
 
-function filterStock(){ const q=document.getElementById('stock-search').value.trim().toLowerCase(); const data=STATE.data.STOCK||[]; const src=STATE.filter==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(STATE.filter))); STOCK_FILTERED=q?src.filter(s=>s.molde.toLowerCase().includes(q)):src; document.getElementById('tbody-stock').innerHTML=STOCK_FILTERED.map(s=>`<tr><td style="font-weight:700">${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`).join(''); document.getElementById('stock-count').textContent=`${STOCK_FILTERED.length} de ${src.length} moldes`; }
+function filterStock(){ const q=document.getElementById('stock-search').value.trim().toLowerCase(); const data=STATE.data.STOCK||[]; const src=STATE.filter==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(STATE.filter))); STOCK_FILTERED=q?src.filter(s=>s.molde.toLowerCase().includes(q)):src; document.getElementById('tbody-stock').innerHTML=STOCK_FILTERED.map(s=>`<td><td style="font-weight:700">${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`).join(''); document.getElementById('stock-count').textContent=`${STOCK_FILTERED.length} de ${src.length} moldes`; }
 
 function genFaltantes(){
   const data = STATE.data.STOCK || [];
@@ -1153,108 +1074,18 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
-  console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
-  
   document.getElementById('tn4').textContent = data.length;
-  const totalSpan = document.getElementById('total-intervenciones');
-  if(totalSpan) totalSpan.textContent = data.length;
-  
-  const containerTabla = document.getElementById('tbody-mantenimiento');
-  const containerUlt = document.getElementById('ult-mant');
-  const containerTipo = document.getElementById('chart-tareas-tipo');
-  const containerResp = document.getElementById('chart-tareas-responsable');
-  
-  if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
-    if(containerUlt) containerUlt.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
-    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
-    if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
-    return;
-  }
-  
-  // TABLA COMPLETA
-  if(containerTabla){
-    containerTabla.innerHTML = data.map(r => `
-      <tr style="border-bottom:1px solid var(--b0)">
-        <td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td>
-        <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td>
-        <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
-        <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
-        <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
-      </tr>
-    `).join('');
-  }
-  
-  // TODAS LAS INTERVENCIONES (con descripción)
-  if(containerUlt){
-    const todas = [...data].reverse();
-    containerUlt.innerHTML = todas.map(r => `
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b0);gap:10px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:200px">
-          <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2);white-space:nowrap">${r.fecha || '—'}</div>
-          ${getTareaBadge(r.tipoTarea || 'Otros')}
-          <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
-          <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
-        </div>
-        <div style="color:var(--t1);font-size:11px;flex:1;min-width:200px;text-align:left">${r.descripcion || '—'}</div>
-      </div>
-    `).join('');
-  }
-  
-  // GRÁFICO TIPOS DE TAREA (con colores como antes)
-  if(containerTipo){
-    const tipos = {};
-    data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
-    const maxTareas = Math.max(...Object.values(tipos));
-    const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a'];
-    
-    containerTipo.innerHTML = `
-      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
-      ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
-        const porcentaje = (cantidad / maxTareas) * 100;
-        const color = colores[idx % colores.length];
-        return `
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span>
-              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
-            </div>
-            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
-  }
-  
-  // GRÁFICO RESPONSABLES
-  if(containerResp){
-    const responsables = {};
-    data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
-    const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
-    const maxResp = topResp[0]?.[1] || 1;
-    const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
-    
-    containerResp.innerHTML = `
-      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
-      ${topResp.map(([responsable, cantidad], idx) => {
-        const porcentaje = (cantidad / maxResp) * 100;
-        const color = coloresResp[idx % coloresResp.length];
-        return `
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span>
-              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
-            </div>
-            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
-  }
+  document.getElementById('total-intervenciones').textContent = data.length;
+  if(!data.length){ document.getElementById('tbody-mantenimiento').innerHTML='<tr><td colspan="5" style="text-align:center">No hay registros</td></tr>'; document.getElementById('ult-mant').innerHTML='Sin registros'; document.getElementById('chart-tareas-tipo').innerHTML='Sin datos'; document.getElementById('chart-tareas-responsable').innerHTML='Sin datos'; return; }
+  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `<tr><td class="tg">${r.fecha}</td><td style="font-size:11px">${r.responsable}</td><td style="font-weight:500">${r.moldeEquipo}</td><td>${getTareaBadge(r.tipoTarea)}</td><td style="max-width:350px">${r.descripcion}</td></tr>`).join('');
+  const todas = [...data].reverse();
+  document.getElementById('ult-mant').innerHTML = todas.map(r => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:8px"><div style="display:flex;gap:10px;flex-wrap:wrap"><span style="background:var(--bg4);padding:2px 6px;border-radius:4px">${r.fecha}</span>${getTareaBadge(r.tipoTarea)}<span style="font-weight:600">${r.moldeEquipo}</span></div><div>${r.responsable}</div><div style="color:var(--t2);font-size:11px">${r.descripcion}</div></div>`).join('');
+  const tipos = {}; data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
+  const maxTareas = Math.max(...Object.values(tipos));
+  document.getElementById('chart-tareas-tipo').innerHTML = `<div style="margin-bottom:12px">📊 CANTIDAD DE TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${t}</span><span style="color:var(--am)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxTareas)*100}%;height:100%;background:var(--am);border-radius:4px"></div></div></div>`).join('');
+  const resp = {}; data.forEach(r => { resp[r.responsable] = (resp[r.responsable] || 0) + 1; });
+  const maxResp = Math.max(...Object.values(resp));
+  document.getElementById('chart-tareas-responsable').innerHTML = `<div style="margin-bottom:12px">👥 TOP RESPONSABLES</div>` + Object.entries(resp).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([r,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${r}</span><span style="color:var(--bl)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxResp)*100}%;height:100%;background:var(--bl);border-radius:4px"></div></div></div>`).join('');
 }
 
 function buildVidaUtil(){
