@@ -228,6 +228,26 @@ tbody tr:hover td{background:var(--bg3)}
 .status-ok { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
 .status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
 .status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
+  /* FORZAR VISIBILIDAD DE TARJETAS DE MOLDES */
+#molde-cards {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 15px !important;
+  width: 100% !important;
+}
+
+.mc {
+  display: block !important;
+  background: var(--bg3) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--rl) !important;
+  padding: 13px 15px !important;
+}
+
+.mc:hover {
+  border-color: var(--b2) !important;
+  transform: translateY(-1px) !important;
+}
 </style>
 </head>
 <body>
