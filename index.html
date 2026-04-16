@@ -858,6 +858,8 @@ function buildMoldes(){
   const data = STATE.data.MOLDES || [];
   const filtered = F === 'todos' ? data : data.filter(m => m.id === F || m.id === normID(F));
   
+  if(!document.getElementById('kpi-moldes')) return;
+  
   const ops = data.filter(m => m.estado === 'Operativo').length;
   const cal = data.filter(m => m.estado === 'En calibración' || m.estado === 'En laboratorio').length;
   const fab = data.filter(m => m.estado === 'En fabricación').length;
@@ -871,18 +873,20 @@ function buildMoldes(){
     <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
   `;
 
-  if(window.chartPesos) window.chartPesos.destroy();
-  window.chartPesos = new Chart(document.getElementById('ch-pesos'), {
-    type: 'bar',
-    data: {
-      labels: filtered.map(m => `${m.id} #${m.num}`),
-      datasets: [
-        { label: 'Peso real promedio', data: filtered.map(m => m.prom || 0), backgroundColor: filtered.map(m => pesoColor(m.prom, m.nominal) + 'bb'), borderColor: filtered.map(m => pesoColor(m.prom, m.nominal)), borderWidth: 1, borderRadius: 4 },
-        { label: 'Nominal', data: filtered.map(m => m.nominal), backgroundColor: 'rgba(245,166,35,.15)', borderColor: 'rgba(245,166,35,.4)', borderWidth: 1.5, borderRadius: 4, type: 'bar' }
-      ]
-    },
-    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'kg', color: '#6e7d96' }, ticks: { color: '#6e7d96' } }, y: { ticks: { color: '#b8c4d8' } } } }
-  });
+  if(document.getElementById('ch-pesos')){
+    if(window.chartPesos) window.chartPesos.destroy();
+    window.chartPesos = new Chart(document.getElementById('ch-pesos'), {
+      type: 'bar',
+      data: {
+        labels: filtered.map(m => `${m.id} #${m.num}`),
+        datasets: [
+          { label: 'Peso real promedio', data: filtered.map(m => m.prom || 0), backgroundColor: filtered.map(m => pesoColor(m.prom, m.nominal) + 'bb'), borderColor: filtered.map(m => pesoColor(m.prom, m.nominal)), borderWidth: 1, borderRadius: 4 },
+          { label: 'Nominal', data: filtered.map(m => m.nominal), backgroundColor: 'rgba(245,166,35,.15)', borderColor: 'rgba(245,166,35,.4)', borderWidth: 1.5, borderRadius: 4, type: 'bar' }
+        ]
+      },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'kg', color: '#6e7d96' }, ticks: { color: '#6e7d96' } }, y: { ticks: { color: '#b8c4d8' } } } }
+    });
+  }
 
   let alHtml = '';
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
@@ -894,42 +898,46 @@ function buildMoldes(){
   function estadoBadge(e) { const m = { 'Operativo': 'bg', 'En calibración': 'bb', 'En laboratorio': 'bb', 'En fabricación': 'br', 'No operativo': 'br' }; return `<span class="badge ${m[e] || 'bgr'}">${e}</span>`; }
   function cromBadge(c) { if (c === 'Sí') return '<span class="badge bg">Cromado</span>'; if (c === 'En proceso') return '<span class="badge ba">En proceso</span>'; return '<span class="badge bgr">Sin cromado</span>'; }
 
-  document.getElementById('molde-cards').innerHTML = filtered.map(m => {
-    const col = pesoColor(m.prom, m.nominal);
-    const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
-    const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
-    const imgUrl = `img/ladrillos/${m.id}.png`;
-    return `
-      <div class="mc" onclick="verPlano('img/planos/molde-${m.id}.jpg', 'Plano - ${m.id} #${m.num}')" style="cursor:pointer">
-        <div class="mch">
-          <div style="display:flex;align-items:center;gap:10px">
-            <img src="${imgUrl}" alt="${m.id}" style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.display='none'">
-            <div>
-              <div class="mcn">${m.id}</div>
-              <div class="mcnum">N° ${m.num}</div>
+  if(document.getElementById('molde-cards')){
+    document.getElementById('molde-cards').innerHTML = filtered.map(m => {
+      const col = pesoColor(m.prom, m.nominal);
+      const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
+      const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
+      const imgUrl = `img/ladrillos/${m.id}.png`;
+      return `
+        <div class="mc" onclick="verPlano('img/planos/molde-${m.id}.jpg', 'Plano - ${m.id} #${m.num}')" style="cursor:pointer">
+          <div class="mch">
+            <div style="display:flex;align-items:center;gap:10px">
+              <img src="${imgUrl}" alt="${m.id}" style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.display='none'">
+              <div>
+                <div class="mcn">${m.id}</div>
+                <div class="mcnum">N° ${m.num}</div>
+              </div>
             </div>
+            ${estadoBadge(m.estado)}
           </div>
-          ${estadoBadge(m.estado)}
+          <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
+          <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
+          ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
+          ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
+          ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : '<div class="mobs" style="color:var(--t3);font-size:9px">⚠️ Sin registros de vías</div>'}
+          <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
+          <div class="mobs">${m.obs || 'Sin observaciones'}</div>
         </div>
-        <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
-        <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
-        ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
-        ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
-        ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : '<div class="mobs" style="color:var(--t3);font-size:9px">⚠️ Sin registros de vías</div>'}
-        <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
-        <div class="mobs">${m.obs || 'Sin observaciones'}</div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  }
 
   const cromData = STATE.data.CROMADO || [];
   const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
-  document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c => {
-    const pend = !c.recep;
-    const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
-    const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
-    return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
-  }).join('');
+  if(document.getElementById('tbody-cromado')){
+    document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c => {
+      const pend = !c.recep;
+      const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
+      const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
+      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
+    }).join('');
+  }
   dibujarGraficoCromado();
 }
 
@@ -950,7 +958,7 @@ function dibujarGraficoCromado(){
   window.chartCromadoEstado = new Chart(canvas, {
     type: 'doughnut',
     data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, spacing: 5, cutout: '65%' }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8', font: { size: 12, family: "'IBM Plex Mono', monospace", weight: '500' }, usePointStyle: true, pointStyle: 'circle', padding: 15 } }, tooltip: { backgroundColor: '#0d1017', titleColor: '#f0f4ff', bodyColor: '#b8c4d8', borderColor: '#f5a623', borderWidth: 1, callbacks: { label: (ctx) => { const value = ctx.raw; const porcentaje = total > 0 ? ((value / total) * 100).toFixed(1) : 0; return `${ctx.label}: ${value} molde(s) (${porcentaje}%)`; } } } }, elements: { arc: { borderWidth: 0 } }, animation: { animateRotate: true, animateScale: true, duration: 800 } }
+    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8', font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { callbacks: { label: (ctx) => { const porcentaje = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : 0; return `${ctx.label}: ${ctx.raw} molde(s) (${porcentaje}%)`; } } } } }
   });
 }
 
@@ -1052,18 +1060,108 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
+  console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
+  
   document.getElementById('tn4').textContent = data.length;
-  document.getElementById('total-intervenciones').textContent = data.length;
-  if(!data.length){ document.getElementById('tbody-mantenimiento').innerHTML='<table><td colspan="5" style="text-align:center">No hay registros</td></tr>'; document.getElementById('ult-mant').innerHTML='Sin registros'; document.getElementById('chart-tareas-tipo').innerHTML='Sin datos'; document.getElementById('chart-tareas-responsable').innerHTML='Sin datos'; return; }
-  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `<tr><td class="tg">${r.fecha}</td><td>${r.responsable}</td><td style="font-weight:500">${r.moldeEquipo}</td><td>${getTareaBadge(r.tipoTarea)}</td><td style="max-width:350px">${r.descripcion}</td></tr>`).join('');
-  const todas = [...data].reverse();
-  document.getElementById('ult-mant').innerHTML = todas.map(r => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:8px"><div style="display:flex;gap:10px;flex-wrap:wrap"><span style="background:var(--bg4);padding:2px 6px;border-radius:4px">${r.fecha}</span>${getTareaBadge(r.tipoTarea)}<span style="font-weight:600">${r.moldeEquipo}</span></div><div>${r.responsable}</div><div style="color:var(--t2);font-size:11px">${r.descripcion}</div></div>`).join('');
-  const tipos = {}; data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
-  const maxTareas = Math.max(...Object.values(tipos));
-  document.getElementById('chart-tareas-tipo').innerHTML = `<div style="margin-bottom:12px">📊 CANTIDAD DE TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${t}</span><span style="color:var(--am)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxTareas)*100}%;height:100%;background:var(--am);border-radius:4px"></div></div></div>`).join('');
-  const resp = {}; data.forEach(r => { resp[r.responsable] = (resp[r.responsable] || 0) + 1; });
-  const maxResp = Math.max(...Object.values(resp));
-  document.getElementById('chart-tareas-responsable').innerHTML = `<div style="margin-bottom:12px">👥 TOP RESPONSABLES</div>` + Object.entries(resp).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([r,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${r}</span><span style="color:var(--bl)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxResp)*100}%;height:100%;background:var(--bl);border-radius:4px"></div></div></div>`).join('');
+  const totalSpan = document.getElementById('total-intervenciones');
+  if(totalSpan) totalSpan.textContent = data.length;
+  
+  const containerTabla = document.getElementById('tbody-mantenimiento');
+  const containerUlt = document.getElementById('ult-mant');
+  const containerTipo = document.getElementById('chart-tareas-tipo');
+  const containerResp = document.getElementById('chart-tareas-responsable');
+  
+  if(!data.length){
+    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+    if(containerUlt) containerUlt.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)">Sin registros</div>';
+    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
+    if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
+    return;
+  }
+  
+  // TABLA COMPLETA
+  if(containerTabla){
+    containerTabla.innerHTML = data.map(r => `
+      <tr style="border-bottom:1px solid var(--b0)">
+        <td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td>
+        <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td>
+        <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
+        <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
+        <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
+      </tr>
+    `).join('');
+  }
+  
+  // TODAS LAS INTERVENCIONES (con descripción)
+  if(containerUlt){
+    const todas = [...data].reverse();
+    containerUlt.innerHTML = todas.map(r => `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b0);gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:200px">
+          <div style="background:var(--bg4);border-radius:var(--r);padding:4px 8px;font-family:var(--fm);font-size:10px;color:var(--t2);white-space:nowrap">${r.fecha || '—'}</div>
+          ${getTareaBadge(r.tipoTarea || 'Otros')}
+          <div style="font-weight:600;color:var(--t0)">${r.moldeEquipo || '—'}</div>
+          <div style="font-size:11px;color:var(--t2)">${r.responsable || '—'}</div>
+        </div>
+        <div style="color:var(--t1);font-size:11px;flex:1;min-width:200px;text-align:left">${r.descripcion || '—'}</div>
+      </div>
+    `).join('');
+  }
+  
+  // GRÁFICO TIPOS DE TAREA (con colores como antes)
+  if(containerTipo){
+    const tipos = {};
+    data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
+    const maxTareas = Math.max(...Object.values(tipos));
+    const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a'];
+    
+    containerTipo.innerHTML = `
+      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
+      ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
+        const porcentaje = (cantidad / maxTareas) * 100;
+        const color = colores[idx % colores.length];
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span>
+              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+            </div>
+            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
+  
+  // GRÁFICO RESPONSABLES
+  if(containerResp){
+    const responsables = {};
+    data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
+    const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
+    const maxResp = topResp[0]?.[1] || 1;
+    const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
+    
+    containerResp.innerHTML = `
+      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
+      ${topResp.map(([responsable, cantidad], idx) => {
+        const porcentaje = (cantidad / maxResp) * 100;
+        const color = coloresResp[idx % coloresResp.length];
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span>
+              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+            </div>
+            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
 }
 
 function buildVidaUtil(){
