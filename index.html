@@ -905,7 +905,7 @@ function buildMoldes(){
       const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
       const imgUrl = `img/ladrillos/${m.id}.png`;
       return `
-        <div class="mc" onclick="verPlano('img/planos/molde-${m.id}.jpg', 'Plano - ${m.id} #${m.num}')" style="cursor:pointer">
+        <div class="mc">
           <div class="mch">
             <div style="display:flex;align-items:center;gap:10px">
               <img src="${imgUrl}" alt="${m.id}" style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.display='none'">
@@ -938,12 +938,14 @@ function buildMoldes(){
       return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
   }
+  
+  // Llamar al gráfico circular de cromado
   dibujarGraficoCromado();
 }
-
 function dibujarGraficoCromado(){
   const data = STATE.data.MOLDES || [];
   if(!data.length) return;
+  
   let cromadoSi = 0, cromadoNo = 0, cromadoProceso = 0;
   data.forEach(molde => {
     const cromado = (molde.cromado || '').toString().toLowerCase().trim();
@@ -951,14 +953,44 @@ function dibujarGraficoCromado(){
     else if(cromado === 'en proceso' || cromado === 'proceso') cromadoProceso++;
     else cromadoNo++;
   });
+  
   const total = cromadoSi + cromadoNo + cromadoProceso;
   const canvas = document.getElementById('chart-cromado-estado');
   if(!canvas) return;
+  
   if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
+  
   window.chartCromadoEstado = new Chart(canvas, {
     type: 'doughnut',
-    data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, spacing: 5, cutout: '65%' }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8', font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' } }, tooltip: { callbacks: { label: (ctx) => { const porcentaje = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : 0; return `${ctx.label}: ${ctx.raw} molde(s) (${porcentaje}%)`; } } } } }
+    data: { 
+      labels: ['Cromado', 'Sin cromado', 'En proceso'], 
+      datasets: [{ 
+        data: [cromadoSi, cromadoNo, cromadoProceso], 
+        backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], 
+        borderWidth: 0, 
+        borderRadius: 10, 
+        spacing: 5, 
+        cutout: '65%' 
+      }]
+    },
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: true, 
+      plugins: { 
+        legend: { 
+          position: 'bottom', 
+          labels: { color: '#b8c4d8', font: { size: 12 }, usePointStyle: true, pointStyle: 'circle' } 
+        }, 
+        tooltip: { 
+          callbacks: { 
+            label: (ctx) => { 
+              const porcentaje = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : 0; 
+              return `${ctx.label}: ${ctx.raw} molde(s) (${porcentaje}%)`; 
+            } 
+          } 
+        } 
+      } 
+    }
   });
 }
 
