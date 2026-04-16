@@ -123,7 +123,7 @@ tbody tr:hover td{background:var(--bg3)}
 .ltb.active{background:var(--am);border-color:var(--am);color:var(--bg0)}
 .ltb:hover:not(.active){color:var(--t1);border-color:var(--b3)}
 
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:4px;width:100%}
+.mg {display:grid;grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));gap: 15px;margin-top: 4px;width: 100%;}
 .mc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;transition:all .2s}
 .mc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .mch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
@@ -332,43 +332,72 @@ tbody tr:hover td{background:var(--bg3)}
 
 <!-- TAB 2: MOLDES Y CROMADO -->
 <section class="tab-s" id="tab-moldes">
-  <div class="sh"><div><div class="sh-t">Seguimiento de Moldes y Cromado</div><div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div></div></div>
+  <div class="sh">
+    <div>
+      <div class="sh-t">Seguimiento de Moldes y Cromado</div>
+      <div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
   <div class="krow" id="kpi-moldes"></div>
+
+  <!-- Gráfico circular de cromado -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
     <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
       <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
     </div>
   </div>
+
+  <!-- Gráfico de pesos -->
   <div class="g7030">
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
-      <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,166,35,.22)"></div>Nominal</div></div>
+      <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,166,35,.22)"></div>Nominal</div>
+      </div>
       <div style="position:relative;width:100%;height:300px"><canvas id="ch-pesos"></canvas></div>
     </div>
-    <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div><div id="alerts-moldes"></div></div>
+    <div class="card" style="margin-bottom:0">
+      <div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div>
+      <div id="alerts-moldes"></div>
+    </div>
   </div>
-  <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Detalle por molde</div><div class="mg" id="molde-cards"></div></div>
+
+  <!-- Tarjetas de moldes -->
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Detalle por molde</div>
+    <div class="mg" id="molde-cards"></div>
+  </div>
+
+  <!-- Historial de cromados -->
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial de Cromados · <span style="color:var(--re)">■</span> fila resaltada = aún en proceso</div>
-    <div class="notice" style="margin-bottom:11px"><div style="font-size:14px;flex-shrink:0">ℹ</div><div class="notice-t">Filas <strong style="color:var(--re)">resaltadas en rojo</strong> = moldes enviados a cromado <strong>sin fecha de recepción</strong></div></div>
+    <div class="notice" style="margin-bottom:11px">
+      <div style="font-size:14px;flex-shrink:0">ℹ</div>
+      <div class="notice-t">Filas <strong style="color:var(--re)">resaltadas en rojo</strong> = moldes enviados a cromado <strong>sin fecha de recepción</strong></div>
+    </div>
     <div class="tw">
-  <table>
-    <thead>
-      <tr>
-        <th>Molde</th>
-        <th>Fecha Envío</th>
-        <th>Fecha Recepción</th>
-        <th class="tr">Días</th>
-        <th>Proveedor</th>
-        <th>Transporte Ida</th>
-        <th>Detalle</th>
-        <th>Observaciones</th>
-      </tr>
-    </thead>
-    <tbody id="tbody-cromado"></tbody>
-  </table>
-</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Molde</th>
+            <th>Fecha Envío</th>
+            <th>Fecha Recepción</th>
+            <th class="tr">Días</th>
+            <th>Proveedor</th>
+            <th>Transporte Ida</th>
+            <th>Detalle</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-cromado"></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
