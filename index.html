@@ -919,42 +919,11 @@ function pesoColor(prom, nominal){
 }
 
 function buildMoldes(){
-  console.log('🔧 buildMoldes iniciada');
-  
   const F = STATE.filter;
   const data = STATE.data.MOLDES || [];
-  console.log('📊 Datos de moldes:', data.length);
-  
-  if(!data.length){
-    console.warn('⚠️ No hay datos de moldes');
-    document.getElementById('kpi-moldes').innerHTML = '<div class="al alg">Cargando datos de moldes...</div>';
-    return;
-  }
-  
   const filtered = F === 'todos' ? data : data.filter(m => m.id === F || m.id === normID(F));
-  console.log('📊 Filtrados:', filtered.length);
   
-  // Verificar que los elementos existan
-  if(!document.getElementById('kpi-moldes')){
-    console.error('❌ No existe kpi-moldes');
-    return;
-  }
-  if(!document.getElementById('ch-pesos')){
-    console.error('❌ No existe ch-pesos');
-    return;
-  }
-  if(!document.getElementById('alerts-moldes')){
-    console.error('❌ No existe alerts-moldes');
-    return;
-  }
-  if(!document.getElementById('molde-cards')){
-    console.error('❌ No existe molde-cards');
-    return;
-  }
-  if(!document.getElementById('tbody-cromado')){
-    console.error('❌ No existe tbody-cromado');
-    return;
-  }
+  if(!document.getElementById('kpi-moldes')) return;
   
   const ops = data.filter(m => m.estado === 'Operativo').length;
   const cal = data.filter(m => m.estado === 'En calibración' || m.estado === 'En laboratorio').length;
@@ -962,17 +931,14 @@ function buildMoldes(){
   const crom = data.filter(m => m.cromado === 'Sí' || m.cromado === 'En proceso').length;
   const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).length;
 
-  try{
-    document.getElementById('kpi-moldes').innerHTML = `
-      <div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div>
-      <div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div>
-      <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div>
-      <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
-    `;
-    console.log('✅ KPIs actualizados');
-  } catch(e){ console.error('Error en KPIs:', e); }
+  document.getElementById('kpi-moldes').innerHTML = `
+    <div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div>
+    <div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div>
+    <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div>
+    <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
+  `;
 
-  try{
+  if(document.getElementById('ch-pesos')){
     if(window.chartPesos) window.chartPesos.destroy();
     window.chartPesos = new Chart(document.getElementById('ch-pesos'), {
       type: 'bar',
@@ -985,8 +951,7 @@ function buildMoldes(){
       },
       options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'kg', color: '#6e7d96' }, ticks: { color: '#6e7d96' } }, y: { ticks: { color: '#b8c4d8' } } } }
     });
-    console.log('✅ Gráfico de pesos actualizado');
-  } catch(e){ console.error('Error en gráfico de pesos:', e); }
+  }
 
   let alHtml = '';
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
@@ -994,26 +959,22 @@ function buildMoldes(){
   filtered.filter(m => m.estado === 'Operativo' && m.cromado === 'No').forEach(m => { alHtml += `<div class="al ala"><div class="aico">◇</div><div><div class="at">${m.id} #${m.num} — Cromado pendiente</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
   if (!alHtml) alHtml = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('alerts-moldes').innerHTML = alHtml;
-  console.log('✅ Alertas actualizadas');
 
   function estadoBadge(e) { const m = { 'Operativo': 'bg', 'En calibración': 'bb', 'En laboratorio': 'bb', 'En fabricación': 'br', 'No operativo': 'br' }; return `<span class="badge ${m[e] || 'bgr'}">${e}</span>`; }
   function cromBadge(c) { if (c === 'Sí') return '<span class="badge bg">Cromado</span>'; if (c === 'En proceso') return '<span class="badge ba">En proceso</span>'; return '<span class="badge bgr">Sin cromado</span>'; }
 
-  try{
+  if(document.getElementById('molde-cards')){
     document.getElementById('molde-cards').innerHTML = filtered.map(m => {
       const col = pesoColor(m.prom, m.nominal);
       const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
       const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
-      const imgUrl = `img/ladrillos/${m.id}.png`;
+      // VERSIÓN SIN IMÁGENES
       return `
         <div class="mc">
           <div class="mch">
-            <div style="display:flex;align-items:center;gap:10px">
-              <img src="${imgUrl}" alt="${m.id}" style="width:40px;height:40px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.display='none'">
-              <div>
-                <div class="mcn">${m.id}</div>
-                <div class="mcnum">N° ${m.num}</div>
-              </div>
+            <div>
+              <div class="mcn">${m.id}</div>
+              <div class="mcnum">N° ${m.num}</div>
             </div>
             ${estadoBadge(m.estado)}
           </div>
@@ -1027,27 +988,20 @@ function buildMoldes(){
         </div>
       `;
     }).join('');
-    console.log('✅ Tarjetas de moldes actualizadas');
-  } catch(e){ console.error('Error en tarjetas de moldes:', e); }
+  }
 
-  try{
-    const cromData = STATE.data.CROMADO || [];
-    const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
+  const cromData = STATE.data.CROMADO || [];
+  const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
+  if(document.getElementById('tbody-cromado')){
     document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c => {
       const pend = !c.recep;
       const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
       const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
       return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
-    console.log('✅ Tabla de cromados actualizada');
-  } catch(e){ console.error('Error en tabla de cromados:', e); }
-
-  try{
-    dibujarGraficoCromado();
-    console.log('✅ Gráfico circular dibujado');
-  } catch(e){ console.error('Error en gráfico circular:', e); }
+  }
   
-  console.log('🎉 buildMoldes completada');
+  dibujarGraficoCromado();
 }
 function dibujarGraficoCromado(){
   const data = STATE.data.MOLDES || [];
