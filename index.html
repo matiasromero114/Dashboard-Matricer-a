@@ -381,13 +381,39 @@ tbody tr:hover td{background:var(--bg3)}
 
 <!-- TAB 4: MANTENIMIENTO -->
 <section class="tab-s" id="tab-mantenimiento">
-  <div class="sh"><div><div class="sh-t">Registro de Mantenimiento de Moldes</div><div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div></div></div>
-  <div class="g2">
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--gr)"></div>Distribución por tipo de tarea</div><div id="chart-tareas-tipo" style="min-height:280px">Cargando...</div></div>
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div><div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div></div>
+  <div class="sh">
+    <div>
+      <div class="sh-t">Registro de Mantenimiento de Moldes</div>
+      <div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div>
+    </div>
   </div>
-  <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Todas las intervenciones · Total: <span id="total-intervenciones">0</span></div><div id="ult-mant" style="font-size:11px;color:var(--t1);max-height:500px;overflow-y:auto">Cargando...</div></div>
-  <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo</div><div class="tw"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Distribución por tipo de tarea</div>
+      <div id="chart-tareas-tipo" style="min-height:280px">Cargando...</div>
+    </div>
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div>
+      <div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Responsable</th>
+            <th>Molde/Equipo</th>
+            <th>Tipo de tarea</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-mantenimiento"></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
 <!-- TAB 5: VIDA ÚTIL -->
@@ -1074,18 +1100,95 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
+  console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
+  
   document.getElementById('tn4').textContent = data.length;
-  document.getElementById('total-intervenciones').textContent = data.length;
-  if(!data.length){ document.getElementById('tbody-mantenimiento').innerHTML='<tr><td colspan="5" style="text-align:center">No hay registros</td></tr>'; document.getElementById('ult-mant').innerHTML='Sin registros'; document.getElementById('chart-tareas-tipo').innerHTML='Sin datos'; document.getElementById('chart-tareas-responsable').innerHTML='Sin datos'; return; }
-  document.getElementById('tbody-mantenimiento').innerHTML = data.map(r => `<tr><td class="tg">${r.fecha}</td><td style="font-size:11px">${r.responsable}</td><td style="font-weight:500">${r.moldeEquipo}</td><td>${getTareaBadge(r.tipoTarea)}</td><td style="max-width:350px">${r.descripcion}</td></tr>`).join('');
-  const todas = [...data].reverse();
-  document.getElementById('ult-mant').innerHTML = todas.map(r => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:8px"><div style="display:flex;gap:10px;flex-wrap:wrap"><span style="background:var(--bg4);padding:2px 6px;border-radius:4px">${r.fecha}</span>${getTareaBadge(r.tipoTarea)}<span style="font-weight:600">${r.moldeEquipo}</span></div><div>${r.responsable}</div><div style="color:var(--t2);font-size:11px">${r.descripcion}</div></div>`).join('');
-  const tipos = {}; data.forEach(r => { tipos[r.tipoTarea] = (tipos[r.tipoTarea] || 0) + 1; });
-  const maxTareas = Math.max(...Object.values(tipos));
-  document.getElementById('chart-tareas-tipo').innerHTML = `<div style="margin-bottom:12px">📊 CANTIDAD DE TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b)=>b[1]-a[1]).map(([t,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${t}</span><span style="color:var(--am)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxTareas)*100}%;height:100%;background:var(--am);border-radius:4px"></div></div></div>`).join('');
-  const resp = {}; data.forEach(r => { resp[r.responsable] = (resp[r.responsable] || 0) + 1; });
-  const maxResp = Math.max(...Object.values(resp));
-  document.getElementById('chart-tareas-responsable').innerHTML = `<div style="margin-bottom:12px">👥 TOP RESPONSABLES</div>` + Object.entries(resp).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([r,c]) => `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between"><span>${r}</span><span style="color:var(--bl)">${c}</span></div><div style="background:var(--bg4);border-radius:4px;height:20px"><div style="width:${(c/maxResp)*100}%;height:100%;background:var(--bl);border-radius:4px"></div></div></div>`).join('');
+  
+  const containerTabla = document.getElementById('tbody-mantenimiento');
+  const containerTipo = document.getElementById('chart-tareas-tipo');
+  const containerResp = document.getElementById('chart-tareas-responsable');
+  
+  if(!data.length){
+    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td><tr>';
+    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
+    if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
+    return;
+  }
+  
+  // ===== TABLA COMPLETA (Historial completo) =====
+  if(containerTabla){
+    containerTabla.innerHTML = data.map(r => `
+      <tr style="border-bottom:1px solid var(--b0)">
+        <td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td>
+        <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td>
+        <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
+        <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
+        <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
+      </tr>
+    `).join('');
+  }
+  
+  // ===== GRÁFICO 1: Distribución por tipo de tarea (CON COLORES DIFERENTES) =====
+  if(containerTipo){
+    const tipos = {};
+    data.forEach(r => { 
+      const tipo = r.tipoTarea || 'Otros';
+      tipos[tipo] = (tipos[tipo] || 0) + 1; 
+    });
+    const maxTareas = Math.max(...Object.values(tipos));
+    // Colores variados para cada tipo de tarea
+    const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
+    
+    containerTipo.innerHTML = `
+      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
+      ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
+        const porcentaje = (cantidad / maxTareas) * 100;
+        const color = colores[idx % colores.length];
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span>
+              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+            </div>
+            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
+  
+  // ===== GRÁFICO 2: Top responsables =====
+  if(containerResp){
+    const responsables = {};
+    data.forEach(r => { 
+      const resp = r.responsable || 'Desconocido';
+      responsables[resp] = (responsables[resp] || 0) + 1; 
+    });
+    const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
+    const maxResp = topResp[0]?.[1] || 1;
+    const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
+    
+    containerResp.innerHTML = `
+      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
+      ${topResp.map(([responsable, cantidad], idx) => {
+        const porcentaje = (cantidad / maxResp) * 100;
+        const color = coloresResp[idx % coloresResp.length];
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span>
+              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
+            </div>
+            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
 }
 
 function buildVidaUtil(){
