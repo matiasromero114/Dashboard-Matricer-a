@@ -1164,7 +1164,7 @@ function buildMantenimiento(){
   const containerResp = document.getElementById('chart-tareas-responsable');
   
   if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td><tr>';
+    if(containerTabla) containerTabla.innerHTML = '<table><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
     if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     return;
@@ -1183,7 +1183,7 @@ function buildMantenimiento(){
     `).join('');
   }
   
-  // ===== GRÁFICO 1: Distribución por tipo de tarea (CON COLORES DIFERENTES) =====
+  // ===== GRÁFICO 1: Distribución por tipo de tarea (SIN PORCENTAJES) =====
   if(containerTipo){
     const tipos = {};
     data.forEach(r => { 
@@ -1191,7 +1191,6 @@ function buildMantenimiento(){
       tipos[tipo] = (tipos[tipo] || 0) + 1; 
     });
     const maxTareas = Math.max(...Object.values(tipos));
-    // Colores variados para cada tipo de tarea
     const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
     
     containerTipo.innerHTML = `
@@ -1206,7 +1205,7 @@ function buildMantenimiento(){
               <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
             </div>
             <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)"></div>
             </div>
           </div>
         `;
@@ -1214,7 +1213,7 @@ function buildMantenimiento(){
     `;
   }
   
-  // ===== GRÁFICO 2: Top responsables =====
+  // ===== GRÁFICO 2: Top responsables (SIN PORCENTAJES) =====
   if(containerResp){
     const responsables = {};
     data.forEach(r => { 
@@ -1237,7 +1236,7 @@ function buildMantenimiento(){
               <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
             </div>
             <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)">${porcentaje > 20 ? Math.round(porcentaje)+'%' : ''}</div>
+              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)"></div>
             </div>
           </div>
         `;
