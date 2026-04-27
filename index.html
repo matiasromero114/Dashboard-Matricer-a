@@ -1003,19 +1003,41 @@ function dibujarGraficoCromado(){
 }
 
 function buildPlanos(){
+  // Tipos de ladrillos (sección existente)
   const tiposLadrillos = [
-    { id: 'H8', nombre: 'H8 - Hueco del 8', img: 'img/ladrillos/H8.png' },
-    { id: 'H12', nombre: 'H12 - Hueco del 12', img: 'img/ladrillos/H12.png' },
-    { id: 'H18', nombre: 'H18 - Hueco del 18', img: 'img/ladrillos/H18.png' },
-    { id: 'P12', nombre: 'P12 - Portante del 12', img: 'img/ladrillos/P12.png' },
-    { id: 'P18', nombre: 'P18 - Portante del 18', img: 'img/ladrillos/P18.png' },
-    { id: 'L12', nombre: 'L12 - Losa del 12', img: 'img/ladrillos/L12.png' },
-    { id: 'L16', nombre: 'L16 - Losa del 16', img: 'img/ladrillos/L16.png' },
-    { id: 'DM20', nombre: 'DM20 - Doble muro del 20', img: 'img/ladrillos/DM20.png' },
-    { id: 'DM27', nombre: 'DM27 - Doble muro del 27', img: 'img/ladrillos/DM27.png' },
-    { id: 'KB', nombre: 'KB - Clima block', img: 'img/ladrillos/KB.png' }
+    { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' },
+    { id: 'H12', nombre: 'H12', img: 'img/ladrillos/H12.png' },
+    { id: 'H18', nombre: 'H18', img: 'img/ladrillos/H18.png' },
+    { id: 'P12', nombre: 'P12', img: 'img/ladrillos/P12.png' },
+    { id: 'P18', nombre: 'P18', img: 'img/ladrillos/P18.png' },
+    { id: 'L12', nombre: 'L12', img: 'img/ladrillos/L12.png' },
+    { id: 'L16', nombre: 'L16', img: 'img/ladrillos/L16.png' },
+    { id: 'DM20', nombre: 'DM20', img: 'img/ladrillos/DM20.png' },
+    { id: 'DM27', nombre: 'DM27', img: 'img/ladrillos/DM27.png' },
+    { id: 'KB', nombre: 'KB', img: 'img/ladrillos/KB.png' }
   ];
   
+  // Planos de moldes (sección existente)
+  const planosMoldes = tiposLadrillos.map(t => ({
+    id: t.id,
+    nombre: t.nombre,
+    img: `img/planos/molde-${t.id}.jpg`
+  }));
+  
+  // NUEVA SECCIÓN: Planos CMP
+  const planosCMP = [
+    { nombre: 'Araña modificada H12', img: 'img/planos/arania-modificada-h12.jpg' },
+    { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/medida-boquilla-h12.jpg' },
+    { nombre: 'Boquilla H12', img: 'img/planos/boquilla-h12.jpg' },
+    { nombre: 'Boquilla P18', img: 'img/planos/boquilla-p18.jpg' },
+    { nombre: 'Dados H12', img: 'img/planos/dados-h12.jpg' },
+    { nombre: 'Dados H18', img: 'img/planos/dados-h18.jpg' },
+    { nombre: 'Plano H18', img: 'img/planos/plano-h18.jpg' },
+    { nombre: 'Modificaciones H12 BR', img: 'img/planos/modificaciones-h12-br.jpg' },
+    { nombre: 'Piezas araña H12', img: 'img/planos/piezas-arania-h12.jpg' }
+  ];
+  
+  // Galería de tipos de ladrillos
   const galeriaLadrillos = tiposLadrillos.map(t => `
     <div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer">
       <div style="display:flex;align-items:center;gap:12px">
@@ -1029,19 +1051,54 @@ function buildPlanos(){
   `).join('');
   document.getElementById('ladrillos-gallery').innerHTML = galeriaLadrillos;
   
-  const planosMoldes = tiposLadrillos.map(t => `
-    <div class="mc" onclick="verPlano('img/planos/molde-${t.id}.jpg', 'Plano - ${t.nombre}')" style="cursor:pointer">
+  // Galería de planos de moldes
+  const galeriaPlanosMoldes = planosMoldes.map(p => `
+    <div class="mc" onclick="verPlano('${p.img}', 'Plano - ${p.nombre}')" style="cursor:pointer">
       <div style="display:flex;align-items:center;gap:12px">
-        <img src="img/planos/molde-${t.id}.jpg" alt="Plano ${t.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'">
+        <img src="${p.img}" alt="Plano ${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${p.nombre}%3C/text%3E%3C/svg%3E'">
         <div>
-          <div class="mcn">${t.nombre}</div>
+          <div class="mcn">${p.nombre}</div>
           <div class="mcnum">Plano técnico - click para ampliar</div>
         </div>
       </div>
     </div>
   `).join('');
-  document.getElementById('planos-moldes-gallery').innerHTML = planosMoldes;
-  document.getElementById('tn6').textContent = tiposLadrillos.length;
+  document.getElementById('planos-moldes-gallery').innerHTML = galeriaPlanosMoldes;
+  
+  // NUEVA GALERÍA: Planos CMP
+  const galeriaPlanosCMP = planosCMP.map(p => `
+    <div class="mc" onclick="verPlano('${p.img}', '${p.nombre}')" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="${p.img}" alt="${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${p.nombre}%3C/text%3E%3C/svg%3E'">
+        <div>
+          <div class="mcn">${p.nombre}</div>
+          <div class="mcnum">Plano CMP - click para ampliar</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Crear el contenedor para la nueva sección si no existe
+  let cmpContainer = document.getElementById('planos-cmp-gallery');
+  if(!cmpContainer){
+    // Si no existe, creamos la nueva sección dentro del card correspondiente
+    const planosSection = document.querySelector('#tab-planos .card:last-child');
+    const newCard = document.createElement('div');
+    newCard.className = 'card';
+    newCard.innerHTML = `
+      <div class="ct"><div class="ctd" style="background:var(--am)"></div>Planos CMP · Documentación técnica</div>
+      <div class="mg" id="planos-cmp-gallery"></div>
+    `;
+    // Insertar después del último card existente (el de planos de moldes)
+    const parent = document.getElementById('tab-planos');
+    parent.appendChild(newCard);
+    cmpContainer = document.getElementById('planos-cmp-gallery');
+  }
+  cmpContainer.innerHTML = galeriaPlanosCMP;
+  
+  // Actualizar contador total (opcional: ahora suma ladrillos + moldes + CMP)
+  const totalPlanos = tiposLadrillos.length + planosMoldes.length + planosCMP.length;
+  document.getElementById('tn6').textContent = totalPlanos;
 }
 
 function verPlano(imgUrl, titulo){
