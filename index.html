@@ -1024,17 +1024,18 @@ function buildPlanos(){
     img: `img/planos/molde-${t.id}.jpg`
   }));
   
-  // NUEVA SECCIÓN: Planos CMP
+  // ===== PLANOS CMP (con los nombres EXACTOS de tus archivos) =====
   const planosCMP = [
-    { nombre: 'Araña modificada H12', img: 'img/planos/arania-modificada-h12.jpg' },
-    { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/medida-boquilla-h12.jpg' },
-    { nombre: 'Boquilla H12', img: 'img/planos/boquilla-h12.jpg' },
-    { nombre: 'Boquilla P18', img: 'img/planos/boquilla-p18.jpg' },
-    { nombre: 'Dados H12', img: 'img/planos/dados-h12.jpg' },
-    { nombre: 'Dados H18', img: 'img/planos/dados-h18.jpg' },
-    { nombre: 'Plano H18', img: 'img/planos/plano-h18.jpg' },
-    { nombre: 'Modificaciones H12 BR', img: 'img/planos/modificaciones-h12-br.jpg' },
-    { nombre: 'Piezas araña H12', img: 'img/planos/piezas-arania-h12.jpg' }
+    { nombre: 'Araña modificada H12', img: 'img/planos/Araña-modificada-H12.jpg' },
+    { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/Medida-Boquilla-H12.jpg' },
+    { nombre: 'Boquilla H12', img: 'img/planos/Boquilla-H12.jpg' },
+    { nombre: 'Boquilla H18', img: 'img/planos/Boquilla-H18.jpg' },
+    { nombre: 'Boquilla P18', img: 'img/planos/Boquilla-P18.jpg' },
+    { nombre: 'Dados H12', img: 'img/planos/Dados-H12.jpg' },
+    { nombre: 'Dados H18', img: 'img/planos/Dados-H18.jpg' },
+    { nombre: 'Plano H18', img: 'img/planos/Plano-H18.jpg' },
+    { nombre: 'Modificaciones H12 BR', img: 'img/planos/Modificaciones-H12-BR.jpg' },
+    { nombre: 'Piezas araña H12', img: 'img/planos/Piezas-Araña-H12.jpg' }
   ];
   
   // Galería de tipos de ladrillos
@@ -1065,7 +1066,7 @@ function buildPlanos(){
   `).join('');
   document.getElementById('planos-moldes-gallery').innerHTML = galeriaPlanosMoldes;
   
-  // NUEVA GALERÍA: Planos CMP
+  // Galería de planos CMP (NUEVA SECCIÓN)
   const galeriaPlanosCMP = planosCMP.map(p => `
     <div class="mc" onclick="verPlano('${p.img}', '${p.nombre}')" style="cursor:pointer">
       <div style="display:flex;align-items:center;gap:12px">
@@ -1078,25 +1079,22 @@ function buildPlanos(){
     </div>
   `).join('');
   
-  // Crear el contenedor para la nueva sección si no existe
+  // Crear la nueva sección si no existe
   let cmpContainer = document.getElementById('planos-cmp-gallery');
   if(!cmpContainer){
-    // Si no existe, creamos la nueva sección dentro del card correspondiente
-    const planosSection = document.querySelector('#tab-planos .card:last-child');
+    const parent = document.getElementById('tab-planos');
     const newCard = document.createElement('div');
     newCard.className = 'card';
     newCard.innerHTML = `
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Planos CMP · Documentación técnica</div>
       <div class="mg" id="planos-cmp-gallery"></div>
     `;
-    // Insertar después del último card existente (el de planos de moldes)
-    const parent = document.getElementById('tab-planos');
     parent.appendChild(newCard);
     cmpContainer = document.getElementById('planos-cmp-gallery');
   }
   cmpContainer.innerHTML = galeriaPlanosCMP;
   
-  // Actualizar contador total (opcional: ahora suma ladrillos + moldes + CMP)
+  // Actualizar contador total (opcional)
   const totalPlanos = tiposLadrillos.length + planosMoldes.length + planosCMP.length;
   document.getElementById('tn6').textContent = totalPlanos;
 }
