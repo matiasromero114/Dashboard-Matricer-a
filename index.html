@@ -1248,45 +1248,119 @@ function buildMantenimiento(){
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
-  const LIMITE_NORMAL = 15000, LIMITE_EXTRA = 10000, LIMITE_TOTAL = LIMITE_NORMAL + LIMITE_EXTRA;
+  
+  const LIMITE = 12000; // 12.000 toneladas = 100%
   const container = document.getElementById('gauges-container');
-  if(!data.length){ container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>'; return; }
+  
+  if(!data.length){
+    container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>';
+    return;
+  }
+  
   container.innerHTML = '';
+  
   data.forEach(molde => {
     const tn = molde.tnProducidas;
-    const porcentaje = Math.min((tn / LIMITE_TOTAL) * 100, 100);
+    let porcentaje = Math.min((tn / LIMITE) * 100, 100);
     let status = '', statusText = '', color = '';
-    if(tn >= LIMITE_TOTAL) { status = 'critical'; statusText = '⚠ VIDA ÚTIL EXCEDIDA'; color = '#f05252'; }
-    else if(tn >= LIMITE_NORMAL) { status = 'warning'; statusText = '⚠ ZONA DE EXTRA (requiere reparaciones)'; color = '#f5a623'; }
-    else { status = 'ok'; statusText = '✓ DENTRO DE VIDA ÚTIL'; color = '#3dd68c'; }
-    const canvasId = `gauge-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
+    const esH12_3 = (molde.molde === 'H12' && molde.numero === '3');
+    
+    if(esH12_3){
+      // H12 #3 no tiene límite: solo mostramos el porcentaje sobre 12000 pero sin alarma roja
+      if(porcentaje >= 100){
+        status = 'warning';
+        statusText = '⚠ Sin límite definido';
+        color = '#f5a623';
+      } else if(porcentaje >= 71){
+        status = 'warning';
+        statusText = '⚠ Próximo a límite hipotético';
+        color = '#f5a623';
+      } else {
+        status = 'ok';
+        statusText = '✓ Sin límite definido';
+        color = '#3dd68c';
+      }
+    } else {
+      if(porcentaje >= 100){
+        status = 'critical';
+        statusText = '⚠ VIDA ÚTIL EXCEDIDA';
+        color = '#f05252';
+      } else if(porcentaje >= 71){
+        status = 'warning';
+        statusText = '⚠ CERCANO AL LÍMITE';
+        color = '#f5a623';
+      } else {
+        status = 'ok';
+        statusText = '✓ DENTRO DE VIDA ÚTIL';
+        color = '#3dd68c';
+      }
+    }
+    
+    const canvasId = `semi-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
-    card.innerHTML = `<div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div><div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div><canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas><div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div><div class="gauge-label">Vida útil normal: ${LIMITE_NORMAL.toLocaleString()} t</div><div class="gauge-label" style="color:var(--t3)">Extra por reparaciones: +${LIMITE_EXTRA.toLocaleString()} t</div><div class="gauge-label" style="color:var(--t2);margin-top:4px">Límite total: ${LIMITE_TOTAL.toLocaleString()} t</div><div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>`;
+    card.innerHTML = `
+      <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div>
+      <canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas>
+      <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
+      <div class="gauge-label">Límite: ${LIMITE.toLocaleString()} t</div>
+      <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
+    `;
     container.appendChild(card);
-    setTimeout(() => drawGauge(canvasId, porcentaje, color, LIMITE_NORMAL, LIMITE_TOTAL), 10);
+    
+    // Dibujar gráfico semicircular después de insertar
+    setTimeout(() => drawSemiCircle(canvasId, porcentaje, color, esH12_3), 10);
   });
 }
 
-function drawGauge(canvasId, percent, color, limiteNormal, limiteTotal){
+function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width = 200, h = canvas.height = 120;
   ctx.clearRect(0, 0, w, h);
-  const startAngle = -Math.PI / 1.8, endAngle = Math.PI / 1.8, radius = 70, centerX = w/2, centerY = h - 15;
-  ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, endAngle); ctx.strokeStyle = '#2d3a50'; ctx.lineWidth = 14; ctx.stroke();
-  const normalPorcentaje = (limiteNormal / limiteTotal) * 100;
-  const normalAngle = startAngle + (normalPorcentaje / 100) * (endAngle - startAngle);
-  ctx.beginPath(); ctx.arc(centerX, centerY, radius + 4, normalAngle - 0.03, normalAngle + 0.03); ctx.strokeStyle = '#f5a623'; ctx.lineWidth = 3; ctx.stroke();
+  
+  // Ángulos para el semicírculo (de -180° a 0°, pero usando radianes)
+  const startAngle = -Math.PI;   // -180 grados (izquierda)
+  const endAngle = 0;            // 0 grados (derecha)
+  const radius = 70;
+  const centerX = w/2;
+  const centerY = h - 10;
+  
+  // Dibujar fondo del semicírculo (gris)
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.strokeStyle = '#2d3a50';
+  ctx.lineWidth = 14;
+  ctx.stroke();
+  
+  // Calcular ángulo según porcentaje (mapeo lineal)
   const angle = startAngle + (percent / 100) * (endAngle - startAngle);
-  ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, angle); ctx.strokeStyle = color; ctx.lineWidth = 14; ctx.stroke();
-  ctx.font = 'bold 20px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f0f4ff'; ctx.textAlign = 'center'; ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 3);
-  ctx.font = '9px "IBM Plex Mono", monospace'; ctx.fillStyle = '#6e7d96'; ctx.fillText('vida útil', centerX, centerY + 14);
-  ctx.font = '8px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f5a623';
-  const markX = centerX + Math.cos(normalAngle) * (radius + 12); const markY = centerY + Math.sin(normalAngle) * (radius + 12);
-  ctx.fillText('15k', markX - 8, markY - 3);
+  
+  // Dibujar barra de progreso
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, angle);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 14;
+  ctx.stroke();
+  
+  // Texto central: porcentaje
+  ctx.font = 'bold 20px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#f0f4ff';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 5);
+  ctx.font = '9px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#6e7d96';
+  ctx.fillText('vida útil', centerX, centerY + 12);
+  
+  // Si el molde no tiene límite, agregar un indicador visual (punto naranja)
+  if(sinLimite){
+    ctx.font = 'bold 12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#f5a623';
+    ctx.fillText('∞', centerX + 35, centerY - 8);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
