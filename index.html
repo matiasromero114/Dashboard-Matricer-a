@@ -1321,21 +1321,21 @@ function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
-  const w = canvas.width = 200, h = canvas.height = 120;
+  const w = canvas.width = 200, h = canvas.height = 130;  // Aumenté altura para texto abajo
   ctx.clearRect(0, 0, w, h);
   
   // Ángulos para el semicírculo (de -180° a 0°)
   const startAngle = -Math.PI;
   const endAngle = 0;
-  const radius = 70;
+  const radius = 65;
   const centerX = w/2;
-  const centerY = h - 10;
+  const centerY = h - 25; // Bajo un poco el centro para dejar espacio arriba
   
   // Dibujar fondo del semicírculo (gris)
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, startAngle, endAngle);
   ctx.strokeStyle = '#2d3a50';
-  ctx.lineWidth = 14;
+  ctx.lineWidth = 12;
   ctx.stroke();
   
   // Calcular ángulo según porcentaje (puede superar 100%, pero visualmente se detiene en 100%)
@@ -1346,30 +1346,32 @@ function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, startAngle, angle);
   ctx.strokeStyle = color;
-  ctx.lineWidth = 14;
+  ctx.lineWidth = 12;
   ctx.stroke();
   
-  // Mostrar porcentaje real (sin límite)
-  ctx.font = 'bold 20px "IBM Plex Mono", monospace';
+  // Mostrar porcentaje real (sin límite) en el centro del semicírculo
+  ctx.font = 'bold 24px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#f0f4ff';
   ctx.textAlign = 'center';
-  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 5);
-  ctx.font = '9px "IBM Plex Mono", monospace';
-  ctx.fillStyle = '#6e7d96';
-  ctx.fillText('vida útil', centerX, centerY + 12);
+  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 15);
   
-  // Si el porcentaje supera 100%, agregar un indicador visual de exceso
+  // Texto "vida útil" debajo del porcentaje (dentro del mismo semicírculo)
+  ctx.font = '10px "IBM Plex Mono", monospace';
+  ctx.fillStyle = '#6e7d96';
+  ctx.fillText('vida útil', centerX, centerY + 8);
+  
+  // Si el porcentaje supera 100% y NO es el molde sin límite, mostrar advertencia debajo
   if(percent > 100 && !sinLimite){
-    ctx.font = 'bold 12px "IBM Plex Mono", monospace';
+    ctx.font = 'bold 10px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f05252';
-    ctx.fillText('⚠ EXCEDIDO', centerX + 35, centerY - 8);
+    ctx.fillText('⚠ EXCEDIDO', centerX, centerY + 28);
   }
   
-  // Si el molde no tiene límite, agregar un indicador visual (infinito)
+  // Si el molde no tiene límite, mostrar símbolo infinito debajo
   if(sinLimite){
     ctx.font = 'bold 14px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f5a623';
-    ctx.fillText('∞', centerX + 35, centerY - 8);
+    ctx.fillText('∞', centerX + 30, centerY - 15);
   }
 }
 
