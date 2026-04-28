@@ -1261,17 +1261,18 @@ function buildVidaUtil(){
   
   data.forEach(molde => {
     const tn = molde.tnProducidas;
-    let porcentaje = Math.min((tn / LIMITE) * 100, 100);
+    // Porcentaje SIN límite superior (puede superar 100%)
+    const porcentaje = (tn / LIMITE) * 100;
     let status = '', statusText = '', color = '';
     const esH12_3 = (molde.molde === 'H12' && molde.numero === '3');
     
     if(esH12_3){
-      // H12 #3 no tiene límite: solo mostramos el porcentaje sobre 12000 pero sin alarma roja
+      // H12 #3 no tiene límite: nunca rojo
       if(porcentaje >= 100){
         status = 'warning';
-        statusText = '⚠ Sin límite definido';
+        statusText = `⚠ ${Math.round(porcentaje)}% (sin límite)`;
         color = '#f5a623';
-      } else if(porcentaje >= 71){
+      } else if(porcentaje >= 81){
         status = 'warning';
         statusText = '⚠ Próximo a límite hipotético';
         color = '#f5a623';
@@ -1281,11 +1282,12 @@ function buildVidaUtil(){
         color = '#3dd68c';
       }
     } else {
+      // Moldes con límite
       if(porcentaje >= 100){
         status = 'critical';
-        statusText = '⚠ VIDA ÚTIL EXCEDIDA';
+        statusText = `⚠ VIDA ÚTIL EXCEDIDA (${Math.round(porcentaje)}%)`;
         color = '#f05252';
-      } else if(porcentaje >= 71){
+      } else if(porcentaje >= 81){
         status = 'warning';
         statusText = '⚠ CERCANO AL LÍMITE';
         color = '#f5a623';
@@ -1322,9 +1324,9 @@ function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   const w = canvas.width = 200, h = canvas.height = 120;
   ctx.clearRect(0, 0, w, h);
   
-  // Ángulos para el semicírculo (de -180° a 0°, pero usando radianes)
-  const startAngle = -Math.PI;   // -180 grados (izquierda)
-  const endAngle = 0;            // 0 grados (derecha)
+  // Ángulos para el semicírculo (de -180° a 0°)
+  const startAngle = -Math.PI;
+  const endAngle = 0;
   const radius = 70;
   const centerX = w/2;
   const centerY = h - 10;
@@ -1336,8 +1338,9 @@ function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   ctx.lineWidth = 14;
   ctx.stroke();
   
-  // Calcular ángulo según porcentaje (mapeo lineal)
-  const angle = startAngle + (percent / 100) * (endAngle - startAngle);
+  // Calcular ángulo según porcentaje (puede superar 100%, pero visualmente se detiene en 100%)
+  let displayPercent = Math.min(percent, 100);
+  const angle = startAngle + (displayPercent / 100) * (endAngle - startAngle);
   
   // Dibujar barra de progreso
   ctx.beginPath();
@@ -1346,7 +1349,7 @@ function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   ctx.lineWidth = 14;
   ctx.stroke();
   
-  // Texto central: porcentaje
+  // Mostrar porcentaje real (sin límite)
   ctx.font = 'bold 20px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#f0f4ff';
   ctx.textAlign = 'center';
@@ -1355,9 +1358,16 @@ function drawSemiCircle(canvasId, percent, color, sinLimite = false){
   ctx.fillStyle = '#6e7d96';
   ctx.fillText('vida útil', centerX, centerY + 12);
   
-  // Si el molde no tiene límite, agregar un indicador visual (punto naranja)
-  if(sinLimite){
+  // Si el porcentaje supera 100%, agregar un indicador visual de exceso
+  if(percent > 100 && !sinLimite){
     ctx.font = 'bold 12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#f05252';
+    ctx.fillText('⚠ EXCEDIDO', centerX + 35, centerY - 8);
+  }
+  
+  // Si el molde no tiene límite, agregar un indicador visual (infinito)
+  if(sinLimite){
+    ctx.font = 'bold 14px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f5a623';
     ctx.fillText('∞', centerX + 35, centerY - 8);
   }
