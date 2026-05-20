@@ -403,7 +403,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
     <div class="tw">
-      <table>
+      <tr>
         <thead>
           <tr>
             <th>Fecha</th>
@@ -419,7 +419,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTL (con nuevo diseño de gráfico circular tipo doughnut) -->
+<!-- TAB 5: VIDA ÚTL (con fechas de inicio y fin) -->
 <section class="tab-s" id="tab-vidaUtil">
   <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
   <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
@@ -1245,7 +1245,7 @@ function buildMantenimiento(){
 }
 
 // ============================================================
-// NUEVA VERSIÓN DE VIDA ÚTIL CON GRÁFICO CIRCULAR TIPO DOUGHNUT
+// VIDA ÚTIL CON GRÁFICO DOUGHNUT Y FECHAS DE INICIO / FIN
 // ============================================================
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
@@ -1300,6 +1300,11 @@ function buildVidaUtil(){
     let displayPercent = Math.min(porcentajeReal, 200);
     
     const canvasId = `doughnut-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
+    
+    // Obtener fechas de inicio y fin (pueden ser nulas o vacías)
+    const inicio = molde.inicio && molde.inicio !== '' ? molde.inicio : '—';
+    const fin = molde.fin && molde.fin !== '' ? molde.fin : '—';
+    
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
@@ -1308,6 +1313,9 @@ function buildVidaUtil(){
       <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div>
       <canvas id="${canvasId}" width="240" height="240" class="gauge-canvas"></canvas>
       <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
+      <div style="font-size:10px; color:var(--t2); margin-top:4px; text-align:center">
+        Inicio: ${inicio} · Fin: ${fin}
+      </div>
       <div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div>
       <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
     `;
