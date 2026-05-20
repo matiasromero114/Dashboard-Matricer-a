@@ -202,7 +202,7 @@ tbody tr:hover td{background:var(--bg3)}
 }
 .gauge-canvas {
   width: 100%;
-  max-width: 180px;
+  max-width: 200px;
   height: auto;
 }
 .gauge-value {
@@ -416,10 +416,10 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTIL -->
+<!-- TAB 5: VIDA ÚTL (modificado) -->
 <section class="tab-s" id="tab-vidaUtil">
-  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · Límite normal: 15.000 t · Extra por reparaciones: +10.000 t (total 25.000 t)</div></div></div>
-  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = dentro de vida útil (hasta 15.000 t) · <span style="color:var(--am)">Amarillo</span> = zona de extra (15.000 a 25.000 t, requiere reparaciones) · <span style="color:var(--re)">Rojo</span> = vida útil excedida (más de 25.000 t)</div></div>
+  <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
+  <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
   <div class="mg" id="gauges-container"></div>
 </section>
 
@@ -710,13 +710,20 @@ function parseStock(rows){
   console.log('📦 Stock parseado:', resultados.length, 'registros');
   return resultados;
 }
+
 function parseVidaUtil(rows){
   if(!rows) return null;
   const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde');
   if(hi < 0) return null;
   return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde').map(r => ({
-    molde: (r[0]||'').trim(), numero: (r[1]||'').trim(), clave: (r[2]||'').trim(), inicio: (r[3]||'').trim(), fin: (r[4]||'').trim() || null,
-    tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0, horas: (r[6]||'').trim(), pallets: (r[7]||'').trim() || null
+    molde: (r[0]||'').trim(),
+    numero: (r[1]||'').toString().trim(),
+    clave: (r[2]||'').trim(),
+    inicio: (r[3]||'').trim(),
+    fin: (r[4]||'').trim() || null,
+    tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0,
+    horas: (r[6]||'').trim(),
+    pallets: (r[7]||'').trim() || null
   }));
 }
 
@@ -894,7 +901,7 @@ function buildLam(){
   if(window.chartAcum) window.chartAcum.destroy();
   window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
 
-  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}<td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
+  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
 function buildMoldes(){
@@ -1094,7 +1101,7 @@ function buildPlanos(){
   }
   cmpContainer.innerHTML = galeriaPlanosCMP;
   
-  // Actualizar contador total (opcional)
+  // Actualizar contador total
   const totalPlanos = tiposLadrillos.length + planosMoldes.length + planosCMP.length;
   document.getElementById('tn6').textContent = totalPlanos;
 }
@@ -1123,7 +1130,7 @@ function buildStock(){
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
 }
 
-function filterStock(){ const q=document.getElementById('stock-search').value.trim().toLowerCase(); const data=STATE.data.STOCK||[]; const src=STATE.filter==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(STATE.filter))); STOCK_FILTERED=q?src.filter(s=>s.molde.toLowerCase().includes(q)):src; document.getElementById('tbody-stock').innerHTML=STOCK_FILTERED.map(s=>`<td><td style="font-weight:700">${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`).join(''); document.getElementById('stock-count').textContent=`${STOCK_FILTERED.length} de ${src.length} moldes`; }
+function filterStock(){ const q=document.getElementById('stock-search').value.trim().toLowerCase(); const data=STATE.data.STOCK||[]; const src=STATE.filter==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(STATE.filter))); STOCK_FILTERED=q?src.filter(s=>s.molde.toLowerCase().includes(q)):src; document.getElementById('tbody-stock').innerHTML=STOCK_FILTERED.map(s=>`<tr><td style="font-weight:700">${s.molde}</td><td class="tr ${stockCls(s.boquillas)}">${s.boquillas}</td><td class="tr ${stockCls(s.aranas)}">${s.aranas}</td><td class="tr ${stockCls(s.dados)}">${s.dados}</td><td class="tr ${stockCls(s.placaBase)}">${s.placaBase}</td><td class="tr ${stockCls(s.frenos)}">${s.frenos}</td><td class="tg">${s.rev}</td><td>${stockEstado(s)}</td></tr>`).join(''); document.getElementById('stock-count').textContent=`${STOCK_FILTERED.length} de ${src.length} moldes`; }
 
 function genFaltantes(){
   const data = STATE.data.STOCK || [];
@@ -1164,7 +1171,7 @@ function buildMantenimiento(){
   const containerResp = document.getElementById('chart-tareas-responsable');
   
   if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<table><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
     if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     return;
@@ -1183,7 +1190,7 @@ function buildMantenimiento(){
     `).join('');
   }
   
-  // ===== GRÁFICO 1: Distribución por tipo de tarea (SIN PORCENTAJES) =====
+  // ===== GRÁFICO 1: Distribución por tipo de tarea =====
   if(containerTipo){
     const tipos = {};
     data.forEach(r => { 
@@ -1213,7 +1220,7 @@ function buildMantenimiento(){
     `;
   }
   
-  // ===== GRÁFICO 2: Top responsables (SIN PORCENTAJES) =====
+  // ===== GRÁFICO 2: Top responsables =====
   if(containerResp){
     const responsables = {};
     data.forEach(r => { 
@@ -1245,11 +1252,16 @@ function buildMantenimiento(){
   }
 }
 
+// ============================================================
+// NUEVA VERSIÓN DE VIDA ÚTIL CON GRÁFICO CIRCULAR COMPLETO Y MOLDES #3 INFINITOS
+// ============================================================
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
   
-  const LIMITE = 12000; // 12.000 toneladas = 100%
+  const LIMITE_BASE = 12000; // 12.000 t = 100%
+  const TOLERANCIA = 15000;  // hasta 15.000 t = 125%
+  
   const container = document.getElementById('gauges-container');
   
   if(!data.length){
@@ -1261,35 +1273,34 @@ function buildVidaUtil(){
   
   data.forEach(molde => {
     const tn = molde.tnProducidas;
-    // Porcentaje SIN límite superior (puede superar 100%)
-    const porcentaje = (tn / LIMITE) * 100;
-    let status = '', statusText = '', color = '';
-    const esH12_3 = (molde.molde === 'H12' && molde.numero === '3');
+    const esInfinito = (molde.numero === '3'); // H12 #3, H18 #3, futuros #3
     
-    if(esH12_3){
-      // H12 #3 no tiene límite: nunca rojo
-      if(porcentaje >= 100){
+    // Porcentaje real (puede superar 200%)
+    let porcentajeReal = (tn / LIMITE_BASE) * 100;
+    
+    // Determinar estado y color
+    let status = '', statusText = '', color = '';
+    
+    if(esInfinito){
+      // Moldes sin límite: nunca rojo
+      if(porcentajeReal >= 100){
         status = 'warning';
-        statusText = `⚠ ${Math.round(porcentaje)}% (sin límite)`;
-        color = '#f5a623';
-      } else if(porcentaje >= 81){
-        status = 'warning';
-        statusText = '⚠ Próximo a límite hipotético';
+        statusText = '∞ Sin límite definido (supera 100%)';
         color = '#f5a623';
       } else {
         status = 'ok';
-        statusText = '✓ Sin límite definido';
+        statusText = '∞ Sin límite definido';
         color = '#3dd68c';
       }
     } else {
-      // Moldes con límite
-      if(porcentaje >= 100){
+      // Moldes con límite normal
+      if(porcentajeReal > 125){ // > 15.000 t
         status = 'critical';
-        statusText = `⚠ VIDA ÚTIL EXCEDIDA (${Math.round(porcentaje)}%)`;
+        statusText = `⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`;
         color = '#f05252';
-      } else if(porcentaje >= 81){
+      } else if(porcentajeReal > 100){ // 12.001 a 15.000 t
         status = 'warning';
-        statusText = '⚠ CERCANO AL LÍMITE';
+        statusText = `⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`;
         color = '#f5a623';
       } else {
         status = 'ok';
@@ -1298,6 +1309,9 @@ function buildVidaUtil(){
       }
     }
     
+    // Porcentaje visual (máximo 200% para el círculo)
+    let displayPercent = Math.min(porcentajeReal, 200);
+    
     const canvasId = `semi-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
     const card = document.createElement('div');
     card.className = 'gauge-container';
@@ -1305,73 +1319,77 @@ function buildVidaUtil(){
     card.innerHTML = `
       <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
       <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div>
-      <canvas id="${canvasId}" width="200" height="120" class="gauge-canvas"></canvas>
+      <canvas id="${canvasId}" width="200" height="140" class="gauge-canvas"></canvas>
       <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
-      <div class="gauge-label">Límite: ${LIMITE.toLocaleString()} t</div>
+      <div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div>
       <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
     `;
     container.appendChild(card);
     
-    // Dibujar gráfico semicircular después de insertar
-    setTimeout(() => drawSemiCircle(canvasId, porcentaje, color, esH12_3), 10);
+    // Dibujar gráfico circular
+    setTimeout(() => drawSemiCircle(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
 }
 
-function drawSemiCircle(canvasId, percent, color, sinLimite = false){
+// Función modificada para dibujar círculo completo (360°)
+function drawSemiCircle(canvasId, displayPercent, realPercent, color, esInfinito = false){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
-  const w = canvas.width = 200, h = canvas.height = 130;  // Aumenté altura para texto abajo
+  const w = canvas.width = 200;
+  const h = canvas.height = 140;
   ctx.clearRect(0, 0, w, h);
   
-  // Ángulos para el semicírculo (de -180° a 0°)
-  const startAngle = -Math.PI;
-  const endAngle = 0;
-  const radius = 65;
+  // Centro y radio
   const centerX = w/2;
-  const centerY = h - 25; // Bajo un poco el centro para dejar espacio arriba
+  const centerY = h - 25;
+  const radius = 65;
   
-  // Dibujar fondo del semicírculo (gris)
+  // Ángulo de inicio: -90° (parte superior)
+  const startAngle = -Math.PI / 2;
+  // Ángulo final según porcentaje visual (máximo 200% → 360°)
+  const endAngle = startAngle + (displayPercent / 200) * 2 * Math.PI;
+  
+  // Dibujar fondo del círculo completo (gris)
   ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
   ctx.strokeStyle = '#2d3a50';
   ctx.lineWidth = 12;
   ctx.stroke();
   
-  // Calcular ángulo según porcentaje (puede superar 100%, pero visualmente se detiene en 100%)
-  let displayPercent = Math.min(percent, 100);
-  const angle = startAngle + (displayPercent / 100) * (endAngle - startAngle);
+  // Dibujar progreso (solo hasta el ángulo calculado)
+  if(displayPercent > 0){
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 12;
+    ctx.stroke();
+  }
   
-  // Dibujar barra de progreso
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, startAngle, angle);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 12;
-  ctx.stroke();
-  
-  // Mostrar porcentaje real (sin límite) en el centro del semicírculo
+  // Mostrar porcentaje REAL (puede ser >200%)
   ctx.font = 'bold 24px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#f0f4ff';
   ctx.textAlign = 'center';
-  ctx.fillText(`${Math.round(percent)}%`, centerX, centerY - 15);
+  let percentText = `${Math.round(realPercent)}%`;
+  ctx.fillText(percentText, centerX, centerY - 15);
   
-  // Texto "vida útil" debajo del porcentaje (dentro del mismo semicírculo)
+  // Si es infinito, dibujar símbolo ∞ al lado
+  if(esInfinito){
+    ctx.font = 'bold 20px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#f5a623';
+    ctx.fillText('∞', centerX + 45, centerY - 18);
+  }
+  
+  // Texto "vida útil" debajo del porcentaje
   ctx.font = '10px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#6e7d96';
   ctx.fillText('vida útil', centerX, centerY + 8);
   
-  // Si el porcentaje supera 100% y NO es el molde sin límite, mostrar advertencia debajo
-  if(percent > 100 && !sinLimite){
-    ctx.font = 'bold 10px "IBM Plex Mono", monospace';
+  // Si realPercent > 200% y no es infinito, mostrar advertencia extra
+  if(realPercent > 200 && !esInfinito){
+    ctx.font = 'bold 9px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f05252';
-    ctx.fillText('⚠ EXCEDIDO', centerX, centerY + 28);
-  }
-  
-  // Si el molde no tiene límite, mostrar símbolo infinito debajo
-  if(sinLimite){
-    ctx.font = 'bold 14px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#f5a623';
-    ctx.fillText('∞', centerX + 30, centerY - 15);
+    ctx.fillText('>200%', centerX, centerY + 28);
   }
 }
 
