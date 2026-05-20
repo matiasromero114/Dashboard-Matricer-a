@@ -202,7 +202,7 @@ tbody tr:hover td{background:var(--bg3)}
 }
 .gauge-canvas {
   width: 100%;
-  max-width: 260px;
+  max-width: 240px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -218,6 +218,7 @@ tbody tr:hover td{background:var(--bg3)}
   font-size: 9px;
   color: var(--t2);
   margin-top: 2px;
+  text-align: center;
 }
 .gauge-status {
   font-family: var(--fm);
@@ -308,7 +309,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw"></table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
+    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
   </div>
 </section>
 
@@ -418,7 +419,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTL (modificado) -->
+<!-- TAB 5: VIDA ÚTL (con nuevo diseño de gráfico circular tipo doughnut) -->
 <section class="tab-s" id="tab-vidaUtil">
   <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
   <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
@@ -1244,14 +1245,13 @@ function buildMantenimiento(){
 }
 
 // ============================================================
-// NUEVA VERSIÓN DE VIDA ÚTIL CON GRÁFICO CIRCULAR COMPLETO Y MOLDES #3 INFINITOS
+// NUEVA VERSIÓN DE VIDA ÚTIL CON GRÁFICO CIRCULAR TIPO DOUGHNUT
 // ============================================================
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
   
   const LIMITE_BASE = 12000; // 12.000 t = 100%
-  const TOLERANCIA = 15000;  // hasta 15.000 t = 125%
   
   const container = document.getElementById('gauges-container');
   
@@ -1281,11 +1281,11 @@ function buildVidaUtil(){
         color = '#3dd68c';
       }
     } else {
-      if(porcentajeReal > 125){
+      if(porcentajeReal > 125){ // > 15.000 t
         status = 'critical';
         statusText = `⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`;
         color = '#f05252';
-      } else if(porcentajeReal > 100){
+      } else if(porcentajeReal > 100){ // 12.001 a 15.000 t
         status = 'warning';
         statusText = `⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`;
         color = '#f5a623';
@@ -1296,75 +1296,92 @@ function buildVidaUtil(){
       }
     }
     
+    // Porcentaje visual para el arco (máximo 200%)
     let displayPercent = Math.min(porcentajeReal, 200);
     
-    const canvasId = `semi-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
+    const canvasId = `doughnut-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
     card.innerHTML = `
       <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
       <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div>
-      <canvas id="${canvasId}" width="260" height="180" class="gauge-canvas"></canvas>
+      <canvas id="${canvasId}" width="240" height="240" class="gauge-canvas"></canvas>
       <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
       <div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div>
       <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
     `;
     container.appendChild(card);
     
-    setTimeout(() => drawSemiCircle(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
+    setTimeout(() => drawDoughnut(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
 }
 
-function drawSemiCircle(canvasId, displayPercent, realPercent, color, esInfinito = false){
+// Función que dibuja un doughnut (círculo con agujero)
+function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito = false){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
-  const w = canvas.width = 260;
-  const h = canvas.height = 180;
+  const w = canvas.width = 240;
+  const h = canvas.height = 240;
   ctx.clearRect(0, 0, w, h);
   
   const centerX = w/2;
-  const centerY = h - 35;
-  const radius = 85;
+  const centerY = h/2;
+  const radius = 90;
+  const innerRadius = 55; // Tamaño del agujero interior
   
+  // Ángulo de inicio: -90° (parte superior)
   const startAngle = -Math.PI / 2;
+  // Ángulo final según porcentaje visual (máximo 200% → 360°)
   const endAngle = startAngle + (displayPercent / 200) * 2 * Math.PI;
   
+  // Dibujar fondo gris (círculo completo)
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = '#2d3a50';
-  ctx.lineWidth = 14;
-  ctx.stroke();
+  ctx.fillStyle = '#2d3a50';
+  ctx.fill();
   
+  // Dibujar el anillo de progreso
   if(displayPercent > 0){
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.lineWidth = radius - innerRadius;
     ctx.strokeStyle = color;
-    ctx.lineWidth = 14;
     ctx.stroke();
   }
   
-  ctx.font = 'bold 28px "IBM Plex Mono", monospace';
+  // Recortar el centro para simular doughnut (pintar un círculo interior del color de fondo)
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+  ctx.fillStyle = 'var(--bg3)';
+  ctx.fill();
+  
+  // Mostrar porcentaje REAL dentro del centro
+  ctx.font = 'bold 32px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#f0f4ff';
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
   let percentText = `${Math.round(realPercent)}%`;
-  ctx.fillText(percentText, centerX, centerY - 12);
+  ctx.fillText(percentText, centerX, centerY - 5);
   
+  // Si es infinito, mostrar símbolo ∞ debajo del porcentaje
   if(esInfinito){
-    ctx.font = 'bold 24px "IBM Plex Mono", monospace';
+    ctx.font = 'bold 26px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f5a623';
-    ctx.fillText('∞', centerX + 55, centerY - 18);
+    ctx.fillText('∞', centerX + 50, centerY - 10);
   }
   
+  // Texto "vida útil" pequeño debajo del porcentaje
   ctx.font = '12px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#6e7d96';
-  ctx.fillText('vida útil', centerX, centerY + 10);
+  ctx.fillText('vida útil', centerX, centerY + 25);
   
+  // Si realPercent > 200% y no es infinito, mostrar advertencia extra
   if(realPercent > 200 && !esInfinito){
     ctx.font = 'bold 11px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f05252';
-    ctx.fillText('>200%', centerX, centerY + 35);
+    ctx.fillText('>200%', centerX, centerY + 48);
   }
 }
 
