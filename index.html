@@ -295,7 +295,12 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="krow" id="kpi-lam"></div>
   <div class="g2">
     <div class="card"><div class="ct"><div class="ctd" style="background:var(--or)"></div>Desgaste acumulado de camisas</div><div id="dsgaste-bars"></div></div>
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Estado y alertas</div><div id="lam-alerts"></div></div>
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--re)"></div>Estado y alertas</div>
+      <div id="lam-alerts"></div>
+      <!-- Contenedor para el Control de Estaño -->
+      <div id="tin-data" style="margin-top:15px;"></div>
+    </div>
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--am)"></div>mm retirados por rectificación (eje Y en mm)</div>
@@ -403,7 +408,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
     <div class="tw">
-      <tr>
+      <table>
         <thead>
           <tr>
             <th>Fecha</th>
@@ -495,7 +500,8 @@ const URLS_SHEETS = {
   CROMADO: sheetCSV(SHEET_ID_SEG, '2142850839'),
   STOCK: sheetCSV(SHEET_ID_SEG, '573894203'),
   VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
-  MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513')
+  MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
+  ESTAÑO: sheetCSV(SHEET_ID_LAM, '0')   // Hoja Laminador_KLB12 (gid=0)
 };
 
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
@@ -506,7 +512,8 @@ const URLS_GITHUB = {
   CROMADO: GITHUB_BASE + 'cromados.csv',
   STOCK: GITHUB_BASE + 'stock.csv',
   VIDA_UTIL: GITHUB_BASE + 'vida_util.csv',
-  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv'
+  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv',
+  ESTAÑO: GITHUB_BASE + 'estano.csv'
 };
 
 const FB = {
@@ -536,7 +543,7 @@ let STATE = {
   filter: 'todos',
   activeTab: 'lam',
   activeLam: 'KLB12',
-  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null },
+  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null, ESTAÑO: null },
   usingLive: false
 };
 
@@ -752,6 +759,41 @@ function parseMantenimiento(rows){
   return datos;
 }
 
+// Función para parsear la hoja de Control de Estaño (Laminador_KLB12)
+function parseEstano(rows){
+  if(!rows || rows.length < 3) return null;
+  // La fila 0 (índice 0) contiene la guía (columna F)
+  let guia = '';
+  if(rows[0] && rows[0][5]) guia = rows[0][5].trim();
+  if(!guia) guia = 'Diferencia crítica: 6 mm entre centro y esquinas. 6 vueltas = 1 mm.';
+  
+  // Buscar la última fila con datos válidos (fecha, centro, esquina)
+  let ultimoRegistro = null;
+  for(let i = rows.length-1; i >= 1; i--){ // saltamos fila 0 (guía)
+    const row = rows[i];
+    if(!row || row.length < 6) continue;
+    const fecha = row[0] ? row[0].trim() : '';
+    const centro = parseFloat(String(row[1]).replace(',', '.'));
+    const esquina = parseFloat(String(row[2]).replace(',', '.'));
+    const diferencia = parseFloat(String(row[3]).replace(',', '.'));
+    const vueltas = row[4] ? parseFloat(String(row[4]).replace(',', '.')) : null;
+    const observaciones = row[5] ? row[5].trim() : '';
+    if(fecha && !isNaN(centro) && !isNaN(esquina)){
+      ultimoRegistro = {
+        fecha: fecha,
+        centro: centro,
+        esquina: esquina,
+        diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia,
+        vueltas: vueltas,
+        observaciones: observaciones
+      };
+      break;
+    }
+  }
+  if(!ultimoRegistro) return null;
+  return { guia, ultimo: ultimoRegistro };
+}
+
 async function cargarDatos(){
   const btn = document.getElementById('btn-refresh');
   const ri = document.getElementById('ri');
@@ -761,17 +803,18 @@ async function cargarDatos(){
 
   let fromSheets=0, fromGithub=0;
   try{
-    const [r1,r2,r3,r4,r5,r6,r7] = await Promise.all([
+    const [r1,r2,r3,r4,r5,r6,r7, r8] = await Promise.all([
       fetchCSV(URLS_SHEETS.CAMISA_KLB12, URLS_GITHUB.CAMISA_KLB12),
       fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
       fetchCSV(URLS_SHEETS.MOLDES, URLS_GITHUB.MOLDES),
       fetchCSV(URLS_SHEETS.CROMADO, URLS_GITHUB.CROMADO),
       fetchCSV(URLS_SHEETS.STOCK, URLS_GITHUB.STOCK),
       fetchCSV(URLS_SHEETS.VIDA_UTIL, URLS_GITHUB.VIDA_UTIL),
-      fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO)
+      fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO),
+      fetchCSV(URLS_SHEETS.ESTAÑO, URLS_GITHUB.ESTAÑO)
     ]);
 
-    [r1,r2,r3,r4,r5,r6,r7].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
+    [r1,r2,r3,r4,r5,r6,r7,r8].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
 
     if(r1){ const p=parseCamisa_KLB12(r1.rows); if(p&&p.rows.length){ STATE.data.KLB12=p; console.log('✅ KLB12:',p.rows.length,'['+r1.source+']'); } }
     if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length){ STATE.data.LM1210=p; console.log('✅ LM1210:',p.rows.length,'['+r2.source+']'); } }
@@ -780,6 +823,7 @@ async function cargarDatos(){
     if(r5){ const p=parseStock(r5.rows); if(p&&p.length){ STATE.data.STOCK=p; console.log('✅ Stock:',p.length,'['+r5.source+']'); } }
     if(r6){ const p=parseVidaUtil(r6.rows); if(p&&p.length){ STATE.data.VIDA_UTIL=p; console.log('✅ VidaUtil:',p.length,'['+r6.source+']'); } }
     if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length){ STATE.data.MANTENIMIENTO=p; console.log('✅ Mantenimiento:',p.length,'['+r7.source+']'); } }
+    if(r8){ const p=parseEstano(r8.rows); if(p){ STATE.data.ESTAÑO=p; console.log('✅ Estaño:',p); } }
 
     if(!STATE.data.KLB12) STATE.data.KLB12 = FB.KLB12;
     if(!STATE.data.LM1210) STATE.data.LM1210 = FB.LM1210;
@@ -788,13 +832,14 @@ async function cargarDatos(){
     if(!STATE.data.STOCK) STATE.data.STOCK = FB.STOCK;
     if(!STATE.data.VIDA_UTIL) STATE.data.VIDA_UTIL = FB.VIDA_UTIL;
     if(!STATE.data.MANTENIMIENTO) STATE.data.MANTENIMIENTO = FB.MANTENIMIENTO;
+    if(!STATE.data.ESTAÑO) STATE.data.ESTAÑO = null;
 
   }catch(e){ console.error(e); }
 
   const dot = document.querySelector('.dot');
   let label, color;
-  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/7)`;
-  } else if(fromGithub > 0){ label = `GitHub (${fromGithub}/7)`;
+  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/8)`;
+  } else if(fromGithub > 0){ label = `GitHub (${fromGithub}/8)`;
   } else { label = 'Datos locales'; color = 'var(--re)'; }
   dot.style.background = color || 'var(--am)';
   document.getElementById('dstatus').textContent = label;
@@ -893,6 +938,85 @@ function buildLam(){
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
 
+  // ---- BLOQUE CONTROL ESTAÑO ----
+  const tinData = STATE.data.ESTAÑO;
+  const tinContainer = document.getElementById('tin-data');
+  if(tinData && tinData.ultimo){
+    const reg = tinData.ultimo;
+    const centro = reg.centro;
+    const esquina = reg.esquina;
+    const diferencia = reg.diferencia;
+    const observacion = reg.observaciones || 'Sin observaciones';
+    const fecha = reg.fecha;
+    
+    // Determinar estado y colores
+    let estado = '', colorEstado = '', mensaje = '';
+    const idealMin = 1.2, idealMax = 1.5;
+    const esquinaFueraRango = (esquina < idealMin || esquina > idealMax);
+    const diferenciaCritica = (diferencia >= 6);
+    
+    if(diferenciaCritica){
+      estado = 'critical';
+      colorEstado = 'var(--re)';
+      mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm entre centro y esquina';
+    } else if(esquinaFueraRango){
+      estado = 'warning';
+      colorEstado = 'var(--am)';
+      mensaje = '⚠ ACERCAR: Esquina fuera del rango ideal (1.2–1.5 mm)';
+    } else {
+      estado = 'ok';
+      colorEstado = 'var(--gr)';
+      mensaje = '✓ Correcto: dentro de parámetros';
+    }
+    
+    // Calcular vueltas necesarias (6 vueltas por mm)
+    let vueltasNecesarias = '';
+    if(esquina > idealMax){
+      const vueltas = (esquina - idealMax) * 6;
+      vueltasNecesarias = `🔧 Se necesitan ≈ ${vueltas.toFixed(1)} vueltas para alcanzar ${idealMax} mm.`;
+    } else if(esquina < idealMin){
+      vueltasNecesarias = `⚠ Esquina por debajo de ${idealMin} mm. Revisar ajuste.`;
+    } else {
+      vueltasNecesarias = `✓ Esquina dentro del rango (${idealMin}–${idealMax} mm).`;
+    }
+    
+    const html = `
+      <div style="margin-top: 12px; border-top: 1px solid var(--b1); padding-top: 12px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+          <span style="font-size:16px;">📏</span>
+          <span style="font-family:var(--fh); font-size:13px; letter-spacing:.1em;">CONTROL ESTAÑO · Último control: ${fecha}</span>
+        </div>
+        <div class="tin-diagram" style="display:flex; justify-content:space-around; gap:15px; background:var(--bg3); padding:10px; border-radius:var(--r);">
+          <div class="tin-point" style="text-align:center">
+            <div class="tin-label">CENTRO</div>
+            <div class="tin-value" style="font-size:20px; font-weight:700;">${centro.toFixed(2)} mm</div>
+          </div>
+          <div class="tin-point" style="text-align:center">
+            <div class="tin-label">ESQUINA</div>
+            <div class="tin-value" style="font-size:20px; font-weight:700; color:${colorEstado}">${esquina.toFixed(2)} mm</div>
+          </div>
+          <div class="tin-point" style="text-align:center">
+            <div class="tin-label">DIFERENCIA</div>
+            <div class="tin-value" style="font-size:20px; font-weight:700;">${diferencia.toFixed(2)} mm</div>
+          </div>
+        </div>
+        <div style="text-align:center; margin:10px 0;">
+          <div class="tin-diff" style="background:${colorEstado}20; color:${colorEstado}; border:1px solid ${colorEstado}40; padding:5px 10px; border-radius:999px; display:inline-block;">
+            ${mensaje}
+          </div>
+        </div>
+        <div style="font-size:11px; color:var(--t1); background:var(--bg4); padding:8px; border-radius:var(--r); margin-top:5px;">
+          <div><strong>📝 Observación:</strong> ${observacion}</div>
+          <div style="margin-top:5px;"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div>
+          <div style="margin-top:5px;"><strong>📐 Guía:</strong> ${tinData.guia}</div>
+        </div>
+      </div>
+    `;
+    tinContainer.innerHTML = html;
+  } else {
+    tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px;">⚠️ No se encontraron datos de Control de Estaño. Verifique la hoja "Laminador_KLB12".</div>`;
+  }
+
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
 
@@ -906,6 +1030,10 @@ function buildLam(){
 
   document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
+
+// ---------------------- EL RESTO DE FUNCIONES (buildMoldes, buildStock, buildMantenimiento, buildVidaUtil, buildPlanos) se mantienen idénticas a la versión anterior.
+// Para no repetir innecesariamente, aquí se asume que están incluidas (están en el código original).
+// En esta entrega se incluyen todas para que sea funcional.
 
 function buildMoldes(){
   const F = STATE.filter;
@@ -985,7 +1113,7 @@ function buildMoldes(){
       const pend = !c.recep;
       const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
       const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
-      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
+      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td></td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
   }
   
@@ -1166,7 +1294,7 @@ function buildMantenimiento(){
   const containerResp = document.getElementById('chart-tareas-responsable');
   
   if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
+    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></table>';
     if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     return;
