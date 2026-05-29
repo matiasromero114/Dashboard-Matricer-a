@@ -231,6 +231,20 @@ tbody tr:hover td{background:var(--bg3)}
 .status-ok { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
 .status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
 .status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
+
+/* Estilos adicionales para las nuevas barras horizontales */
+.bar-wrapper {
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+.bar-real {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.bar-nominal-line {
+  box-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
+#pesos-bars-container {
+  overflow-x: auto;
+}
 </style>
 </head>
 <body>
@@ -298,7 +312,6 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="card">
       <div class="ct"><div class="ctd" style="background:var(--re)"></div>Estado y alertas</div>
       <div id="lam-alerts"></div>
-      <!-- Contenedor para el Control de Estaño -->
       <div id="tin-data" style="margin-top:15px;"></div>
     </div>
   </div>
@@ -314,11 +327,18 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr>
+        </thead>
+        <tbody id="tbody-lam"></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
-<!-- TAB 2: MOLDES Y CROMADO -->
+<!-- TAB 2: MOLDES Y CROMADO (con el nuevo gráfico de barras horizontales) -->
 <section class="tab-s" id="tab-moldes">
   <div class="sh">
     <div>
@@ -334,15 +354,16 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
   <div class="g7030">
+    <!-- CARD DEL GRÁFICO DE PESOS (NUEVO DISEÑO) -->
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
       <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div>
         <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div>
         <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,166,35,.22)"></div>Nominal</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:2px;height:12px;background:white"></div>Nominal (línea blanca)</div>
       </div>
-      <div style="position:relative;width:100%;height:300px"><canvas id="ch-pesos"></canvas></div>
+      <div id="pesos-bars-container" style="width:100%; overflow-x:auto; padding-bottom:5px;"></div>
     </div>
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div>
@@ -362,16 +383,7 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="tw">
       <table>
         <thead>
-          <tr>
-            <th>Molde</th>
-            <th>Fecha Envío</th>
-            <th>Fecha Recepción</th>
-            <th class="tr">Días</th>
-            <th>Proveedor</th>
-            <th>Transporte Ida</th>
-            <th>Detalle</th>
-            <th>Observaciones</th>
-          </tr>
+          <tr><th>Molde</th><th>Fecha Envío</th><th>Fecha Recepción</th><th class="tr">Días</th><th>Proveedor</th><th>Transporte Ida</th><th>Detalle</th><th>Observaciones</th></tr>
         </thead>
         <tbody id="tbody-cromado"></tbody>
       </table>
@@ -409,22 +421,14 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
     <div class="tw">
       <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Responsable</th>
-            <th>Molde/Equipo</th>
-            <th>Tipo de tarea</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead>
         <tbody id="tbody-mantenimiento"></tbody>
       </table>
     </div>
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTL (con fechas de inicio y fin) -->
+<!-- TAB 5: VIDA ÚTIL -->
 <section class="tab-s" id="tab-vidaUtil">
   <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
   <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
@@ -468,7 +472,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </div>
 
-<!-- MODAL PARA VER PLANOS -->
+<!-- MODAL PLANOS -->
 <div class="modal-ov" id="modal-plano">
   <div class="modal-box">
     <div class="modal-head">
@@ -501,7 +505,7 @@ const URLS_SHEETS = {
   STOCK: sheetCSV(SHEET_ID_SEG, '573894203'),
   VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
   MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
-  ESTAÑO: sheetCSV(SHEET_ID_LAM, '0')   // Hoja Laminador_KLB12 (gid=0)
+  ESTAÑO: sheetCSV(SHEET_ID_LAM, '0')
 };
 
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
@@ -759,17 +763,13 @@ function parseMantenimiento(rows){
   return datos;
 }
 
-// Función para parsear la hoja de Control de Estaño (Laminador_KLB12)
 function parseEstano(rows){
   if(!rows || rows.length < 3) return null;
-  // La fila 0 (índice 0) contiene la guía (columna F)
   let guia = '';
   if(rows[0] && rows[0][5]) guia = rows[0][5].trim();
   if(!guia) guia = 'Diferencia crítica: 6 mm entre centro y esquinas. 6 vueltas = 1 mm.';
-  
-  // Buscar la última fila con datos válidos (fecha, centro, esquina)
   let ultimoRegistro = null;
-  for(let i = rows.length-1; i >= 1; i--){ // saltamos fila 0 (guía)
+  for(let i = rows.length-1; i >= 1; i--){
     const row = rows[i];
     if(!row || row.length < 6) continue;
     const fecha = row[0] ? row[0].trim() : '';
@@ -938,7 +938,6 @@ function buildLam(){
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
 
-  // ---- BLOQUE CONTROL ESTAÑO ----
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
@@ -949,17 +948,15 @@ function buildLam(){
     const observacion = reg.observaciones || 'Sin observaciones';
     const fecha = reg.fecha;
     
-    // Determinar estado y colores
     let estado = '', colorEstado = '', mensaje = '';
     const idealMin = 1.2, idealMax = 1.5;
-    const esquinaFueraRango = (esquina < idealMin || esquina > idealMax);
     const diferenciaCritica = (diferencia >= 6);
     
     if(diferenciaCritica){
       estado = 'critical';
       colorEstado = 'var(--re)';
       mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm entre centro y esquina';
-    } else if(esquinaFueraRango){
+    } else if(esquina < idealMin || esquina > idealMax){
       estado = 'warning';
       colorEstado = 'var(--am)';
       mensaje = '⚠ ACERCAR: Esquina fuera del rango ideal (1.2–1.5 mm)';
@@ -969,7 +966,6 @@ function buildLam(){
       mensaje = '✓ Correcto: dentro de parámetros';
     }
     
-    // Calcular vueltas necesarias (6 vueltas por mm)
     let vueltasNecesarias = '';
     if(esquina > idealMax){
       const vueltas = (esquina - idealMax) * 6;
@@ -1031,10 +1027,65 @@ function buildLam(){
   document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
-// ---------------------- EL RESTO DE FUNCIONES (buildMoldes, buildStock, buildMantenimiento, buildVidaUtil, buildPlanos) se mantienen idénticas a la versión anterior.
-// Para no repetir innecesariamente, aquí se asume que están incluidas (están en el código original).
-// En esta entrega se incluyen todas para que sea funcional.
+// ---------- NUEVA FUNCIÓN PARA LAS BARRAS HORIZONTALES (OPCIÓN 1) ----------
+function renderPesoBars(filtered){
+  const container = document.getElementById('pesos-bars-container');
+  if(!container) return;
+  
+  if(!filtered.length){
+    container.innerHTML = '<div class="al alg">No hay moldes para mostrar</div>';
+    return;
+  }
+  
+  let html = '<div style="display:flex;flex-direction:column;gap:14px;">';
+  
+  filtered.forEach(m => {
+    const nominal = m.nominal;
+    const real = m.prom;
+    const tieneDatos = (real !== null && !isNaN(real) && nominal > 0);
+    
+    let barWidthPercent = 0;
+    let barColor = '#6e7d96'; // gris por defecto
+    let valueText = '';
+    
+    if(tieneDatos){
+      let rawPercent = (real / nominal) * 100;
+      barWidthPercent = Math.min(rawPercent, 200);
+      const diffKg = real - nominal;
+      const diffG = diffKg * 1000;
+      if(diffG < 0) barColor = '#3dd68c';
+      else if(diffG <= 300) barColor = '#f5a623';
+      else barColor = '#f05252';
+      valueText = `${real.toFixed(3)} / ${nominal.toFixed(1)} kg`;
+    } else {
+      barWidthPercent = 0;
+      barColor = '#6e7d96';
+      valueText = 'S/D';
+    }
+    
+    const label = `${m.id} #${m.num}`;
+    
+    html += `
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div style="min-width: 90px; font-family:var(--fh); font-weight:600; font-size:13px; color:var(--t0);">${label}</div>
+        <div style="flex:1; min-width:200px;">
+          <div class="bar-wrapper" style="position:relative; width:100%; max-width:350px; height:24px; background:var(--bg4); border-radius:12px; overflow:visible; box-shadow:inset 0 1px 2px rgba(0,0,0,0.2);">
+            <div class="bar-real" style="position:absolute; left:0; top:0; height:100%; width:${barWidthPercent}%; background:${barColor}; border-radius:12px 0 0 12px; transition:width 0.2s ease; ${barWidthPercent >= 100 ? 'border-radius:12px;' : ''}"></div>
+            <div class="bar-nominal-line" style="position:absolute; left:100%; top:0; height:100%; width:2px; background:white; transform:translateX(-1px); box-shadow:0 0 3px rgba(0,0,0,0.5); z-index:2;"></div>
+          </div>
+        </div>
+        <div style="min-width: 100px; text-align:right; font-family:var(--fm); font-size:11px; color:var(--t1);">
+          ${valueText}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
 
+// ---------- FUNCIONES PARA LA PESTAÑA MOLDES (MODIFICADA) ----------
 function buildMoldes(){
   const F = STATE.filter;
   const data = STATE.data.MOLDES || [];
@@ -1055,20 +1106,8 @@ function buildMoldes(){
     <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
   `;
 
-  if(document.getElementById('ch-pesos')){
-    if(window.chartPesos) window.chartPesos.destroy();
-    window.chartPesos = new Chart(document.getElementById('ch-pesos'), {
-      type: 'bar',
-      data: {
-        labels: filtered.map(m => `${m.id} #${m.num}`),
-        datasets: [
-          { label: 'Peso real promedio', data: filtered.map(m => m.prom || 0), backgroundColor: filtered.map(m => pesoColor(m.prom, m.nominal) + 'bb'), borderColor: filtered.map(m => pesoColor(m.prom, m.nominal)), borderWidth: 1, borderRadius: 4 },
-          { label: 'Nominal', data: filtered.map(m => m.nominal), backgroundColor: 'rgba(245,166,35,.15)', borderColor: 'rgba(245,166,35,.4)', borderWidth: 1.5, borderRadius: 4, type: 'bar' }
-        ]
-      },
-      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'kg', color: '#6e7d96' }, ticks: { color: '#6e7d96' } }, y: { ticks: { color: '#b8c4d8' } } } }
-    });
-  }
+  // Renderizar barras horizontales
+  renderPesoBars(filtered);
 
   let alHtml = '';
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
@@ -1113,7 +1152,7 @@ function buildMoldes(){
       const pend = !c.recep;
       const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
       const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
-      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td></td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
+      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
   }
   
@@ -1285,21 +1324,16 @@ function getTareaBadge(tipo){
 
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
-  console.log('🔧 buildMantenimiento ejecutado, datos:', data.length);
-  
   document.getElementById('tn4').textContent = data.length;
-  
   const containerTabla = document.getElementById('tbody-mantenimiento');
   const containerTipo = document.getElementById('chart-tareas-tipo');
   const containerResp = document.getElementById('chart-tareas-responsable');
-  
   if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></table>';
+    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
     if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     return;
   }
-  
   if(containerTabla){
     containerTabla.innerHTML = data.map(r => `
       <tr style="border-bottom:1px solid var(--b0)">
@@ -1311,16 +1345,11 @@ function buildMantenimiento(){
       </tr>
     `).join('');
   }
-  
   if(containerTipo){
     const tipos = {};
-    data.forEach(r => { 
-      const tipo = r.tipoTarea || 'Otros';
-      tipos[tipo] = (tipos[tipo] || 0) + 1; 
-    });
+    data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
     const maxTareas = Math.max(...Object.values(tipos));
     const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
-    
     containerTipo.innerHTML = `
       <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
       ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
@@ -1340,17 +1369,12 @@ function buildMantenimiento(){
       }).join('')}
     `;
   }
-  
   if(containerResp){
     const responsables = {};
-    data.forEach(r => { 
-      const resp = r.responsable || 'Desconocido';
-      responsables[resp] = (responsables[resp] || 0) + 1; 
-    });
+    data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
     const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
     const maxResp = topResp[0]?.[1] || 1;
     const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
-    
     containerResp.innerHTML = `
       <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
       ${topResp.map(([responsable, cantidad], idx) => {
@@ -1372,32 +1396,21 @@ function buildMantenimiento(){
   }
 }
 
-// ============================================================
-// VIDA ÚTIL CON GRÁFICO DOUGHNUT Y FECHAS DE INICIO / FIN
-// ============================================================
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
-  
-  const LIMITE_BASE = 12000; // 12.000 t = 100%
-  
+  const LIMITE_BASE = 12000;
   const container = document.getElementById('gauges-container');
-  
   if(!data.length){
     container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>';
     return;
   }
-  
   container.innerHTML = '';
-  
   data.forEach(molde => {
     const tn = molde.tnProducidas;
-    const esInfinito = (molde.numero === '3'); // H12 #3, H18 #3, futuros #3
-    
+    const esInfinito = (molde.numero === '3');
     let porcentajeReal = (tn / LIMITE_BASE) * 100;
-    
     let status = '', statusText = '', color = '';
-    
     if(esInfinito){
       if(porcentajeReal >= 100){
         status = 'warning';
@@ -1409,11 +1422,11 @@ function buildVidaUtil(){
         color = '#3dd68c';
       }
     } else {
-      if(porcentajeReal > 125){ // > 15.000 t
+      if(porcentajeReal > 125){
         status = 'critical';
         statusText = `⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`;
         color = '#f05252';
-      } else if(porcentajeReal > 100){ // 12.001 a 15.000 t
+      } else if(porcentajeReal > 100){
         status = 'warning';
         statusText = `⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`;
         color = '#f5a623';
@@ -1423,16 +1436,10 @@ function buildVidaUtil(){
         color = '#3dd68c';
       }
     }
-    
-    // Porcentaje visual para el arco (máximo 200%)
     let displayPercent = Math.min(porcentajeReal, 200);
-    
     const canvasId = `doughnut-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
-    
-    // Obtener fechas de inicio y fin (pueden ser nulas o vacías)
     const inicio = molde.inicio && molde.inicio !== '' ? molde.inicio : '—';
     const fin = molde.fin && molde.fin !== '' ? molde.fin : '—';
-    
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
@@ -1448,12 +1455,10 @@ function buildVidaUtil(){
       <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
     `;
     container.appendChild(card);
-    
     setTimeout(() => drawDoughnut(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
 }
 
-// Función que dibuja un doughnut (círculo con agujero)
 function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito = false){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
@@ -1461,24 +1466,16 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
   const w = canvas.width = 240;
   const h = canvas.height = 240;
   ctx.clearRect(0, 0, w, h);
-  
   const centerX = w/2;
   const centerY = h/2;
   const radius = 90;
-  const innerRadius = 55; // Tamaño del agujero interior
-  
-  // Ángulo de inicio: -90° (parte superior)
+  const innerRadius = 55;
   const startAngle = -Math.PI / 2;
-  // Ángulo final según porcentaje visual (máximo 200% → 360°)
   const endAngle = startAngle + (displayPercent / 200) * 2 * Math.PI;
-  
-  // Dibujar fondo gris (círculo completo)
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
   ctx.fillStyle = '#2d3a50';
   ctx.fill();
-  
-  // Dibujar el anillo de progreso
   if(displayPercent > 0){
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -1486,34 +1483,24 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
     ctx.strokeStyle = color;
     ctx.stroke();
   }
-  
-  // Recortar el centro para simular doughnut (pintar un círculo interior del color de fondo)
   ctx.beginPath();
   ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
   ctx.fillStyle = 'var(--bg3)';
   ctx.fill();
-  
-  // Mostrar porcentaje REAL dentro del centro
   ctx.font = 'bold 32px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#f0f4ff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   let percentText = `${Math.round(realPercent)}%`;
   ctx.fillText(percentText, centerX, centerY - 5);
-  
-  // Si es infinito, mostrar símbolo ∞ debajo del porcentaje
   if(esInfinito){
     ctx.font = 'bold 26px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f5a623';
     ctx.fillText('∞', centerX + 50, centerY - 10);
   }
-  
-  // Texto "vida útil" pequeño debajo del porcentaje
   ctx.font = '12px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#6e7d96';
   ctx.fillText('vida útil', centerX, centerY + 25);
-  
-  // Si realPercent > 200% y no es infinito, mostrar advertencia extra
   if(realPercent > 200 && !esInfinito){
     ctx.font = 'bold 11px "IBM Plex Mono", monospace';
     ctx.fillStyle = '#f05252';
