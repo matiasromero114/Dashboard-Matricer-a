@@ -565,7 +565,7 @@ const URLS_SHEETS = {
   VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
   MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
   ESTAÑO: sheetCSV(SHEET_ID_LAM, '0'),
-  ESTADO_PIEZAS: sheetCSV(SHEET_ID_SEG, '147291883')
+  ESTADO_PIEZAS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuWo7tg-cxCot76IDBydPW9kqrte9VUiyVmB2sxJlji9Hqklr0zrJDas-wWDMHfu9hLw4WDmacBTfB/pub?gid=147291883&single=true&output=csv'
 };
 
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
@@ -578,7 +578,8 @@ const URLS_GITHUB = {
   VIDA_UTIL: GITHUB_BASE + 'vida_util.csv',
   MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv',
   ESTAÑO: GITHUB_BASE + 'estano.csv',
-  ESTADO_PIEZAS: GITHUB_BASE + 'estado_piezas.csv'
+  // Se comenta la línea de GitHub para que no intente cargar desde allí
+  // ESTADO_PIEZAS: GITHUB_BASE + 'estado_piezas.csv'
 };
 
 const FB = {
