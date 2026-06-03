@@ -54,10 +54,10 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 
 .navtabs{background:var(--bg1);border-bottom:1px solid var(--b1);padding:0 20px;display:flex;overflow-x:auto}
 .navtabs::-webkit-scrollbar{display:none}
-.navtab{padding:12px 18px;font-family:var(--fh);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;white-space:nowrap;transition:all .2s;position:relative;top:1px;display:flex;align-items:center;gap:6px}
+.navtab{padding:10px 12px;font-family:var(--fh);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t2);border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;white-space:nowrap;transition:all .2s;position:relative;top:1px;display:flex;align-items:center;gap:4px}
 .navtab:hover{color:var(--t1)}
 .navtab.active{color:var(--am);border-bottom-color:var(--am)}
-.tn{background:var(--bg4);border-radius:999px;padding:1px 7px;font-size:10px;font-family:var(--fm)}
+.tn{background:var(--bg4);border-radius:999px;padding:1px 6px;font-size:9px;font-family:var(--fm)}
 .navtab.active .tn{background:var(--amd);color:var(--am)}
 
 .main{padding:20px;max-width:1600px;margin:0 auto}
@@ -75,7 +75,7 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .ct{font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:13px;display:flex;align-items:center;gap:7px}
 .ctd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
-.krow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:13px}
+.krow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:13px}
 @media(max-width:900px){.krow{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.krow{grid-template-columns:1fr}}
 .kpi{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 17px;position:relative;overflow:hidden}
@@ -97,7 +97,7 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .br{background:var(--red);color:var(--re);border:1px solid var(--reb)}
 .bb{background:var(--bld);color:var(--bl);border:1px solid var(--blb)}
 .bgr{background:var(--bg4);color:var(--t2);border:1px solid var(--b1)}
-.bo{background:rgba(251,146,60,.15);color:var(--or);border:1px solid rgba(251,146,60,.3)} /* nuevo para reacondicionado */
+.bo{background:rgba(251,146,60,.15);color:var(--or);border:1px solid rgba(251,146,60,.3)}
 
 .al{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:var(--r);border:1px solid;margin-bottom:7px;font-size:12px;line-height:1.5}
 .al:last-child{margin-bottom:0}
@@ -245,7 +245,6 @@ tbody tr:hover td{background:var(--bg3)}
 #pesos-bars-container {
   overflow-x: auto;
 }
-/* Estilos para la pestaña Estado Piezas */
 .search-estado {
   background: var(--bg3);
   border: 1px solid var(--b1);
@@ -314,13 +313,13 @@ tbody tr:hover td{background:var(--bg3)}
 </div>
 
 <nav class="navtabs">
-  <button class="navtab active" onclick="switchTab('lam',this)">01 · Laminadoras<span class="tn" id="tn1">30</span></button>
-  <button class="navtab" onclick="switchTab('moldes',this)">02 · Moldes y Cromado<span class="tn" id="tn2">14</span></button>
-  <button class="navtab" onclick="switchTab('stock',this)">03 · Stock de Repuestos<span class="tn" id="tn3">11</span></button>
-  <button class="navtab" onclick="switchTab('mantenimiento',this)">04 · Mantenimiento<span class="tn" id="tn4">0</span></button>
-  <button class="navtab" onclick="switchTab('vidaUtil',this)">05 · Vida Útil<span class="tn" id="tn5">0</span></button>
-  <button class="navtab" onclick="switchTab('planos',this)">06 · Planos y Referencias<span class="tn" id="tn6">10</span></button>
-  <button class="navtab" onclick="switchTab('estadoPiezas',this)">07 · Estado de Piezas<span class="tn" id="tn7">0</span></button>
+  <button class="navtab active" onclick="switchTab('lam',this)">01·Laminadoras<span class="tn" id="tn1">30</span></button>
+  <button class="navtab" onclick="switchTab('moldes',this)">02·Moldes<span class="tn" id="tn2">14</span></button>
+  <button class="navtab" onclick="switchTab('stock',this)">03·Stock<span class="tn" id="tn3">11</span></button>
+  <button class="navtab" onclick="switchTab('mantenimiento',this)">04·Mantenim.<span class="tn" id="tn4">0</span></button>
+  <button class="navtab" onclick="switchTab('vidaUtil',this)">05·Vida Útil<span class="tn" id="tn5">0</span></button>
+  <button class="navtab" onclick="switchTab('planos',this)">06·Planos<span class="tn" id="tn6">10</span></button>
+  <button class="navtab" onclick="switchTab('estadoPiezas',this)">07·EstadoPiezas<span class="tn" id="tn7">0</span></button>
 </nav>
 
 <main class="main">
@@ -857,47 +856,59 @@ function parseEstano(rows){
   return { guia, ultimo: ultimoRegistro };
 }
 
-// NUEVO PARSER PARA ESTADO DE PIEZAS (hoja "Estado de molde")
+// NUEVO PARSER MEJORADO PARA ESTADO DE PIEZAS
 function parseEstadoPiezas(rows){
-  if(!rows || rows.length < 2) return [];
-  // Buscar fila de encabezados (primera columna "Molde")
+  if(!rows || rows.length < 2){
+    console.warn('⚠️ No hay filas para parsear Estado de Piezas');
+    return [];
+  }
+  // Buscar fila de encabezados dinámicamente
   let headerIndex = -1;
-  for(let i=0; i<Math.min(rows.length, 20); i++){
-    const first = (rows[i][0] || '').trim();
-    if(first === 'Molde'){
+  for(let i=0; i<Math.min(rows.length, 30); i++){
+    const firstCell = (rows[i][0] || '').trim();
+    if(firstCell === 'Molde'){
       headerIndex = i;
       break;
     }
   }
-  if(headerIndex === -1) return [];
+  if(headerIndex === -1){
+    console.error('❌ No se encontró la fila de encabezado "Molde" en Estado de Piezas');
+    return [];
+  }
   
   const headers = rows[headerIndex];
-  // Índices de columnas según la imagen: 
-  // 0: Molde, 1: N°, 2: Ladrillo, 3: Componente, 4: Estado, 5: Acción Requerida, 6: Observación, 7: Operatividad, 8: Fecha Revisión (puede variar)
-  const idxMolde = 0;
-  const idxNumero = 1;
-  const idxComponente = 3;
-  const idxEstado = 4;
-  const idxAccion = 5;
-  const idxObservacion = 6;
-  const idxFecha = 7; // Operatividad (fecha de estado)
+  // Mapear índices por nombre de columna (case-insensitive)
+  const idxMap = {
+    molde: -1, numero: -1, componente: -1, estado: -1, accion: -1, observacion: -1, fecha: -1
+  };
+  headers.forEach((h, idx) => {
+    const clean = (h || '').trim().toLowerCase();
+    if(clean === 'molde') idxMap.molde = idx;
+    else if(clean === 'n°' || clean === 'nº' || clean === 'numero') idxMap.numero = idx;
+    else if(clean === 'componente') idxMap.componente = idx;
+    else if(clean === 'estado') idxMap.estado = idx;
+    else if(clean === 'acción requerida' || clean === 'accion requerida') idxMap.accion = idx;
+    else if(clean === 'observación' || clean === 'observacion') idxMap.observacion = idx;
+    else if(clean === 'operatividad') idxMap.fecha = idx; // la columna Operatividad es la fecha
+  });
   
   const resultados = [];
-  for(let i = headerIndex+1; i < rows.length; i++){
+  for(let i=headerIndex+1; i<rows.length; i++){
     const row = rows[i];
-    if(!row || row.length < 5) continue;
-    const molde = (row[idxMolde] || '').trim();
-    if(!molde || molde === '' || molde === 'Molde') continue;
-    const numero = (row[idxNumero] || '').trim();
-    const componente = (row[idxComponente] || '').trim();
-    let estado = (row[idxEstado] || '').trim();
-    const accion = (row[idxAccion] || '').trim();
-    const observacion = (row[idxObservacion] || '').trim();
-    let fecha = (row[idxFecha] || '').trim();
-    // Limpiar estado (puede tener emojis como ✔)
-    if(estado.includes('✔')) estado = estado.replace('✔','').trim() || 'Buen estado';
-    if(estado === '' && accion !== '') estado = 'Pendiente';
+    if(!row || row.length < 2) continue;
+    const molde = row[idxMap.molde] ? row[idxMap.molde].trim() : '';
+    if(!molde || molde === '') continue;
+    const numero = (idxMap.numero >=0 && row[idxMap.numero]) ? row[idxMap.numero].trim() : '';
+    let componente = (idxMap.componente >=0 && row[idxMap.componente]) ? row[idxMap.componente].trim() : 'Pieza';
+    let estado = (idxMap.estado >=0 && row[idxMap.estado]) ? row[idxMap.estado].trim() : '';
+    const accion = (idxMap.accion >=0 && row[idxMap.accion]) ? row[idxMap.accion].trim() : '';
+    const observacion = (idxMap.observacion >=0 && row[idxMap.observacion]) ? row[idxMap.observacion].trim() : '';
+    const fecha = (idxMap.fecha >=0 && row[idxMap.fecha]) ? row[idxMap.fecha].trim() : '';
+    
+    // Limpiar estado (posibles emojis)
+    if(estado.includes('✔')) estado = estado.replace('✔','').trim();
     if(estado === '') estado = 'Sin especificar';
+    if(componente === '') componente = 'Pieza';
     
     resultados.push({
       molde: molde,
@@ -909,7 +920,7 @@ function parseEstadoPiezas(rows){
       fecha: fecha
     });
   }
-  console.log('🔧 Estado de Piezas parseado:', resultados.length, 'registros');
+  console.log(`🔧 Estado de Piezas parseado: ${resultados.length} registros. Columnas encontradas:`, idxMap);
   return resultados;
 }
 
@@ -1167,7 +1178,7 @@ function renderPesoBars(filtered){
     const tieneDatos = (real !== null && !isNaN(real) && nominal > 0);
     
     let barWidthPercent = 0;
-    let barColor = '#6e7d96'; // gris por defecto
+    let barColor = '#6e7d96';
     let valueText = '';
     
     if(tieneDatos){
@@ -1628,7 +1639,7 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
   }
 }
 
-// ================== NUEVA FUNCIÓN PARA ESTADO DE PIEZAS ==================
+// ================== ESTADO DE PIEZAS MEJORADO ==================
 let ESTADO_FILTER_TEXT = '';
 function filterEstadoPiezas(){
   const input = document.getElementById('search-estado');
@@ -1681,25 +1692,34 @@ function buildEstadoPiezas(){
   const chartCanvas = document.getElementById('chart-estado-piezas');
   if(chartCanvas){
     if(window.chartEstadoPiezas) window.chartEstadoPiezas.destroy();
-    window.chartEstadoPiezas = new Chart(chartCanvas, {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(estadosCount),
-        datasets: [{
-          data: Object.values(estadosCount),
-          backgroundColor: ['#3dd68c', '#f5a623', '#fb923c', '#f05252'],
-          borderWidth: 0,
-          cutout: '60%'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#b8c4d8', font: { size: 10 } } }
+    if(Object.keys(estadosCount).length > 0){
+      window.chartEstadoPiezas = new Chart(chartCanvas, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(estadosCount),
+          datasets: [{
+            data: Object.values(estadosCount),
+            backgroundColor: ['#3dd68c', '#f5a623', '#fb923c', '#f05252'],
+            borderWidth: 0,
+            cutout: '60%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#b8c4d8', font: { size: 10 } } }
+          }
         }
-      }
-    });
+      });
+    } else {
+      // mostrar mensaje si no hay datos para el gráfico
+      const ctx = chartCanvas.getContext('2d');
+      ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+      ctx.fillStyle = '#6e7d96';
+      ctx.font = '12px monospace';
+      ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
+    }
   }
   
   // Alertas de acción requerida
@@ -1735,38 +1755,42 @@ function buildEstadoPiezas(){
   });
   
   let cardsHtml = '';
-  for(const [moldeKey, piezas] of Object.entries(grouped)){
-    cardsHtml += `
-      <div class="mc">
-        <div class="mch">
-          <div>
-            <div class="mcn">${moldeKey}</div>
-            <div class="mcnum">${piezas.length} pieza(s)</div>
-          </div>
-          <span class="badge bb">${piezas[0].molde}</span>
-        </div>
-        <div style="margin-top:8px;">
-    `;
-    piezas.forEach(p => {
-      let badgeClass = 'estado-badge-otro';
-      if(p.estado.includes('Buen')) badgeClass = 'estado-badge-bueno';
-      else if(p.estado.includes('Cromado')) badgeClass = 'estado-badge-cromado';
-      else if(p.estado.includes('Reacondicionado')) badgeClass = 'estado-badge-reacondicionado';
+  if(Object.keys(grouped).length === 0){
+    cardsHtml = '<div class="al alg">No hay piezas registradas para los filtros seleccionados.</div>';
+  } else {
+    for(const [moldeKey, piezas] of Object.entries(grouped)){
       cardsHtml += `
-        <div class="pieza-item">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:600; font-size:13px;">${p.componente || 'Pieza'}</span>
-            <span class="badge ${badgeClass}">${p.estado}</span>
+        <div class="mc">
+          <div class="mch">
+            <div>
+              <div class="mcn">${moldeKey}</div>
+              <div class="mcnum">${piezas.length} pieza(s)</div>
+            </div>
+            <span class="badge bb">${piezas[0].molde}</span>
           </div>
-          ${p.accion ? `<div style="font-size:11px; color:var(--am); margin-top:3px;">🔧 ${p.accion}</div>` : ''}
-          ${p.observacion ? `<div style="font-size:10px; color:var(--t2); margin-top:2px;">📝 ${p.observacion}</div>` : ''}
-          ${p.fecha ? `<div style="font-size:9px; color:var(--t3); margin-top:3px;">📅 ${p.fecha}</div>` : ''}
-        </div>
+          <div style="margin-top:8px;">
       `;
-    });
-    cardsHtml += `</div></div>`;
+      piezas.forEach(p => {
+        let badgeClass = 'estado-badge-otro';
+        if(p.estado.includes('Buen')) badgeClass = 'estado-badge-bueno';
+        else if(p.estado.includes('Cromado')) badgeClass = 'estado-badge-cromado';
+        else if(p.estado.includes('Reacondicionado')) badgeClass = 'estado-badge-reacondicionado';
+        cardsHtml += `
+          <div class="pieza-item">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:600; font-size:13px;">${p.componente || 'Pieza'}</span>
+              <span class="badge ${badgeClass}">${p.estado}</span>
+            </div>
+            ${p.accion ? `<div style="font-size:11px; color:var(--am); margin-top:3px;">🔧 ${p.accion}</div>` : ''}
+            ${p.observacion ? `<div style="font-size:10px; color:var(--t2); margin-top:2px;">📝 ${p.observacion}</div>` : ''}
+            ${p.fecha ? `<div style="font-size:9px; color:var(--t3); margin-top:3px;">📅 ${p.fecha}</div>` : ''}
+          </div>
+        `;
+      });
+      cardsHtml += `</div></div>`;
+    }
   }
-  document.getElementById('estado-cards-container').innerHTML = cardsHtml || '<div class="al alg">No hay piezas registradas para los filtros seleccionados.</div>';
+  document.getElementById('estado-cards-container').innerHTML = cardsHtml;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
