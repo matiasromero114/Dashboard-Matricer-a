@@ -12,8 +12,8 @@
   --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.08);--b2:rgba(255,255,255,.16);--b3:rgba(255,255,255,.28);
   --t0:#f0f4ff;--t1:#b8c4d8;--t2:#6e7d96;--t3:#3d4f6a;
   --am:#f5a623;--amd:rgba(245,166,35,.13);--amb:rgba(245,166,35,.3);
-  --gr:#4ade80;--grd:rgba(74,222,128,.1);--grb:rgba(74,222,128,.3);
-  --re:#f87171;--red:rgba(248,113,113,.1);--reb:rgba(248,113,113,.3);
+  --gr:#3dd68c;--grd:rgba(61,214,140,.1);--grb:rgba(61,214,140,.3);
+  --re:#f05252;--red:rgba(240,82,82,.1);--reb:rgba(240,82,82,.3);
   --bl:#60a5fa;--bld:rgba(96,165,250,.1);--blb:rgba(96,165,250,.3);
   --te:#2dd4bf;--or:#fb923c;
   --fh:'IBM Plex Sans Condensed',sans-serif;
@@ -123,7 +123,7 @@ tbody tr:hover td{background:var(--bg3)}
 .ltb.active{background:var(--am);border-color:var(--am);color:var(--bg0)}
 .ltb:hover:not(.active){color:var(--t1);border-color:var(--b3)}
 
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:15px;margin-top:4px;width:100%}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:4px;width:100%}
 .mc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;transition:all .2s}
 .mc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .mch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
@@ -232,45 +232,18 @@ tbody tr:hover td{background:var(--bg3)}
 .status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
 .status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
 
-/* Estilo para el contenedor de búsqueda de estado de moldes */
-.search-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  gap: 10px;
-  flex-wrap: wrap;
+/* Estilos adicionales para las nuevas barras horizontales */
+.bar-wrapper {
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
 }
-.search-container input {
-  flex-grow: 1;
-  background: var(--bg3);
-  border: 1px solid var(--b1);
-  border-radius: var(--r);
-  padding: 8px 14px;
-  font-family: var(--fm);
-  font-size: 12px;
-  color: var(--t0);
-  outline: none;
-  transition: border-color .15s;
+.bar-real {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.search-container input:focus {
-  border-color: var(--am);
+.bar-nominal-line {
+  box-shadow: 0 0 3px rgba(0,0,0,0.5);
 }
-.search-container button {
-  background: var(--am);
-  border: none;
-  padding: 8px 16px;
-  border-radius: var(--r);
-  font-family: var(--fh);
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--bg0);
-  cursor: pointer;
-  transition: all .15s;
-}
-.search-container button:hover {
-  background: #f5b84b;
-  transform: translateY(-1px);
+#pesos-bars-container {
+  overflow-x: auto;
 }
 </style>
 </head>
@@ -317,7 +290,6 @@ tbody tr:hover td{background:var(--bg3)}
   <button class="navtab" onclick="switchTab('mantenimiento',this)">04 · Mantenimiento<span class="tn" id="tn4">0</span></button>
   <button class="navtab" onclick="switchTab('vidaUtil',this)">05 · Vida Útil<span class="tn" id="tn5">0</span></button>
   <button class="navtab" onclick="switchTab('planos',this)">06 · Planos y Referencias<span class="tn" id="tn6">10</span></button>
-  <button class="navtab" onclick="switchTab('estadoMoldes',this)">07 · Estado de Moldes<span class="tn" id="tn7">0</span></button>
 </nav>
 
 <main class="main">
@@ -355,11 +327,18 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr>
+        </thead>
+        <tbody id="tbody-lam"></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
-<!-- TAB 2: MOLDES Y CROMADO -->
+<!-- TAB 2: MOLDES Y CROMADO (con el nuevo gráfico de barras horizontales) -->
 <section class="tab-s" id="tab-moldes">
   <div class="sh">
     <div>
@@ -375,15 +354,16 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
   <div class="g7030">
+    <!-- CARD DEL GRÁFICO DE PESOS (NUEVO DISEÑO) -->
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
       <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#4ade80"></div>Por debajo del nominal</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#fbbf24"></div>Dentro de ±300 g</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f87171"></div>Más de +300 g sobre nominal</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#94a3b8"></div>Nominal</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div>
+        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:2px;height:12px;background:white"></div>Nominal (línea blanca)</div>
       </div>
-      <div style="position:relative;width:100%;height:400px"><canvas id="ch-pesos"></canvas></div>
+      <div id="pesos-bars-container" style="width:100%; overflow-x:auto; padding-bottom:5px;"></div>
     </div>
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div>
@@ -403,16 +383,7 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="tw">
       <table>
         <thead>
-          <tr>
-            <th>Molde</th>
-            <th>Fecha Envío</th>
-            <th>Fecha Recepción</th>
-            <th class="tr">Días</th>
-            <th>Proveedor</th>
-            <th>Transporte Ida</th>
-            <th>Detalle</th>
-            <th>Observaciones</th>
-          </tr>
+          <tr><th>Molde</th><th>Fecha Envío</th><th>Fecha Recepción</th><th class="tr">Días</th><th>Proveedor</th><th>Transporte Ida</th><th>Detalle</th><th>Observaciones</th></tr>
         </thead>
         <tbody id="tbody-cromado"></tbody>
       </table>
@@ -450,22 +421,14 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
     <div class="tw">
       <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Responsable</th>
-            <th>Molde/Equipo</th>
-            <th>Tipo de tarea</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead>
         <tbody id="tbody-mantenimiento"></tbody>
-      </tr>
+      </table>
     </div>
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTL -->
+<!-- TAB 5: VIDA ÚTIL -->
 <section class="tab-s" id="tab-vidaUtil">
   <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
   <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
@@ -490,29 +453,11 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 7: ESTADO DE MOLDES (NUEVO) -->
-<section class="tab-s" id="tab-estadoMoldes">
-  <div class="sh">
-    <div>
-      <div class="sh-t">Estado de Moldes</div>
-      <div class="sh-s">Seguimiento detallado por componente · Estado · Observaciones</div>
-    </div>
-  </div>
-  <div class="search-container">
-    <input type="text" id="estadoMoldesSearch" placeholder="Buscar por molde, número o componente..." oninput="filterEstadoMoldes()">
-    <button onclick="resetEstadoMoldesSearch()">Limpiar</button>
-  </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--te)"></div>Estado de Componentes por Molde</div>
-    <div class="mg" id="estado-moldes-container"></div>
-  </div>
-</section>
-
 </main>
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
-<!-- MODALES -->
+<!-- MODAL FALTANTES -->
 <div class="modal-ov" id="modal-falt">
   <div class="modal-box" style="max-width:500px">
     <div class="modal-head">
@@ -526,6 +471,8 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
 </div>
+
+<!-- MODAL PLANOS -->
 <div class="modal-ov" id="modal-plano">
   <div class="modal-box">
     <div class="modal-head">
@@ -547,7 +494,6 @@ tbody tr:hover td{background:var(--bg3)}
 
 const SHEET_ID_LAM = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0';
 const SHEET_ID_SEG = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0';
-const SHEET_ID_ESTADO_MOLDES = '1GzOxHyvODffNlWjs0Y9FzjMqlkPCXQqf-uR7F9Qf46Y';
 
 function sheetCSV(sheetId, gid){ return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}&gid=${gid}`; }
 
@@ -559,8 +505,7 @@ const URLS_SHEETS = {
   STOCK: sheetCSV(SHEET_ID_SEG, '573894203'),
   VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
   MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
-  ESTAÑO: sheetCSV(SHEET_ID_LAM, '0'),
-  ESTADO_MOLDES: sheetCSV(SHEET_ID_SEG, '147291883'),
+  ESTAÑO: sheetCSV(SHEET_ID_LAM, '0')
 };
 
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
@@ -572,8 +517,7 @@ const URLS_GITHUB = {
   STOCK: GITHUB_BASE + 'stock.csv',
   VIDA_UTIL: GITHUB_BASE + 'vida_util.csv',
   MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv',
-  ESTAÑO: GITHUB_BASE + 'estano.csv',
-  ESTADO_MOLDES: GITHUB_BASE + 'estado_moldes.csv'
+  ESTAÑO: GITHUB_BASE + 'estano.csv'
 };
 
 const FB = {
@@ -596,15 +540,14 @@ const FB = {
     { molde:'KB', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }
   ],
   VIDA_UTIL: [],
-  MANTENIMIENTO: [],
-  ESTADO_MOLDES: []
+  MANTENIMIENTO: []
 };
 
 let STATE = {
   filter: 'todos',
   activeTab: 'lam',
   activeLam: 'KLB12',
-  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null, ESTAÑO: null, ESTADO_MOLDES: null },
+  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null, ESTAÑO: null },
   usingLive: false
 };
 
@@ -851,40 +794,6 @@ function parseEstano(rows){
   return { guia, ultimo: ultimoRegistro };
 }
 
-// NUEVA FUNCIÓN: parsear Estado de Moldes
-function parseEstadoMoldes(rows){
-  if(!rows || rows.length < 2) return [];
-  const datos = [];
-  const headers = rows[0];
-  const idxMolde = 1;
-  const idxNumero = 2;
-  const idxLadrillo = 3;
-  const idxComponente = 4;
-  const idxEstado = 5;
-  const idxAccion = 6;
-  const idxOperatividad = 7;
-  const idxFecha = 8;
-
-  for(let i = 1; i < rows.length; i++){
-    const row = rows[i];
-    if(!row || row.length < 9) continue;
-    const molde = row[idxMolde] ? row[idxMolde].trim() : '';
-    if(molde === '') continue;
-    datos.push({
-      molde: molde,
-      numero: row[idxNumero] ? row[idxNumero].trim() : '',
-      ladrillo: row[idxLadrillo] ? row[idxLadrillo].trim() : '',
-      componente: row[idxComponente] ? row[idxComponente].trim() : '',
-      estado: row[idxEstado] ? row[idxEstado].trim() : '',
-      accion: row[idxAccion] ? row[idxAccion].trim() : '',
-      operatividad: row[idxOperatividad] ? row[idxOperatividad].trim() : '',
-      fecha: row[idxFecha] ? row[idxFecha].trim() : ''
-    });
-  }
-  console.log('📋 Estado Moldes parseados:', datos.length, 'registros');
-  return datos;
-}
-
 async function cargarDatos(){
   const btn = document.getElementById('btn-refresh');
   const ri = document.getElementById('ri');
@@ -894,7 +803,7 @@ async function cargarDatos(){
 
   let fromSheets=0, fromGithub=0;
   try{
-    const [r1,r2,r3,r4,r5,r6,r7, r8, r9] = await Promise.all([
+    const [r1,r2,r3,r4,r5,r6,r7, r8] = await Promise.all([
       fetchCSV(URLS_SHEETS.CAMISA_KLB12, URLS_GITHUB.CAMISA_KLB12),
       fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
       fetchCSV(URLS_SHEETS.MOLDES, URLS_GITHUB.MOLDES),
@@ -902,11 +811,10 @@ async function cargarDatos(){
       fetchCSV(URLS_SHEETS.STOCK, URLS_GITHUB.STOCK),
       fetchCSV(URLS_SHEETS.VIDA_UTIL, URLS_GITHUB.VIDA_UTIL),
       fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO),
-      fetchCSV(URLS_SHEETS.ESTAÑO, URLS_GITHUB.ESTAÑO),
-      fetchCSV(URLS_SHEETS.ESTADO_MOLDES, URLS_GITHUB.ESTADO_MOLDES)
+      fetchCSV(URLS_SHEETS.ESTAÑO, URLS_GITHUB.ESTAÑO)
     ]);
 
-    [r1,r2,r3,r4,r5,r6,r7,r8,r9].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
+    [r1,r2,r3,r4,r5,r6,r7,r8].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
 
     if(r1){ const p=parseCamisa_KLB12(r1.rows); if(p&&p.rows.length){ STATE.data.KLB12=p; console.log('✅ KLB12:',p.rows.length,'['+r1.source+']'); } }
     if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length){ STATE.data.LM1210=p; console.log('✅ LM1210:',p.rows.length,'['+r2.source+']'); } }
@@ -916,7 +824,6 @@ async function cargarDatos(){
     if(r6){ const p=parseVidaUtil(r6.rows); if(p&&p.length){ STATE.data.VIDA_UTIL=p; console.log('✅ VidaUtil:',p.length,'['+r6.source+']'); } }
     if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length){ STATE.data.MANTENIMIENTO=p; console.log('✅ Mantenimiento:',p.length,'['+r7.source+']'); } }
     if(r8){ const p=parseEstano(r8.rows); if(p){ STATE.data.ESTAÑO=p; console.log('✅ Estaño:',p); } }
-    if(r9){ const p=parseEstadoMoldes(r9.rows); if(p&&p.length){ STATE.data.ESTADO_MOLDES=p; console.log('✅ Estado Moldes:',p.length,'['+r9.source+']'); } }
 
     if(!STATE.data.KLB12) STATE.data.KLB12 = FB.KLB12;
     if(!STATE.data.LM1210) STATE.data.LM1210 = FB.LM1210;
@@ -926,14 +833,13 @@ async function cargarDatos(){
     if(!STATE.data.VIDA_UTIL) STATE.data.VIDA_UTIL = FB.VIDA_UTIL;
     if(!STATE.data.MANTENIMIENTO) STATE.data.MANTENIMIENTO = FB.MANTENIMIENTO;
     if(!STATE.data.ESTAÑO) STATE.data.ESTAÑO = null;
-    if(!STATE.data.ESTADO_MOLDES) STATE.data.ESTADO_MOLDES = [];
 
   }catch(e){ console.error(e); }
 
   const dot = document.querySelector('.dot');
   let label, color;
-  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/9)`;
-  } else if(fromGithub > 0){ label = `GitHub (${fromGithub}/9)`;
+  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/8)`;
+  } else if(fromGithub > 0){ label = `GitHub (${fromGithub}/8)`;
   } else { label = 'Datos locales'; color = 'var(--re)'; }
   dot.style.background = color || 'var(--am)';
   document.getElementById('dstatus').textContent = label;
@@ -957,7 +863,6 @@ function renderTab(id){
   if(id === 'mantenimiento') buildMantenimiento();
   if(id === 'vidaUtil') buildVidaUtil();
   if(id === 'planos') buildPlanos();
-  if(id === 'estadoMoldes') buildEstadoMoldes();
 }
 
 function switchTab(id, btn){
@@ -987,9 +892,9 @@ function setF(f, btn){
 function pesoColor(prom, nominal){
   if(prom === null || prom === undefined) return '#555a68';
   const dif = (prom - nominal) * 1000;
-  if(dif < 0) return '#4ade80';
-  if(dif <= 300) return '#fbbf24';
-  return '#f87171';
+  if(dif < 0) return '#3dd68c';
+  if(dif <= 300) return '#f5a623';
+  return '#f05252';
 }
 
 function buildLam(){
@@ -1033,7 +938,6 @@ function buildLam(){
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
 
-  // Control de Estaño
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
@@ -1046,14 +950,13 @@ function buildLam(){
     
     let estado = '', colorEstado = '', mensaje = '';
     const idealMin = 1.2, idealMax = 1.5;
-    const esquinaFueraRango = (esquina < idealMin || esquina > idealMax);
     const diferenciaCritica = (diferencia >= 6);
     
     if(diferenciaCritica){
       estado = 'critical';
       colorEstado = 'var(--re)';
       mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm entre centro y esquina';
-    } else if(esquinaFueraRango){
+    } else if(esquina < idealMin || esquina > idealMax){
       estado = 'warning';
       colorEstado = 'var(--am)';
       mensaje = '⚠ ACERCAR: Esquina fuera del rango ideal (1.2–1.5 mm)';
@@ -1079,22 +982,22 @@ function buildLam(){
           <span style="font-size:16px;">📏</span>
           <span style="font-family:var(--fh); font-size:13px; letter-spacing:.1em;">CONTROL ESTAÑO · Último control: ${fecha}</span>
         </div>
-        <div style="display:flex; justify-content:space-around; gap:15px; background:var(--bg3); padding:10px; border-radius:var(--r);">
-          <div style="text-align:center">
-            <div style="font-size:10px; color:var(--t2);">CENTRO</div>
-            <div style="font-size:20px; font-weight:700;">${centro.toFixed(2)} mm</div>
+        <div class="tin-diagram" style="display:flex; justify-content:space-around; gap:15px; background:var(--bg3); padding:10px; border-radius:var(--r);">
+          <div class="tin-point" style="text-align:center">
+            <div class="tin-label">CENTRO</div>
+            <div class="tin-value" style="font-size:20px; font-weight:700;">${centro.toFixed(2)} mm</div>
           </div>
-          <div style="text-align:center">
-            <div style="font-size:10px; color:var(--t2);">ESQUINA</div>
-            <div style="font-size:20px; font-weight:700; color:${colorEstado}">${esquina.toFixed(2)} mm</div>
+          <div class="tin-point" style="text-align:center">
+            <div class="tin-label">ESQUINA</div>
+            <div class="tin-value" style="font-size:20px; font-weight:700; color:${colorEstado}">${esquina.toFixed(2)} mm</div>
           </div>
-          <div style="text-align:center">
-            <div style="font-size:10px; color:var(--t2);">DIFERENCIA</div>
-            <div style="font-size:20px; font-weight:700;">${diferencia.toFixed(2)} mm</div>
+          <div class="tin-point" style="text-align:center">
+            <div class="tin-label">DIFERENCIA</div>
+            <div class="tin-value" style="font-size:20px; font-weight:700;">${diferencia.toFixed(2)} mm</div>
           </div>
         </div>
         <div style="text-align:center; margin:10px 0;">
-          <div style="background:${colorEstado}20; color:${colorEstado}; border:1px solid ${colorEstado}40; padding:5px 10px; border-radius:999px; display:inline-block;">
+          <div class="tin-diff" style="background:${colorEstado}20; color:${colorEstado}; border:1px solid ${colorEstado}40; padding:5px 10px; border-radius:999px; display:inline-block;">
             ${mensaje}
           </div>
         </div>
@@ -1124,6 +1027,65 @@ function buildLam(){
   document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
+// ---------- NUEVA FUNCIÓN PARA LAS BARRAS HORIZONTALES (OPCIÓN 1) ----------
+function renderPesoBars(filtered){
+  const container = document.getElementById('pesos-bars-container');
+  if(!container) return;
+  
+  if(!filtered.length){
+    container.innerHTML = '<div class="al alg">No hay moldes para mostrar</div>';
+    return;
+  }
+  
+  let html = '<div style="display:flex;flex-direction:column;gap:14px;">';
+  
+  filtered.forEach(m => {
+    const nominal = m.nominal;
+    const real = m.prom;
+    const tieneDatos = (real !== null && !isNaN(real) && nominal > 0);
+    
+    let barWidthPercent = 0;
+    let barColor = '#6e7d96'; // gris por defecto
+    let valueText = '';
+    
+    if(tieneDatos){
+      let rawPercent = (real / nominal) * 100;
+      barWidthPercent = Math.min(rawPercent, 200);
+      const diffKg = real - nominal;
+      const diffG = diffKg * 1000;
+      if(diffG < 0) barColor = '#3dd68c';
+      else if(diffG <= 300) barColor = '#f5a623';
+      else barColor = '#f05252';
+      valueText = `${real.toFixed(3)} / ${nominal.toFixed(1)} kg`;
+    } else {
+      barWidthPercent = 0;
+      barColor = '#6e7d96';
+      valueText = 'S/D';
+    }
+    
+    const label = `${m.id} #${m.num}`;
+    
+    html += `
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div style="min-width: 90px; font-family:var(--fh); font-weight:600; font-size:13px; color:var(--t0);">${label}</div>
+        <div style="flex:1; min-width:200px;">
+          <div class="bar-wrapper" style="position:relative; width:100%; max-width:350px; height:24px; background:var(--bg4); border-radius:12px; overflow:visible; box-shadow:inset 0 1px 2px rgba(0,0,0,0.2);">
+            <div class="bar-real" style="position:absolute; left:0; top:0; height:100%; width:${barWidthPercent}%; background:${barColor}; border-radius:12px 0 0 12px; transition:width 0.2s ease; ${barWidthPercent >= 100 ? 'border-radius:12px;' : ''}"></div>
+            <div class="bar-nominal-line" style="position:absolute; left:100%; top:0; height:100%; width:2px; background:white; transform:translateX(-1px); box-shadow:0 0 3px rgba(0,0,0,0.5); z-index:2;"></div>
+          </div>
+        </div>
+        <div style="min-width: 100px; text-align:right; font-family:var(--fm); font-size:11px; color:var(--t1);">
+          ${valueText}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ---------- FUNCIONES PARA LA PESTAÑA MOLDES (MODIFICADA) ----------
 function buildMoldes(){
   const F = STATE.filter;
   const data = STATE.data.MOLDES || [];
@@ -1144,92 +1106,8 @@ function buildMoldes(){
     <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
   `;
 
-  if(document.getElementById('ch-pesos')){
-    if(window.chartPesos) window.chartPesos.destroy();
-    const alturaCanvas = Math.max(400, filtered.length * 35);
-    document.getElementById('ch-pesos').parentElement.style.height = `${alturaCanvas}px`;
-    window.chartPesos = new Chart(document.getElementById('ch-pesos'), {
-      type: 'bar',
-      data: {
-        labels: filtered.map(m => {
-          let label = `${m.id}`;
-          if(m.num && m.num !== '1') label += ` #${m.num}`;
-          return label;
-        }),
-        datasets: [
-          {
-            label: 'Peso real promedio',
-            data: filtered.map(m => m.prom || 0),
-            backgroundColor: filtered.map(m => {
-              const dif = (m.prom - m.nominal) * 1000;
-              if(dif < 0) return '#4ade80';
-              if(dif <= 300) return '#fbbf24';
-              return '#f87171';
-            }),
-            borderColor: filtered.map(m => {
-              const dif = (m.prom - m.nominal) * 1000;
-              if(dif < 0) return '#22c55e';
-              if(dif <= 300) return '#eab308';
-              return '#ef4444';
-            }),
-            borderWidth: 1,
-            borderRadius: 8,
-            barPercentage: 0.9,
-            categoryPercentage: 0.95,
-          },
-          {
-            label: 'Nominal',
-            data: filtered.map(m => m.nominal),
-            backgroundColor: '#94a3b8',
-            borderColor: '#64748b',
-            borderWidth: 1,
-            borderRadius: 8,
-            barPercentage: 0.9,
-            categoryPercentage: 0.95,
-            type: 'bar'
-          }
-        ]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || '';
-                const value = context.raw;
-                if(label === 'Peso real promedio'){
-                  const molde = filtered[context.dataIndex];
-                  const difGramos = ((molde.prom - molde.nominal) * 1000).toFixed(0);
-                  let estado = '';
-                  if(difGramos < 0) estado = 'por debajo del nominal';
-                  else if(difGramos <= 300) estado = 'dentro de ±300 g';
-                  else estado = 'excede +300 g';
-                  return `${label}: ${value.toFixed(3)} kg (${difGramos > 0 ? '+' : ''}${difGramos} g - ${estado})`;
-                } else {
-                  return `${label}: ${value.toFixed(1)} kg`;
-                }
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            title: { display: true, text: 'kg', color: '#6e7d96', font: { size: 11 } },
-            ticks: { color: '#b8c4d8', stepSize: 0.5 },
-            grid: { color: '#1a2030' }
-          },
-          y: {
-            ticks: { color: '#b8c4d8', font: { size: 12, weight: '500' } },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-  }
+  // Renderizar barras horizontales
+  renderPesoBars(filtered);
 
   let alHtml = '';
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
@@ -1296,7 +1174,7 @@ function dibujarGraficoCromado(){
   if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
   window.chartCromadoEstado = new Chart(canvas, {
     type: 'doughnut',
-    data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#4ade80', '#6e7d96', '#fbbf24'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] },
+    data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] },
     options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
   });
 }
@@ -1450,14 +1328,12 @@ function buildMantenimiento(){
   const containerTabla = document.getElementById('tbody-mantenimiento');
   const containerTipo = document.getElementById('chart-tareas-tipo');
   const containerResp = document.getElementById('chart-tareas-responsable');
-  
   if(!data.length){
     if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
     if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
     return;
   }
-  
   if(containerTabla){
     containerTabla.innerHTML = data.map(r => `
       <tr style="border-bottom:1px solid var(--b0)">
@@ -1469,12 +1345,11 @@ function buildMantenimiento(){
       </tr>
     `).join('');
   }
-  
   if(containerTipo){
     const tipos = {};
     data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
     const maxTareas = Math.max(...Object.values(tipos));
-    const colores = ['#4ade80', '#fbbf24', '#60a5fa', '#f87171', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
+    const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
     containerTipo.innerHTML = `
       <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
       ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
@@ -1494,13 +1369,12 @@ function buildMantenimiento(){
       }).join('')}
     `;
   }
-  
   if(containerResp){
     const responsables = {};
     data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
     const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
     const maxResp = topResp[0]?.[1] || 1;
-    const coloresResp = ['#60a5fa', '#4ade80', '#fbbf24', '#f87171', '#2dd4bf', '#fb923c'];
+    const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
     containerResp.innerHTML = `
       <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
       ${topResp.map(([responsable, cantidad], idx) => {
@@ -1525,59 +1399,47 @@ function buildMantenimiento(){
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
-  
   const LIMITE_BASE = 12000;
-  
   const container = document.getElementById('gauges-container');
-  
   if(!data.length){
     container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>';
     return;
   }
-  
   container.innerHTML = '';
-  
   data.forEach(molde => {
     const tn = molde.tnProducidas;
     const esInfinito = (molde.numero === '3');
-    
     let porcentajeReal = (tn / LIMITE_BASE) * 100;
-    
     let status = '', statusText = '', color = '';
-    
     if(esInfinito){
       if(porcentajeReal >= 100){
         status = 'warning';
         statusText = '∞ Sin límite definido (supera 100%)';
-        color = '#fbbf24';
+        color = '#f5a623';
       } else {
         status = 'ok';
         statusText = '∞ Sin límite definido';
-        color = '#4ade80';
+        color = '#3dd68c';
       }
     } else {
       if(porcentajeReal > 125){
         status = 'critical';
         statusText = `⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`;
-        color = '#f87171';
+        color = '#f05252';
       } else if(porcentajeReal > 100){
         status = 'warning';
         statusText = `⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`;
-        color = '#fbbf24';
+        color = '#f5a623';
       } else {
         status = 'ok';
         statusText = '✓ DENTRO DE VIDA ÚTIL';
-        color = '#4ade80';
+        color = '#3dd68c';
       }
     }
-    
     let displayPercent = Math.min(porcentajeReal, 200);
-    
     const canvasId = `doughnut-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
-    
     const inicio = molde.inicio && molde.inicio !== '' ? molde.inicio : '—';
     const fin = molde.fin && molde.fin !== '' ? molde.fin : '—';
-    
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
@@ -1593,7 +1455,6 @@ function buildVidaUtil(){
       <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
     `;
     container.appendChild(card);
-    
     setTimeout(() => drawDoughnut(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
 }
@@ -1605,20 +1466,16 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
   const w = canvas.width = 240;
   const h = canvas.height = 240;
   ctx.clearRect(0, 0, w, h);
-  
   const centerX = w/2;
   const centerY = h/2;
   const radius = 90;
   const innerRadius = 55;
-  
   const startAngle = -Math.PI / 2;
   const endAngle = startAngle + (displayPercent / 200) * 2 * Math.PI;
-  
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
   ctx.fillStyle = '#2d3a50';
   ctx.fill();
-  
   if(displayPercent > 0){
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -1626,133 +1483,29 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
     ctx.strokeStyle = color;
     ctx.stroke();
   }
-  
   ctx.beginPath();
   ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
   ctx.fillStyle = 'var(--bg3)';
   ctx.fill();
-  
   ctx.font = 'bold 32px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#f0f4ff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   let percentText = `${Math.round(realPercent)}%`;
   ctx.fillText(percentText, centerX, centerY - 5);
-  
   if(esInfinito){
     ctx.font = 'bold 26px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#fbbf24';
+    ctx.fillStyle = '#f5a623';
     ctx.fillText('∞', centerX + 50, centerY - 10);
   }
-  
   ctx.font = '12px "IBM Plex Mono", monospace';
   ctx.fillStyle = '#6e7d96';
   ctx.fillText('vida útil', centerX, centerY + 25);
-  
   if(realPercent > 200 && !esInfinito){
     ctx.font = 'bold 11px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#f87171';
+    ctx.fillStyle = '#f05252';
     ctx.fillText('>200%', centerX, centerY + 48);
   }
-}
-
-// ==================== NUEVA FUNCIÓN: ESTADO DE MOLDES ====================
-let estadoMoldesFiltrados = [];
-
-function buildEstadoMoldes(){
-  const data = STATE.data.ESTADO_MOLDES || [];
-  document.getElementById('tn7').textContent = data.length;
-  estadoMoldesFiltrados = [...data];
-  renderEstadoMoldesCards();
-}
-
-function renderEstadoMoldesCards(){
-  const container = document.getElementById('estado-moldes-container');
-  if(!container) return;
-  
-  if(estadoMoldesFiltrados.length === 0){
-    container.innerHTML = '<div class="al alg">No se encontraron registros de estado de moldes.</div>';
-    return;
-  }
-  
-  // Agrupar por molde y número
-  const agrupados = {};
-  estadoMoldesFiltrados.forEach(item => {
-    const key = `${item.molde}_${item.numero}`;
-    if(!agrupados[key]){
-      agrupados[key] = {
-        molde: item.molde,
-        numero: item.numero,
-        componentes: []
-      };
-    }
-    agrupados[key].componentes.push(item);
-  });
-  
-  const cardsHTML = Object.values(agrupados).map(grupo => {
-    // Ordenar componentes alfabéticamente
-    grupo.componentes.sort((a,b) => a.componente.localeCompare(b.componente));
-    
-    const componentesHTML = grupo.componentes.map(comp => {
-      let estadoColor = '';
-      switch(comp.estado){
-        case 'Buen estado': estadoColor = '#4ade80'; break;
-        case 'Cromado': estadoColor = '#60a5fa'; break;
-        case 'Gastado': estadoColor = '#fbbf24'; break;
-        case 'Requiere reemplazo': estadoColor = '#f87171'; break;
-        case 'En fabricación': estadoColor = '#fbbf24'; break;
-        default: estadoColor = '#6e7d96';
-      }
-      return `
-        <div class="mc" style="margin-bottom:8px;">
-          <div class="mch">
-            <div>
-              <div class="mcn" style="font-size:18px;">${comp.componente}</div>
-              <div class="mcnum">Fecha: ${comp.fecha || '—'}</div>
-            </div>
-            <span class="badge" style="background:${estadoColor}20; color:${estadoColor}; border-color:${estadoColor}40;">${comp.estado}</span>
-          </div>
-          <div class="mr"><span class="mrl">Acción requerida:</span><span class="mrv" style="color:var(--t1);">${comp.accion || '—'}</span></div>
-          <div class="mr"><span class="mrl">Operatividad:</span><span class="mrv" style="color:var(--t1);">${comp.operatividad || '—'}</span></div>
-        </div>
-      `;
-    }).join('');
-    
-    return `
-      <div class="card" style="padding:15px; margin-bottom:15px;">
-        <div class="ct" style="margin-bottom:12px;">
-          <div class="ctd" style="background:var(--bl)"></div>
-          <span style="font-size:16px;">${grupo.molde} ${grupo.numero ? `#${grupo.numero}` : ''}</span>
-        </div>
-        <div class="mg" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:10px;">
-          ${componentesHTML}
-        </div>
-      </div>
-    `;
-  }).join('');
-  
-  container.innerHTML = cardsHTML;
-}
-
-function filterEstadoMoldes(){
-  const searchTerm = document.getElementById('estadoMoldesSearch').value.trim().toLowerCase();
-  const allData = STATE.data.ESTADO_MOLDES || [];
-  if(!searchTerm){
-    estadoMoldesFiltrados = [...allData];
-  } else {
-    estadoMoldesFiltrados = allData.filter(item => 
-      item.molde.toLowerCase().includes(searchTerm) ||
-      item.numero.toLowerCase().includes(searchTerm) ||
-      item.componente.toLowerCase().includes(searchTerm) ||
-      item.estado.toLowerCase().includes(searchTerm)
-    );
-  }
-  renderEstadoMoldesCards();
-}
-
-function resetEstadoMoldesSearch(){
-  document.getElementById('estadoMoldesSearch').value = '';
-  filterEstadoMoldes();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
