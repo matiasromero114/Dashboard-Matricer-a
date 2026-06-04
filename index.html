@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+/* ----- ESTILOS EXISTENTES (sin cambios) ----- */
 :root{
   --bg0:#080a0d;--bg1:#0d1017;--bg2:#131720;--bg3:#1a2030;--bg4:#232c3d;--bg5:#2d3a50;
   --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.08);--b2:rgba(255,255,255,.16);--b3:rgba(255,255,255,.28);
@@ -244,7 +245,6 @@ tbody tr:hover td{background:var(--bg3)}
   overflow-x: auto;
 }
 
-/* Nuevos estilos para Estado de Piezas */
 .search-estado {
   background: var(--bg3);
   border: 1px solid var(--b1);
@@ -324,7 +324,7 @@ tbody tr:hover td{background:var(--bg3)}
 
 <main class="main">
 
-<!-- TAB 1: LAMINADORAS -->
+<!-- TAB 1: LAMINADORAS (sin cambios) -->
 <section class="tab-s active" id="tab-lam">
   <div class="sh">
     <div>
@@ -368,7 +368,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 2: MOLDES Y CROMADO -->
+<!-- TAB 2: MOLDES Y CROMADO (MODIFICADO: añadido nuevo gráfico Estado de Moldes) -->
 <section class="tab-s" id="tab-moldes">
   <div class="sh">
     <div>
@@ -377,12 +377,27 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
   <div class="krow" id="kpi-moldes"></div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
-    <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
-      <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
+  
+  <!-- NUEVO: Contenedor de dos columnas para los gráficos -->
+  <div class="g2">
+    <!-- Gráfico original: Estado de Cromado de Moldes -->
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
+      <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
+        <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
+      </div>
+    </div>
+    
+    <!-- NUEVO GRÁFICO: Estado de Moldes (Operativo, No Operativo, Calibración, Fabricación, Irrecuperable) -->
+    <div class="card">
+      <div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div>
+      <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
+        <canvas id="chart-estado-moldes" style="max-width:280px; max-height:280px"></canvas>
+      </div>
     </div>
   </div>
+  
+  <!-- Resto del contenido sin cambios -->
   <div class="g7030">
     <div class="card" style="margin-bottom:0">
       <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
@@ -420,7 +435,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 3: STOCK -->
+<!-- TAB 3: STOCK (sin cambios) -->
 <section class="tab-s" id="tab-stock">
   <div class="sh"><div><div class="sh-t">Stock de Repuestos de Moldes</div><div class="sh-s">Boquillas · Arañas · Dados · Placa Base · Frenos · 11 tipos de molde</div></div><button class="btn btn-a" onclick="genFaltantes()">▼ Generar lista de faltantes</button></div>
   <div class="krow" id="kpi-stock"></div>
@@ -428,7 +443,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Inventario por tipo de molde</div><div class="tw"><table id="tbl-stock"><thead><tr><th>Tipo de Molde</th><th class="tr">Boquillas</th><th class="tr">Arañas [juegos]</th><th class="tr">Dados [juegos]</th><th class="tr">Placa Base</th><th class="tr">Frenos [juegos]</th><th>Fecha Revisión</th><th>Estado general</th></tr></thead><tbody id="tbody-stock"></tbody></table></div></div>
 </section>
 
-<!-- TAB 4: MANTENIMIENTO -->
+<!-- TAB 4: MANTENIMIENTO (sin cambios) -->
 <section class="tab-s" id="tab-mantenimiento">
   <div class="sh">
     <div>
@@ -457,14 +472,14 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTIL -->
+<!-- TAB 5: VIDA ÚTIL (sin cambios) -->
 <section class="tab-s" id="tab-vidaUtil">
   <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
   <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
   <div class="mg" id="gauges-container"></div>
 </section>
 
-<!-- TAB 6: PLANOS Y REFERENCIAS -->
+<!-- TAB 6: PLANOS Y REFERENCIAS (sin cambios) -->
 <section class="tab-s" id="tab-planos">
   <div class="sh">
     <div>
@@ -482,7 +497,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 7: ESTADO DE PIEZAS -->
+<!-- TAB 7: ESTADO DE PIEZAS (sin cambios) -->
 <section class="tab-s" id="tab-estadoPiezas">
   <div class="sh">
     <div>
@@ -516,7 +531,7 @@ tbody tr:hover td{background:var(--bg3)}
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
-<!-- MODALES -->
+<!-- MODALES (sin cambios) -->
 <div class="modal-ov" id="modal-falt">
   <div class="modal-box" style="max-width:500px">
     <div class="modal-head">
@@ -681,7 +696,7 @@ function parseCSVText(txt){
   return rows;
 }
 
-// PARSERS ORIGINALES COMPLETOS
+// PARSERS ORIGINALES (sin cambios)
 function parseCamisa_KLB12(rows){
   if(!rows||rows.length<8) return null;
   const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
@@ -856,16 +871,13 @@ function parseEstano(rows){
   return { guia, ultimo: ultimoRegistro };
 }
 
-// Parser para Estado de Piezas (robusto)
 function parseEstadoPiezas(rows){
   if(!rows || rows.length < 2){
     console.warn('⚠️ No hay filas para parsear Estado de Piezas');
     return [];
   }
-  
   let headerIndex = -1;
   let idxMolde = -1, idxNumero = -1, idxComponente = -1, idxEstado = -1, idxAccion = -1, idxObservacion = -1, idxFecha = -1;
-  
   for(let i=0; i<Math.min(rows.length, 30); i++){
     const row = rows[i];
     for(let j=0; j<row.length; j++){
@@ -878,7 +890,6 @@ function parseEstadoPiezas(rows){
     }
     if(headerIndex !== -1) break;
   }
-  
   if(headerIndex === -1){
     console.warn('⚠️ No se encontró fila "Molde". Usando primera fila como datos.');
     const resultados = [];
@@ -900,7 +911,6 @@ function parseEstadoPiezas(rows){
     console.log(`🔧 Estado de Piezas parseado (sin cabecera): ${resultados.length} registros.`);
     return resultados;
   }
-  
   const headers = rows[headerIndex];
   const colNames = {
     numero: ['n°','nº','numero'],
@@ -910,7 +920,6 @@ function parseEstadoPiezas(rows){
     observacion: ['observación','observacion','obs'],
     fecha: ['operatividad','fecha revisión','fecha']
   };
-  
   for(let j=0; j<headers.length; j++){
     const h = (headers[j] || '').trim().toLowerCase();
     if(h === 'molde') idxMolde = j;
@@ -921,7 +930,6 @@ function parseEstadoPiezas(rows){
     else if(colNames.observacion.includes(h)) idxObservacion = j;
     else if(colNames.fecha.includes(h)) idxFecha = j;
   }
-  
   const resultados = [];
   for(let i=headerIndex+1; i<rows.length; i++){
     const row = rows[i];
@@ -934,25 +942,22 @@ function parseEstadoPiezas(rows){
     const accion = (idxAccion >=0 && row[idxAccion]) ? row[idxAccion].trim() : '';
     const observacion = (idxObservacion >=0 && row[idxObservacion]) ? row[idxObservacion].trim() : '';
     const fecha = (idxFecha >=0 && row[idxFecha]) ? row[idxFecha].trim() : '';
-    
     if(estado.includes('✔')) estado = estado.replace('✔','').trim();
     if(estado === '') estado = 'Sin especificar';
     if(componente === '') componente = 'Pieza';
-    
     resultados.push({ molde, numero, componente, estado, accion, observacion, fecha });
   }
   console.log(`🔧 Estado de Piezas parseado: ${resultados.length} registros.`);
   return resultados;
 }
 
-// CARGA DE DATOS
+// CARGA DE DATOS (sin cambios)
 async function cargarDatos(){
   const btn = document.getElementById('btn-refresh');
   const ri = document.getElementById('ri');
   btn.classList.add('loading');
   ri.classList.add('spinning');
   document.getElementById('dstatus').textContent='Actualizando...';
-  
   let fromSheets=0, fromGithub=0;
   try{
     const [r1,r2,r3,r4,r5,r6,r7,r8, r9] = await Promise.all([
@@ -966,9 +971,7 @@ async function cargarDatos(){
       fetchCSV(URLS_SHEETS.ESTAÑO, URLS_GITHUB.ESTAÑO),
       fetchCSV(URLS_SHEETS.ESTADO_PIEZAS, null)
     ]);
-    
     [r1,r2,r3,r4,r5,r6,r7,r8,r9].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
-    
     if(r1){ const p=parseCamisa_KLB12(r1.rows); if(p&&p.rows.length){ STATE.data.KLB12=p; console.log('✅ KLB12:',p.rows.length,'['+r1.source+']'); } }
     if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length){ STATE.data.LM1210=p; console.log('✅ LM1210:',p.rows.length,'['+r2.source+']'); } }
     if(r3){ const p=parseMoldes(r3.rows); if(p&&p.length){ STATE.data.MOLDES=p; console.log('✅ Moldes:',p.length,'['+r3.source+']'); } }
@@ -978,7 +981,6 @@ async function cargarDatos(){
     if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length){ STATE.data.MANTENIMIENTO=p; console.log('✅ Mantenimiento:',p.length,'['+r7.source+']'); } }
     if(r8){ const p=parseEstano(r8.rows); if(p){ STATE.data.ESTAÑO=p; console.log('✅ Estaño:',p); } }
     if(r9){ const p=parseEstadoPiezas(r9.rows); if(p&&p.length){ STATE.data.ESTADO_PIEZAS=p; console.log('✅ Estado Piezas:',p.length,'['+r9.source+']'); } }
-    
     if(!STATE.data.KLB12) STATE.data.KLB12 = FB.KLB12;
     if(!STATE.data.LM1210) STATE.data.LM1210 = FB.LM1210;
     if(!STATE.data.MOLDES) STATE.data.MOLDES = FB.MOLDES;
@@ -988,9 +990,7 @@ async function cargarDatos(){
     if(!STATE.data.MANTENIMIENTO) STATE.data.MANTENIMIENTO = FB.MANTENIMIENTO;
     if(!STATE.data.ESTAÑO) STATE.data.ESTAÑO = null;
     if(!STATE.data.ESTADO_PIEZAS) STATE.data.ESTADO_PIEZAS = FB.ESTADO_PIEZAS;
-    
   }catch(e){ console.error(e); }
-  
   const dot = document.querySelector('.dot');
   let label, color;
   if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/9)`;
@@ -1049,7 +1049,7 @@ function pesoColor(prom, nominal){
   return '#f05252';
 }
 
-// ========== BUILD LAMINADORAS (completo) ==========
+// ========== BUILD LAMINADORAS (sin cambios) ==========
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
   if(!D) return;
@@ -1063,14 +1063,12 @@ function buildLam(){
   const maxEvR = Math.max(...rows.map(r=>r.r));
   const pctL = Math.min(desgL/D.ini.lento*100,100);
   const pctR = Math.min(desgR/D.ini.rapido*100,100);
-
   document.getElementById('kpi-lam').innerHTML = `
     <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
     <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
     <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
     <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>
   `;
-
   const barL = Math.min(pctL,100), barR = Math.min(pctR,100);
   const cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
   const cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
@@ -1084,13 +1082,11 @@ function buildLam(){
     <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.rapido/D.ini.rapido*100).toFixed(0)}%;background:${cR}"></div></div><span>${D.act.rapido} mm</span></div>
     <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span>${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>
   `;
-
   let alHtml = '';
   if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm (${pctL.toFixed(1)}%)</div></div></div>`;
   if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm (${pctR.toFixed(1)}%)</div></div></div>`;
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
-
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
@@ -1100,11 +1096,9 @@ function buildLam(){
     const diferencia = reg.diferencia;
     const observacion = reg.observaciones || 'Sin observaciones';
     const fecha = reg.fecha;
-    
     let estado = '', colorEstado = '', mensaje = '';
     const idealMin = 1.2, idealMax = 1.5;
     const diferenciaCritica = (diferencia >= 6);
-    
     if(diferenciaCritica){
       estado = 'critical';
       colorEstado = 'var(--re)';
@@ -1118,7 +1112,6 @@ function buildLam(){
       colorEstado = 'var(--gr)';
       mensaje = '✓ Correcto: dentro de parámetros';
     }
-    
     let vueltasNecesarias = '';
     if(esquina > idealMax){
       const vueltas = (esquina - idealMax) * 6;
@@ -1128,7 +1121,6 @@ function buildLam(){
     } else {
       vueltasNecesarias = `✓ Esquina dentro del rango (${idealMin}–${idealMax} mm).`;
     }
-    
     const html = `
       <div style="margin-top: 12px; border-top: 1px solid var(--b1); padding-top: 12px;">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
@@ -1165,22 +1157,18 @@ function buildLam(){
   } else {
     tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px;">⚠️ No se encontraron datos de Control de Estaño. Verifique la hoja "Laminador_KLB12".</div>`;
   }
-
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
-
   if(window.chartCamisa) window.chartCamisa.destroy();
   window.chartCamisa = new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
-  
   let acumL=0,acumR=0, acumLArr=[],acumRArr=[];
   rows.forEach(r=>{ acumL+=r.l; acumR+=r.r; acumLArr.push(acumL); acumRArr.push(acumR); });
   if(window.chartAcum) window.chartAcum.destroy();
   window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
-
-  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}<tr><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
+  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
-// ========== BUILD MOLDES (completo) ==========
+// ========== BUILD MOLDES (modificado: se añadió la función dibujarGraficoEstadoMoldes) ==========
 function renderPesoBars(filtered){
   const container = document.getElementById('pesos-bars-container');
   if(!container) return;
@@ -1226,6 +1214,56 @@ function renderPesoBars(filtered){
   });
   html += '</div>';
   container.innerHTML = html;
+}
+
+// NUEVA FUNCIÓN: dibujar gráfico de Estado de Moldes
+function dibujarGraficoEstadoMoldes(){
+  const data = STATE.data.MOLDES || [];
+  const filterType = STATE.filter;
+  let filtered = filterType === 'todos' ? data : data.filter(m => m.id === normID(filterType));
+  // Contar estados según mapeo (solo los contemplados, los no contemplados se ignoran)
+  let operativo = 0, noOperativo = 0, enCalibracion = 0, enFabricacion = 0, irrecuperable = 0;
+  filtered.forEach(m => {
+    const estado = (m.estado || '').trim();
+    if(estado === 'Operativo') operativo++;
+    else if(estado === 'No operativo') noOperativo++;
+    else if(estado === 'En calibración' || estado === 'En laboratorio') enCalibracion++;
+    else if(estado === 'En fabricación') enFabricacion++;
+    else if(estado === 'Irrecuperable') irrecuperable++;
+    // otros estados se ignoran
+  });
+  const canvas = document.getElementById('chart-estado-moldes');
+  if(!canvas) return;
+  if(window.chartEstadoMoldes) window.chartEstadoMoldes.destroy();
+  const total = operativo + noOperativo + enCalibracion + enFabricacion + irrecuperable;
+  if(total === 0){
+    // mostrar mensaje en el canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#6e7d96';
+    ctx.font = '12px monospace';
+    ctx.fillText('Sin datos', canvas.width/2-30, canvas.height/2);
+    return;
+  }
+  window.chartEstadoMoldes = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: ['Operativo', 'No Operativo', 'En Calibración', 'En Fabricación', 'Irrecuperable'],
+      datasets: [{
+        data: [operativo, noOperativo, enCalibracion, enFabricacion, irrecuperable],
+        backgroundColor: ['#3dd68c', '#f05252', '#f5a623', '#60a5fa', '#fb923c'],
+        borderWidth: 0,
+        cutout: '65%'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#b8c4d8' } }
+      }
+    }
+  });
 }
 
 function buildMoldes(){
@@ -1288,7 +1326,8 @@ function buildMoldes(){
       return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
   }
-  dibujarGraficoCromado();
+  dibujarGraficoCromado();      // gráfico original
+  dibujarGraficoEstadoMoldes(); // nuevo gráfico
 }
 
 function dibujarGraficoCromado(){
@@ -1311,7 +1350,7 @@ function dibujarGraficoCromado(){
   });
 }
 
-// ========== BUILD STOCK ==========
+// ========== BUILD STOCK (sin cambios) ==========
 let STOCK_FILTERED = [];
 function stockCls(v){ if(v===0) return 'zero'; if(v===1) return 'low'; return 'ok-stock'; }
 function stockEstado(row){ const vals = [row.boquillas, row.aranas, row.dados, row.placaBase, row.frenos]; const zeros = vals.filter(v => v === 0).length; if(zeros === vals.length) return '<span class="badge br">Sin stock</span>'; if(zeros > 0) return '<span class="badge ba">Stock parcial</span>'; return '<span class="badge bg">Completo</span>'; }
@@ -1346,7 +1385,7 @@ function copyFalt(){
   navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada'));
 }
 
-// ========== BUILD MANTENIMIENTO ==========
+// ========== BUILD MANTENIMIENTO (sin cambios) ==========
 function getTareaBadge(tipo){
   const colores = { 'Desarmado de molde': { bg: 'var(--amd)', color: 'var(--am)', icon: '🔧' }, 'Armado de molde': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🔨' }, 'Ajustes': { bg: 'var(--bld)', color: 'var(--bl)', icon: '⚙️' }, 'Calibracion': { bg: 'var(--bld)', color: 'var(--bl)', icon: '📏' }, 'Fabricacion': { bg: 'var(--amd)', color: 'var(--am)', icon: '🏭' }, 'Mantenimiento': { bg: 'var(--red)', color: 'var(--re)', icon: '🛠️' }, 'Orden y Limpieza': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🧹' }, 'Seguimiento': { bg: 'var(--bld)', color: 'var(--bl)', icon: '👁️' } };
   const c = colores[tipo] || { bg: 'var(--bg4)', color: 'var(--t2)', icon: '📋' };
@@ -1372,7 +1411,7 @@ function buildMantenimiento(){
         <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
         <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
         <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
-      </tr>
+       </tr>
     `).join('');
   }
   if(containerTipo){
@@ -1426,7 +1465,7 @@ function buildMantenimiento(){
   }
 }
 
-// ========== BUILD VIDA ÚTIL ==========
+// ========== BUILD VIDA ÚTIL (sin cambios) ==========
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   document.getElementById('tn5').textContent = data.length;
@@ -1538,7 +1577,7 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
   }
 }
 
-// ========== BUILD PLANOS ==========
+// ========== BUILD PLANOS (sin cambios) ==========
 function buildPlanos(){
   const tiposLadrillos = [
     { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' },
@@ -1591,7 +1630,7 @@ function verPlano(imgUrl, titulo){
   document.getElementById('modal-plano').classList.add('open');
 }
 
-// ========== BUILD ESTADO PIEZAS (completo) ==========
+// ========== BUILD ESTADO PIEZAS (sin cambios) ==========
 let ESTADO_FILTER_TEXT = '';
 function filterEstadoPiezas(){
   const input = document.getElementById('search-estado');
