@@ -275,8 +275,7 @@ tbody tr:hover td{background:var(--bg3)}
   border-bottom: none;
 }
 
-/* ========== MEJORAS ESTÉTICAS PARA EL INVENTARIO (SOLO TABLA STOCK) ========== */
-/* Contenedor del card de inventario */
+/* ========== MEJORAS ESTÉTICAS PARA EL INVENTARIO ========== */
 .card-stock-inventario {
   background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
   border-radius: var(--rl);
@@ -291,7 +290,6 @@ tbody tr:hover td{background:var(--bg3)}
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   transform: translateY(-2px);
 }
-/* Título mejorado */
 .card-stock-inventario .ct {
   background: var(--bg1);
   margin: 0 -20px 13px -20px;
@@ -316,7 +314,6 @@ tbody tr:hover td{background:var(--bg3)}
   height: 2px;
   background: var(--am);
 }
-/* Tabla mejorada */
 #tbl-stock {
   width: 100%;
   border-collapse: separate;
@@ -334,15 +331,15 @@ tbody tr:hover td{background:var(--bg3)}
   border-bottom: 1px solid var(--b2);
   white-space: nowrap;
 }
-/* Anchos personalizados (sin afectar JS) */
+/* Anchos de columna fijos para que no se desordenen */
 #tbl-stock thead th:first-child { width: 14%; }
-#tbl-stock thead th:nth-child(2) { width: 10%; text-align: right; }
-#tbl-stock thead th:nth-child(3) { width: 10%; text-align: right; }
-#tbl-stock thead th:nth-child(4) { width: 10%; text-align: right; }
-#tbl-stock thead th:nth-child(5) { width: 10%; text-align: right; }
-#tbl-stock thead th:nth-child(6) { width: 10%; text-align: right; }
-#tbl-stock thead th:nth-child(7) { width: 15%; }
-#tbl-stock thead th:nth-child(8) { width: 21%; }
+#tbl-stock thead th:nth-child(2) { width: 9%; text-align: right; }
+#tbl-stock thead th:nth-child(3) { width: 9%; text-align: right; }
+#tbl-stock thead th:nth-child(4) { width: 9%; text-align: right; }
+#tbl-stock thead th:nth-child(5) { width: 9%; text-align: right; }
+#tbl-stock thead th:nth-child(6) { width: 9%; text-align: right; }
+#tbl-stock thead th:nth-child(7) { width: 18%; }
+#tbl-stock thead th:nth-child(8) { width: 23%; }
 #tbl-stock tbody td {
   padding: 12px 10px;
   border-bottom: 1px solid var(--b0);
@@ -352,42 +349,33 @@ tbody tr:hover td{background:var(--bg3)}
 #tbl-stock tbody tr:hover td {
   background: var(--bg4);
 }
-/* Celdas numéricas con fondos sutiles según valor */
 #tbl-stock tbody td.tr {
   font-family: var(--fm);
   font-weight: 500;
+  text-align: right;
+}
+#tbl-stock .zero, #tbl-stock .low, #tbl-stock .ok-stock {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  min-width: 40px;
+  text-align: center;
 }
 #tbl-stock .zero {
+  background: rgba(240,82,82,0.15);
   color: var(--re);
   font-weight: 700;
-  background: rgba(240,82,82,0.08);
-  border-radius: 4px;
-  display: inline-block;
-  padding: 2px 6px;
-  min-width: 40px;
-  text-align: center;
 }
 #tbl-stock .low {
+  background: rgba(245,166,35,0.15);
   color: var(--am);
   font-weight: 700;
-  background: rgba(245,166,35,0.1);
-  border-radius: 4px;
-  display: inline-block;
-  padding: 2px 6px;
-  min-width: 40px;
-  text-align: center;
 }
 #tbl-stock .ok-stock {
+  background: rgba(61,214,140,0.15);
   color: var(--gr);
   font-weight: 700;
-  background: rgba(61,214,140,0.08);
-  border-radius: 4px;
-  display: inline-block;
-  padding: 2px 6px;
-  min-width: 40px;
-  text-align: center;
 }
-/* Badges de estado mejorados */
 .badge-stock-completo {
   background: var(--grd);
   color: var(--gr);
@@ -424,12 +412,10 @@ tbody tr:hover td{background:var(--bg3)}
   align-items: center;
   gap: 5px;
 }
-/* Íconos en badges (solo CSS) */
 .badge-stock-completo::before { content: "✓"; font-size: 10px; }
 .badge-stock-parcial::before { content: "⚠"; font-size: 10px; }
 .badge-stock-sin::before { content: "✗"; font-size: 10px; }
 
-/* Responsive para tabla pequeña */
 @media (max-width: 768px) {
   #tbl-stock thead th, #tbl-stock tbody td {
     padding: 8px 5px;
@@ -596,13 +582,13 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 3: STOCK (MODIFICADO SÓLO EL CARD DE INVENTARIO, el resto igual) -->
+<!-- TAB 3: STOCK (MODIFICADO CON CORRECCIÓN DE ALINEACIÓN) -->
 <section class="tab-s" id="tab-stock">
   <div class="sh"><div><div class="sh-t">Stock de Repuestos de Moldes</div><div class="sh-s">Boquillas · Arañas · Dados · Placa Base · Frenos · 11 tipos de molde</div></div><button class="btn btn-a" onclick="genFaltantes()">▼ Generar lista de faltantes</button></div>
   <div class="krow" id="kpi-stock"></div>
   <div class="stock-search-wrap"><span style="font-family:var(--fm);font-size:11px;color:var(--t2);">Buscar molde:</span><input class="stock-search" id="stock-search" type="text" placeholder="Ej: H8, H12, P18, DM20..." oninput="filterStock()"><span id="stock-count" style="font-family:var(--fm);font-size:11px;color:var(--t2)"></span></div>
   
-  <!-- CARD DE INVENTARIO MEJORADO -->
+  <!-- CARD DE INVENTARIO MEJORADO Y CON ORDEN CORRECTO -->
   <div class="card-stock-inventario">
     <div class="ct">Inventario por tipo de molde</div>
     <div class="tw">
@@ -614,8 +600,6 @@ tbody tr:hover td{background:var(--bg3)}
       </table>
     </div>
   </div>
-  <!-- FIN CARD MEJORADO -->
-  
 </section>
 
 <!-- TAB 4: MANTENIMIENTO (sin cambios) -->
@@ -706,7 +690,7 @@ tbody tr:hover td{background:var(--bg3)}
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
-<!-- MODALES (sin cambios) -->
+<!-- MODALES -->
 <div class="modal-ov" id="modal-falt">
   <div class="modal-box" style="max-width:500px">
     <div class="modal-head">
@@ -950,28 +934,71 @@ function parseCromado(rows){
   }));
 }
 
+// ========== PARSER DE STOCK CORREGIDO (mapea por encabezados) ==========
 function parseStock(rows){
-  if(!rows) return [];
-  const resultados = [];
-  for(let i = 0; i < rows.length; i++){
+  if(!rows || rows.length === 0) return [];
+  // Buscar fila de encabezados que contenga "Molde"
+  let headerIndex = -1;
+  for(let i=0; i<Math.min(rows.length, 30); i++){
     const row = rows[i];
-    if(!row || row.length < 3) continue;
-    let molde = (row[1] || '').trim();
-    if(!molde || molde === '' || molde === 'Molde') continue;
-    molde = molde.replace(/^["']|["']$/g, '').trim();
-    if(molde.length > 0 && molde !== 'Ladrilo'){
-      resultados.push({
-        molde: molde,
-        boquillas: sn(row[3]),
-        aranas: sn(row[4]),
-        dados: sn(row[5]),
-        placaBase: sn(row[6]),
-        frenos: sn(row[7]),
-        rev: (row[8] || '').trim()
-      });
+    if(!row) continue;
+    if(row.some(cell => cell && cell.trim().toLowerCase() === 'molde')){
+      headerIndex = i;
+      break;
     }
   }
-  console.log('📦 Stock parseado:', resultados.length, 'registros');
+  if(headerIndex === -1){
+    console.warn('⚠️ No se encontró cabecera "Molde" en Stock. Usando índices por defecto.');
+    // fallback a índices fijos (como estaba originalmente)
+    const resultados = [];
+    for(let i=1; i<rows.length; i++){
+      const row = rows[i];
+      if(!row || row.length < 3) continue;
+      let molde = (row[1] || '').trim();
+      if(!molde || molde === '' || molde === 'Molde') continue;
+      molde = molde.replace(/^["']|["']$/g, '').trim();
+      if(molde.length > 0 && molde !== 'Ladrilo'){
+        resultados.push({
+          molde: molde,
+          boquillas: sn(row[3]),
+          aranas: sn(row[4]),
+          dados: sn(row[5]),
+          placaBase: sn(row[6]),
+          frenos: sn(row[7]),
+          rev: (row[8] || '').trim()
+        });
+      }
+    }
+    console.log('📦 Stock parseado (fallback):', resultados.length, 'registros');
+    return resultados;
+  }
+  // Mapear columnas por nombre
+  const headers = rows[headerIndex].map(c => (c||'').trim().toLowerCase());
+  const idxMolde = headers.findIndex(h => h === 'molde');
+  const idxBoquillas = headers.findIndex(h => h.includes('boquilla'));
+  const idxAranas = headers.findIndex(h => h.includes('araña') || h.includes('aranas'));
+  const idxDados = headers.findIndex(h => h.includes('dado'));
+  const idxPlaca = headers.findIndex(h => h.includes('placa base'));
+  const idxFrenos = headers.findIndex(h => h.includes('freno'));
+  const idxRev = headers.findIndex(h => h.includes('fecha') || h.includes('revisión') || h === 'rev');
+  
+  const resultados = [];
+  for(let i=headerIndex+1; i<rows.length; i++){
+    const row = rows[i];
+    if(!row || row.length < 2) continue;
+    let molde = (idxMolde !== -1 && row[idxMolde]) ? row[idxMolde].trim() : '';
+    if(!molde) continue;
+    molde = molde.replace(/^["']|["']$/g, '').trim();
+    if(molde === '' || molde === 'Ladrilo') continue;
+    const boquillas = (idxBoquillas !== -1) ? sn(row[idxBoquillas]) : 0;
+    const aranas = (idxAranas !== -1) ? sn(row[idxAranas]) : 0;
+    const dados = (idxDados !== -1) ? sn(row[idxDados]) : 0;
+    const placaBase = (idxPlaca !== -1) ? sn(row[idxPlaca]) : 0;
+    const frenos = (idxFrenos !== -1) ? sn(row[idxFrenos]) : 0;
+    const rev = (idxRev !== -1 && row[idxRev]) ? row[idxRev].trim() : '';
+    resultados.push({ molde, boquillas, aranas, dados, placaBase, frenos, rev });
+  }
+  console.log('📦 Stock parseado con mapeo:', resultados.length, 'registros');
   return resultados;
 }
 
@@ -1221,7 +1248,7 @@ function pesoColor(prom, nominal){
   return '#f05252';
 }
 
-// ========== BUILD LAMINADORAS (sin cambios) ==========
+// ========== BUILD LAMINADORAS ==========
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
   if(!D) return;
@@ -1492,7 +1519,7 @@ function buildMoldes(){
       const pend = !c.recep;
       const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
       const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
-      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td><td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
+      return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
   }
   dibujarGraficoCromado();
@@ -1519,7 +1546,7 @@ function dibujarGraficoCromado(){
   });
 }
 
-// ========== BUILD STOCK (sin cambios funcionales, solo estéticos) ==========
+// ========== BUILD STOCK (CORREGIDO - orden de columnas explícito) ==========
 let STOCK_FILTERED = [];
 function stockCls(v){ if(v===0) return 'zero'; if(v===1) return 'low'; return 'ok-stock'; }
 function stockEstado(row){ 
@@ -1535,6 +1562,7 @@ function buildStock(){
   STOCK_FILTERED = F==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(F)));
   const total=data.length, sinStock=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, parcial=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].some(v=>v===0)&&![s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, completo=total-sinStock-parcial;
   document.getElementById('kpi-stock').innerHTML = `<div class="kpi ka"><div class="kl">Tipos</div><div class="kv">${total}</div></div><div class="kpi kg"><div class="kl">Completo</div><div class="kv">${completo}</div></div><div class="kpi ka"><div class="kl">Parcial</div><div class="kv">${parcial}</div></div><div class="kpi kr"><div class="kl">Sin stock</div><div class="kv">${sinStock}</div></div>`;
+  // Generar filas con orden explícito: Molde, Boquillas, Arañas, Dados, Placa Base, Frenos, Fecha Rev, Estado
   document.getElementById('tbody-stock').innerHTML = STOCK_FILTERED.map(s=>{ 
     const crit=[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0); 
     return `<tr class="${crit?'crit-row':''}">
@@ -1598,7 +1626,7 @@ function buildMantenimiento(){
         <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
         <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
         <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
-       </tr>
+      </tr>
     `).join('');
   }
   if(containerTipo){
