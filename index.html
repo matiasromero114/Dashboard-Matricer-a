@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-/* ----- ESTILOS EXISTENTES (sin cambios) ----- */
 :root{
   --bg0:#080a0d;--bg1:#0d1017;--bg2:#131720;--bg3:#1a2030;--bg4:#232c3d;--bg5:#2d3a50;
   --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.08);--b2:rgba(255,255,255,.16);--b3:rgba(255,255,255,.28);
@@ -275,7 +274,6 @@ tbody tr:hover td{background:var(--bg3)}
   border-bottom: none;
 }
 
-/* ========== MEJORAS ESTÉTICAS Y DE ALINEACIÓN PARA TABLA STOCK ========== */
 .card-stock-inventario {
   background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
   border-radius: var(--rl);
@@ -319,7 +317,7 @@ tbody tr:hover td{background:var(--bg3)}
   border-collapse: collapse;
   font-size: 12px;
   table-layout: auto;
-  min-width: 800px; /* Para que no se aprieten en móvil */
+  min-width: 800px;
 }
 #tbl-stock thead th {
   background: var(--bg1);
@@ -333,7 +331,6 @@ tbody tr:hover td{background:var(--bg3)}
   white-space: nowrap;
   text-align: left;
 }
-/* Forzar alineación a la derecha solo para las columnas numéricas (2 a 6) */
 #tbl-stock thead th:nth-child(2),
 #tbl-stock thead th:nth-child(3),
 #tbl-stock thead th:nth-child(4),
@@ -348,19 +345,16 @@ tbody tr:hover td{background:var(--bg3)}
   background: var(--bg2);
   vertical-align: middle;
 }
-/* Alineación numérica */
 #tbl-stock tbody td.tr {
   font-family: var(--fm);
   font-weight: 500;
   text-align: right;
 }
-/* Para las celdas que no son numéricas (Molde, Fecha, Estado) */
 #tbl-stock tbody td:first-child,
 #tbl-stock tbody td:nth-child(7),
 #tbl-stock tbody td:nth-child(8) {
   text-align: left;
 }
-/* Estilos de badges numéricos */
 #tbl-stock .zero, #tbl-stock .low, #tbl-stock .ok-stock {
   display: inline-block;
   padding: 2px 8px;
@@ -383,7 +377,6 @@ tbody tr:hover td{background:var(--bg3)}
   color: var(--gr);
   font-weight: 700;
 }
-/* Badges de estado general */
 .badge-stock-completo {
   background: var(--grd);
   color: var(--gr);
@@ -480,7 +473,6 @@ tbody tr:hover td{background:var(--bg3)}
 
 <main class="main">
 
-<!-- TAB 1: LAMINADORAS (sin cambios) -->
 <section class="tab-s active" id="tab-lam">
   <div class="sh">
     <div>
@@ -524,7 +516,6 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 2: MOLDES Y CROMADO (sin cambios) -->
 <section class="tab-s" id="tab-moldes">
   <div class="sh">
     <div>
@@ -587,7 +578,6 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 3: STOCK (CORREGIDO DEFINITIVAMENTE) -->
 <section class="tab-s" id="tab-stock">
   <div class="sh"><div><div class="sh-t">Stock de Repuestos de Moldes</div><div class="sh-s">Boquillas · Arañas · Dados · Placa Base · Frenos · 11 tipos de molde</div></div><button class="btn btn-a" onclick="genFaltantes()">▼ Generar lista de faltantes</button></div>
   <div class="krow" id="kpi-stock"></div>
@@ -606,7 +596,6 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 4: MANTENIMIENTO (sin cambios) -->
 <section class="tab-s" id="tab-mantenimiento">
   <div class="sh">
     <div>
@@ -635,14 +624,12 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 5: VIDA ÚTIL (sin cambios) -->
 <section class="tab-s" id="tab-vidaUtil">
   <div class="sh"><div><div class="sh-t">Vida Útil de Moldes</div><div class="sh-s">Toneladas producidas · 100% = 12.000 t · Círculo completo = 200% (24.000 t)</div></div></div>
   <div class="notice" style="margin-bottom:13px"><div style="font-size:14px">📊</div><div class="notice-t"><strong>Referencia de colores:</strong> <span style="color:var(--gr)">Verde</span> = hasta 12.000 t (100%) · <span style="color:var(--am)">Amarillo</span> = 12.001 – 15.000 t (hasta 125%) · <span style="color:var(--re)">Rojo</span> = más de 15.000 t (supera 125%)<br>Los moldes <strong>#3</strong> (H12 #3, H18 #3, etc.) tienen vida útil <strong>sin límite</strong> (símbolo ∞).</div></div>
   <div class="mg" id="gauges-container"></div>
 </section>
 
-<!-- TAB 6: PLANOS Y REFERENCIAS (sin cambios) -->
 <section class="tab-s" id="tab-planos">
   <div class="sh">
     <div>
@@ -660,7 +647,6 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </section>
 
-<!-- TAB 7: ESTADO DE PIEZAS (sin cambios) -->
 <section class="tab-s" id="tab-estadoPiezas">
   <div class="sh">
     <div>
@@ -694,7 +680,6 @@ tbody tr:hover td{background:var(--bg3)}
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
-<!-- MODALES -->
 <div class="modal-ov" id="modal-falt">
   <div class="modal-box" style="max-width:500px">
     <div class="modal-head">
@@ -812,7 +797,9 @@ function diasBadge(d){
   return `<span class="${cls} tm">${d} días</span>`;
 }
 
+// ══════════════════════════════════════════════════════════════════════
 // NUEVO: convierte "DD/MM/YYYY" a número comparable. -1 si no es válida.
+// ══════════════════════════════════════════════════════════════════════
 function fechaToNum(f){
   if(!f) return -1;
   const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -947,7 +934,6 @@ function parseCromado(rows){
   }));
 }
 
-// PARSER DE STOCK CORREGIDO (mapea por encabezados)
 function parseStock(rows){
   if(!rows || rows.length === 0) return [];
   let headerIndex = -1;
@@ -1377,7 +1363,7 @@ function buildLam(){
   document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
-// ========== BUILD MOLDES (sin cambios) ==========
+// ========== BUILD MOLDES ==========
 function renderPesoBars(filtered){
   const container = document.getElementById('pesos-bars-container');
   if(!container) return;
@@ -1556,7 +1542,7 @@ function dibujarGraficoCromado(){
   });
 }
 
-// ========== BUILD STOCK DEFINITIVO - ORDEN ESTRICTAMENTE CONTROLADO ==========
+// ========== BUILD STOCK ==========
 let STOCK_FILTERED = [];
 function stockCls(v){ if(v===0) return 'zero'; if(v===1) return 'low'; return 'ok-stock'; }
 function stockEstado(row){ 
@@ -1635,7 +1621,7 @@ function copyFalt(){
   navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada'));
 }
 
-// ========== BUILD MANTENIMIENTO (sin cambios) ==========
+// ========== BUILD MANTENIMIENTO ==========
 function getTareaBadge(tipo){
   const colores = { 'Desarmado de molde': { bg: 'var(--amd)', color: 'var(--am)', icon: '🔧' }, 'Armado de molde': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🔨' }, 'Ajustes': { bg: 'var(--bld)', color: 'var(--bl)', icon: '⚙️' }, 'Calibracion': { bg: 'var(--bld)', color: 'var(--bl)', icon: '📏' }, 'Fabricacion': { bg: 'var(--amd)', color: 'var(--am)', icon: '🏭' }, 'Mantenimiento': { bg: 'var(--red)', color: 'var(--re)', icon: '🛠️' }, 'Orden y Limpieza': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🧹' }, 'Seguimiento': { bg: 'var(--bld)', color: 'var(--bl)', icon: '👁️' } };
   const c = colores[tipo] || { bg: 'var(--bg4)', color: 'var(--t2)', icon: '📋' };
@@ -1715,7 +1701,11 @@ function buildMantenimiento(){
   }
 }
 
-// ========== BUILD VIDA ÚTIL (MODIFICADO: ciclo vigente por molde+numero) ==========
+// ══════════════════════════════════════════════════════════════════════════
+// BUILD VIDA ÚTIL — MODIFICADO: agrupa por molde+numero y usa el ciclo
+// vigente (fecha de inicio más reciente). Ciclos anteriores se suman y se
+// muestran como "Ant: X t" cuando hay 2+ ciclos. Molde #3 (∞) no se toca.
+// ══════════════════════════════════════════════════════════════════════════
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   const LIMITE_BASE = 12000;
@@ -1807,6 +1797,7 @@ function buildVidaUtil(){
     setTimeout(() => drawDoughnut(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
 }
+
 function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito = false){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
@@ -1856,7 +1847,7 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
   }
 }
 
-// ========== BUILD PLANOS (sin cambios) ==========
+// ========== BUILD PLANOS ==========
 function buildPlanos(){
   const tiposLadrillos = [
     { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' },
@@ -1909,7 +1900,7 @@ function verPlano(imgUrl, titulo){
   document.getElementById('modal-plano').classList.add('open');
 }
 
-// ========== BUILD ESTADO PIEZAS (sin cambios) ==========
+// ========== BUILD ESTADO PIEZAS ==========
 let ESTADO_FILTER_TEXT = '';
 function filterEstadoPiezas(){
   const input = document.getElementById('search-estado');
