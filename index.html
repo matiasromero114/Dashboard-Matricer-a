@@ -811,6 +811,15 @@ function diasBadge(d){
   const cls=d<=14?'dias-ok':d<=25?'dias-warn':'dias-crit';
   return `<span class="${cls} tm">${d} días</span>`;
 }
+
+// NUEVO: convierte "DD/MM/YYYY" a número comparable. -1 si no es válida.
+function fechaToNum(f){
+  if(!f) return -1;
+  const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m) return -1;
+  return new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1])).getTime();
+}
+
 function normID(s){ return (s||'').trim().toUpperCase().replace(/[\s\-_]+/g,''); }
 
 async function fetchCSV(urlSheets, urlGithub){
@@ -941,7 +950,6 @@ function parseCromado(rows){
 // PARSER DE STOCK CORREGIDO (mapea por encabezados)
 function parseStock(rows){
   if(!rows || rows.length === 0) return [];
-  // Buscar fila de encabezados que contenga "Molde"
   let headerIndex = -1;
   for(let i=0; i<Math.min(rows.length, 30); i++){
     const row = rows[i];
@@ -953,7 +961,6 @@ function parseStock(rows){
   }
   if(headerIndex === -1){
     console.warn('⚠️ No se encontró cabecera "Molde" en Stock. Usando índices por defecto.');
-    // fallback a índices fijos (como estaba originalmente)
     const resultados = [];
     for(let i=1; i<rows.length; i++){
       const row = rows[i];
@@ -976,7 +983,6 @@ function parseStock(rows){
     console.log('📦 Stock parseado (fallback):', resultados.length, 'registros');
     return resultados;
   }
-  // Mapear columnas por nombre
   const headers = rows[headerIndex].map(c => (c||'').trim().toLowerCase());
   const idxMolde = headers.findIndex(h => h === 'molde');
   const idxBoquillas = headers.findIndex(h => h.includes('boquilla'));
@@ -1569,7 +1575,6 @@ function buildStock(){
   
   const tbody = document.getElementById('tbody-stock');
   if(!tbody) return;
-  // Generar filas con orden EXPLÍCITO: Molde, Boquillas, Arañas, Dados, Placa Base, Frenos, Fecha Rev, Estado
   tbody.innerHTML = STOCK_FILTERED.map(s => {
     const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0);
     return `<tr class="${crit ? 'crit-row' : ''}">
@@ -1710,62 +1715,91 @@ function buildMantenimiento(){
   }
 }
 
-// ========== BUILD VIDA ÚTIL (sin cambios) ==========
+// ========== BUILD VIDA ÚTIL (MODIFICADO: ciclo vigente por molde+numero) ==========
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
-  document.getElementById('tn5').textContent = data.length;
   const LIMITE_BASE = 12000;
   const container = document.getElementById('gauges-container');
   if(!data.length){
+    document.getElementById('tn5').textContent = 0;
     container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>';
     return;
   }
+
+  // 1) Agrupar por molde + numero
+  const grupos = {};
+  data.forEach((row, idx) => {
+    const key = `${(row.molde||'').trim()}__${(row.numero||'1').trim()}`;
+    if(!grupos[key]) grupos[key] = [];
+    grupos[key].push({ ...row, _ordenOriginal: idx });
+  });
+
+  // 2) Elegir el ciclo vigente (fecha inicio más reciente) y sumar anteriores
+  const ciclosVigentes = [];
+  Object.values(grupos).forEach(filas => {
+    const ordenadas = [...filas].sort((a,b) => {
+      const fa = fechaToNum(a.inicio);
+      const fb = fechaToNum(b.inicio);
+      if(fb !== fa) return fb - fa;                 // inicio más reciente primero
+      return b._ordenOriginal - a._ordenOriginal;   // empate → última fila de la hoja
+    });
+    const vigente = ordenadas[0];
+    const anteriores = ordenadas.slice(1);
+    const tnAnterior = anteriores.reduce((s, r) => s + (parseFloat(r.tnProducidas) || 0), 0);
+    ciclosVigentes.push({
+      ...vigente,
+      _numCiclo: filas.length,
+      _tnAnterior: tnAnterior,
+      _tnHistorico: tnAnterior + (parseFloat(vigente.tnProducidas) || 0)
+    });
+  });
+
+  // 3) Contador de pestaña = gauges visibles (moldes+numero únicos)
+  document.getElementById('tn5').textContent = ciclosVigentes.length;
+
   container.innerHTML = '';
-  data.forEach(molde => {
+  ciclosVigentes.forEach(molde => {
     const tn = molde.tnProducidas;
     const esInfinito = (molde.numero === '3');
     let porcentajeReal = (tn / LIMITE_BASE) * 100;
     let status = '', statusText = '', color = '';
     if(esInfinito){
-      if(porcentajeReal >= 100){
-        status = 'warning';
-        statusText = '∞ Sin límite definido (supera 100%)';
-        color = '#f5a623';
-      } else {
-        status = 'ok';
-        statusText = '∞ Sin límite definido';
-        color = '#3dd68c';
-      }
+      if(porcentajeReal >= 100){ status='warning'; statusText='∞ Sin límite definido (supera 100%)'; color='#f5a623'; }
+      else { status='ok'; statusText='∞ Sin límite definido'; color='#3dd68c'; }
     } else {
-      if(porcentajeReal > 125){
-        status = 'critical';
-        statusText = `⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`;
-        color = '#f05252';
-      } else if(porcentajeReal > 100){
-        status = 'warning';
-        statusText = `⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`;
-        color = '#f5a623';
-      } else {
-        status = 'ok';
-        statusText = '✓ DENTRO DE VIDA ÚTIL';
-        color = '#3dd68c';
-      }
+      if(porcentajeReal > 125){ status='critical'; statusText=`⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`; color='#f05252'; }
+      else if(porcentajeReal > 100){ status='warning'; statusText=`⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`; color='#f5a623'; }
+      else { status='ok'; statusText='✓ DENTRO DE VIDA ÚTIL'; color='#3dd68c'; }
     }
     let displayPercent = Math.min(porcentajeReal, 200);
-    const canvasId = `doughnut-${molde.molde.replace(/\s/g, '')}-${molde.numero || '1'}`;
+    const canvasId = `doughnut-${molde.molde.replace(/\s/g,'')}-${molde.numero || '1'}`;
     const inicio = molde.inicio && molde.inicio !== '' ? molde.inicio : '—';
-    const fin = molde.fin && molde.fin !== '' ? molde.fin : '—';
+    const fin    = molde.fin && molde.fin !== '' ? molde.fin : '—';
+
+    // Badge "Ciclo N" + detalle "Ant: X t" — solo desde Ciclo 2 en adelante y nunca en #3 (∞)
+    const mostrarCiclo = molde._numCiclo >= 2 && !esInfinito;
+    const tnAntFmt  = molde._tnAnterior.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const tnHistFmt = molde._tnHistorico.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const badgeHtml = mostrarCiclo ? `
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0" title="Ciclo anterior: ${tnAntFmt} t · Total histórico: ${tnHistFmt} t">
+        <span style="background:var(--bld);color:var(--bl);border:1px solid var(--blb);border-radius:999px;padding:2px 8px;font-family:var(--fm);font-size:10px;font-weight:600;white-space:nowrap">Ciclo ${molde._numCiclo}</span>
+        <span style="font-family:var(--fm);font-size:10px;color:var(--t2);white-space:nowrap">Ant: ${tnAntFmt} t</span>
+      </div>` : '';
+
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
     card.innerHTML = `
-      <div class="gauge-title">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
-      <div style="font-size:11px;color:var(--t2);margin-bottom:8px">${molde.clave || ''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;gap:10px;margin-bottom:8px">
+        <div style="text-align:left;min-width:0">
+          <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);line-height:1.1">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:3px">${molde.clave || ''}</div>
+        </div>
+        ${badgeHtml}
+      </div>
       <canvas id="${canvasId}" width="240" height="240" class="gauge-canvas"></canvas>
       <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
-      <div style="font-size:10px; color:var(--t2); margin-top:4px; text-align:center">
-        Inicio: ${inicio} · Fin: ${fin}
-      </div>
+      <div style="font-size:10px; color:var(--t2); margin-top:4px; text-align:center">Inicio: ${inicio} · Fin: ${fin}</div>
       <div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div>
       <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
     `;
