@@ -417,6 +417,168 @@ tbody tr:hover td{background:var(--bg3)}
 .badge-stock-parcial::before { content: "⚠"; font-size: 10px; }
 .badge-stock-sin::before { content: "✗"; font-size: 10px; }
 
+/* ========== OPERATIVIDAD ========== */
+.op-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  gap: 10px;
+}
+.op-card {
+  background: var(--bg3);
+  border: 1px solid var(--b1);
+  border-radius: var(--rl);
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  user-select: none;
+}
+.op-card:hover {
+  border-color: var(--am);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.op-card.activo {
+  border-color: var(--am);
+  background: var(--bg4);
+  box-shadow: 0 0 0 1px var(--am) inset;
+}
+.op-card img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 5px;
+}
+.op-card .op-nombre {
+  font-family: var(--fh);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t0);
+  line-height: 1.1;
+}
+.op-card .op-pct {
+  font-family: var(--fm);
+  font-size: 19px;
+  font-weight: 700;
+  margin-top: 3px;
+  line-height: 1;
+}
+.op-card .op-barra {
+  background: var(--bg5);
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.op-card .op-barra-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width .5s;
+}
+.op-card .op-sub {
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--t2);
+  margin-top: 4px;
+}
+
+.op-detalle {
+  margin-top: 14px;
+  background: var(--bg3);
+  border: 1px solid var(--am);
+  border-radius: var(--rl);
+  padding: 14px 16px;
+  animation: fu .25s ease both;
+}
+.op-detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--b1);
+}
+.op-detalle-titulo {
+  font-family: var(--fh);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--t0);
+}
+.op-detalle-cerrar {
+  color: var(--t2);
+  font-size: 16px;
+  padding: 2px 8px;
+  border-radius: var(--r);
+  transition: all .15s;
+}
+.op-detalle-cerrar:hover {
+  color: var(--re);
+  background: var(--red);
+}
+.op-resumen {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 12px;
+  font-family: var(--fm);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+.op-resumen strong {
+  font-family: var(--fh);
+  font-size: 14px;
+}
+.op-piezas {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.op-pieza {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: var(--bg4);
+  border-radius: var(--r);
+  border-left: 3px solid;
+  font-size: 12px;
+}
+.op-pieza .op-ico {
+  font-weight: 700;
+  font-size: 13px;
+  width: 16px;
+  flex-shrink: 0;
+}
+.op-pieza .op-comp {
+  flex: 1;
+  color: var(--t0);
+}
+.op-pieza .op-est {
+  font-family: var(--fm);
+  font-size: 10px;
+  text-align: right;
+}
+.op-pct-final {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--b1);
+  text-align: center;
+}
+.op-pct-final-label {
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--t2);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.op-pct-final-val {
+  font-family: var(--fh);
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 @media (max-width: 768px) {
   #tbl-stock thead th, #tbl-stock tbody td {
     padding: 8px 5px;
@@ -666,8 +828,8 @@ tbody tr:hover td{background:var(--bg3)}
       </div>
     </div>
     <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas de Acción Requerida</div>
-      <div id="alertas-estado"></div>
+      <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Porcentaje de Operatividad</div>
+      <div id="operatividad-container"></div>
     </div>
   </div>
   <div class="card">
@@ -797,7 +959,6 @@ function diasBadge(d){
   return `<span class="${cls} tm">${d} días</span>`;
 }
 
-// Convierte "DD/MM/YYYY" a número comparable. -1 si no es válida.
 function fechaToNum(f){
   if(!f) return -1;
   const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -1700,9 +1861,6 @@ function buildMantenimiento(){
 }
 
 // ========== BUILD VIDA ÚTIL ==========
-// Agrupa por molde+numero, usa el ciclo vigente (fecha de inicio más reciente).
-// Ciclos anteriores se suman y se muestran como "Ant: X t" cuando hay 2+ ciclos.
-// El badge Ciclo N ahora TAMBIÉN se muestra en moldes #3 cuando reinician.
 function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   const LIMITE_BASE = 12000;
@@ -1713,7 +1871,6 @@ function buildVidaUtil(){
     return;
   }
 
-  // 1) Agrupar por molde + numero
   const grupos = {};
   data.forEach((row, idx) => {
     const key = `${(row.molde||'').trim()}__${(row.numero||'1').trim()}`;
@@ -1721,7 +1878,6 @@ function buildVidaUtil(){
     grupos[key].push({ ...row, _ordenOriginal: idx });
   });
 
-  // 2) Elegir el ciclo vigente (fecha inicio más reciente) y sumar anteriores
   const ciclosVigentes = [];
   Object.values(grupos).forEach(filas => {
     const ordenadas = [...filas].sort((a,b) => {
@@ -1741,7 +1897,6 @@ function buildVidaUtil(){
     });
   });
 
-  // 3) Contador de pestaña = gauges visibles (moldes+numero únicos)
   document.getElementById('tn5').textContent = ciclosVigentes.length;
 
   container.innerHTML = '';
@@ -1763,8 +1918,6 @@ function buildVidaUtil(){
     const inicio = molde.inicio && molde.inicio !== '' ? molde.inicio : '—';
     const fin    = molde.fin && molde.fin !== '' ? molde.fin : '—';
 
-    // Badge "Ciclo N" + detalle "Ant: X t" — se muestra desde Ciclo 2 en adelante,
-    // INCLUYENDO los moldes #3 (∞) cuando reinician.
     const mostrarCiclo = molde._numCiclo >= 2;
     const tnAntFmt  = molde._tnAnterior.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const tnHistFmt = molde._tnHistorico.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -1900,11 +2053,132 @@ function verPlano(imgUrl, titulo){
 
 // ========== BUILD ESTADO PIEZAS ==========
 let ESTADO_FILTER_TEXT = '';
+let OPERATIVIDAD_SELECCIONADO = null;
+
 function filterEstadoPiezas(){
   const input = document.getElementById('search-estado');
   if(input) ESTADO_FILTER_TEXT = input.value.trim().toLowerCase();
+  OPERATIVIDAD_SELECCIONADO = null;
   buildEstadoPiezas();
 }
+
+// Estados considerados "ideales" = suman al % de operatividad
+function esEstadoIdeal(estado){
+  const e = (estado || '').trim().toLowerCase();
+  return e.includes('buen') || e.includes('reacondicionado') || e.includes('cromado');
+}
+
+// Render del bloque "Porcentaje de Operatividad"
+function renderOperatividad(filtered){
+  const container = document.getElementById('operatividad-container');
+  if(!container) return;
+
+  // Agrupar por molde + numero
+  const grupos = {};
+  filtered.forEach(p => {
+    const key = `${p.molde}__${p.numero}`;
+    if(!grupos[key]) grupos[key] = { molde: p.molde, numero: p.numero, piezas: [] };
+    grupos[key].piezas.push(p);
+  });
+
+  // Ordenar: por tipo de molde alfabético, luego por número ascendente
+  const ordenados = Object.values(grupos).sort((a,b) => {
+    const cmp = String(a.molde).localeCompare(String(b.molde));
+    if(cmp !== 0) return cmp;
+    return String(a.numero).localeCompare(String(b.numero), undefined, { numeric: true });
+  });
+
+  if(ordenados.length === 0){
+    container.innerHTML = '<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin piezas para los filtros seleccionados</div><div class="ad">Probá cambiar el filtro o el buscador.</div></div></div>';
+    return;
+  }
+
+  // Calcular % operatividad por molde
+  ordenados.forEach(g => {
+    g.total = g.piezas.length;
+    g.optimas = g.piezas.filter(p => esEstadoIdeal(p.estado)).length;
+    g.deficientes = g.total - g.optimas;
+    g.pct = g.total > 0 ? Math.round((g.optimas / g.total) * 100) : 0;
+  });
+
+  // Grid de tarjetas
+  let html = '<div class="op-grid">';
+  ordenados.forEach(g => {
+    const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
+    const activo = OPERATIVIDAD_SELECCIONADO === `${g.molde}__${g.numero}`;
+    const imgFallback = `this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${g.molde}%3C/text%3E%3C/svg%3E'`;
+    html += `
+      <div class="op-card ${activo ? 'activo' : ''}" data-key="${g.molde}__${g.numero}">
+        <img src="img/ladrillos/${g.molde}.png" alt="${g.molde}" onerror="${imgFallback}">
+        <div class="op-nombre">${g.molde} #${g.numero}</div>
+        <div class="op-pct" style="color:${color}">${g.pct}%</div>
+        <div class="op-barra"><div class="op-barra-fill" style="width:${g.pct}%;background:${color};"></div></div>
+        <div class="op-sub">${g.optimas}/${g.total} óptimas</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  // Panel de detalle (se expande dentro de la misma tarjeta)
+  if(OPERATIVIDAD_SELECCIONADO){
+    const g = ordenados.find(x => `${x.molde}__${x.numero}` === OPERATIVIDAD_SELECCIONADO);
+    if(g){
+      const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
+      html += `
+        <div class="op-detalle">
+          <div class="op-detalle-header">
+            <div class="op-detalle-titulo">${g.molde} #${g.numero} — Detalle de piezas</div>
+            <button class="op-detalle-cerrar" data-cerrar="1">✕</button>
+          </div>
+          <div class="op-resumen">
+            <div><span style="color:var(--gr);">●</span> Óptimas: <strong>${g.optimas}</strong></div>
+            <div><span style="color:var(--re);">●</span> Deficientes: <strong>${g.deficientes}</strong></div>
+            <div><span style="color:var(--t2);">Total piezas:</span> <strong>${g.total}</strong></div>
+          </div>
+          <div class="op-piezas">
+            ${g.piezas.map(p => {
+              const ideal = esEstadoIdeal(p.estado);
+              const ico = ideal ? '✓' : '✗';
+              const col = ideal ? 'var(--gr)' : 'var(--re)';
+              return `
+                <div class="op-pieza" style="border-left-color:${col};">
+                  <span class="op-ico" style="color:${col};">${ico}</span>
+                  <span class="op-comp">${p.componente || 'Pieza'}</span>
+                  <span class="op-est" style="color:${col};">${p.estado || 'Sin especificar'}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="op-pct-final">
+            <div class="op-pct-final-label">Porcentaje de Operatividad</div>
+            <div class="op-pct-final-val" style="color:${color};">${g.pct}%</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  container.innerHTML = html;
+
+  // Click en tarjeta → toggle detalle
+  container.querySelectorAll('.op-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const key = card.getAttribute('data-key');
+      OPERATIVIDAD_SELECCIONADO = (OPERATIVIDAD_SELECCIONADO === key) ? null : key;
+      renderOperatividad(filtered);
+    });
+  });
+
+  // Click en cerrar detalle
+  const btnCerrar = container.querySelector('[data-cerrar="1"]');
+  if(btnCerrar){
+    btnCerrar.addEventListener('click', () => {
+      OPERATIVIDAD_SELECCIONADO = null;
+      renderOperatividad(filtered);
+    });
+  }
+}
+
 function buildEstadoPiezas(){
   const data = STATE.data.ESTADO_PIEZAS || [];
   const filterType = STATE.filter;
@@ -1950,17 +2224,11 @@ function buildEstadoPiezas(){
       ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
     }
   }
-  const acciones = filtered.filter(p => p.accion && p.accion.trim() !== '');
-  let alertsHtml = '';
-  if(acciones.length === 0){
-    alertsHtml = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin acciones pendientes</div></div></div>`;
-  } else {
-    acciones.slice(0,5).forEach(p => {
-      alertsHtml += `<div class="al ala"><div class="aico">⚠</div><div><div class="at">${p.molde} #${p.numero} — ${p.componente}</div><div class="ad">${p.accion} ${p.observacion ? `· ${p.observacion}` : ''}</div>${p.fecha ? `<div class="ad" style="font-size:9px">📅 ${p.fecha}</div>` : ''}</div></div>`;
-    });
-    if(acciones.length > 5) alertsHtml += `<div class="al alb"><div class="aico">📋</div><div>+ ${acciones.length-5} acciones más.</div></div>`;
-  }
-  document.getElementById('alertas-estado').innerHTML = alertsHtml;
+
+  // NUEVO: Porcentaje de Operatividad (reemplaza "Alertas de Acción Requerida")
+  renderOperatividad(filtered);
+
+  // Cards de piezas agrupadas por molde (se mantiene igual)
   const grouped = {};
   filtered.forEach(p => { const key = `${p.molde} #${p.numero}`; if(!grouped[key]) grouped[key] = []; grouped[key].push(p); });
   let cardsHtml = '';
