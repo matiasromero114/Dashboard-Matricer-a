@@ -858,7 +858,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </div>
 
-<!-- NUEVO: Modal de Operatividad -->
+<!-- Modal de Operatividad -->
 <div class="modal-ov" id="modal-operatividad">
   <div class="modal-box">
     <div class="modal-head">
@@ -927,6 +927,25 @@ const FB = {
   MANTENIMIENTO: [],
   ESTADO_PIEZAS: []
 };
+
+// ══════════════════════════════════════════════════════════════════════
+// MAPA DE IMÁGENES ESPECIALES POR MOLDE + NÚMERO
+// Clave: "NombreMolde__N°" (exactamente como viene de la hoja)
+// Valor: ruta de la imagen específica
+// Si un molde no está en el mapa, se usa img/ladrillos/{Molde}.png por defecto.
+// ══════════════════════════════════════════════════════════════════════
+const IMAGENES_ESPECIALES = {
+  'H12 BR 9T__4': 'img/ladrillos/H12-9T.png',
+  // Acá se pueden agregar más en el futuro, por ejemplo:
+  // 'H18 BR 9T__4': 'img/ladrillos/H18-9T.png',
+  // 'P12 BR__2':   'img/ladrillos/P12-BR.png',
+};
+
+function getImagenLadrillo(molde, numero){
+  const clave = `${(molde||'').trim()}__${(numero||'').trim()}`;
+  if(IMAGENES_ESPECIALES[clave]) return IMAGENES_ESPECIALES[clave];
+  return `img/ladrillos/${(molde||'').trim()}.png`;
+}
 
 let STATE = {
   filter: 'todos',
@@ -2060,13 +2079,11 @@ function filterEstadoPiezas(){
   buildEstadoPiezas();
 }
 
-// Estados considerados "ideales" = suman al % de operatividad
 function esEstadoIdeal(estado){
   const e = (estado || '').trim().toLowerCase();
   return e.includes('buen') || e.includes('reacondicionado') || e.includes('cromado');
 }
 
-// Abre el modal con el detalle del molde seleccionado
 function abrirModalOperatividad(g){
   const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
   document.getElementById('op-modal-title').textContent = `${g.molde} #${g.numero} — Detalle de piezas`;
@@ -2112,7 +2129,6 @@ function cerrarModalOperatividad(){
   document.getElementById('modal-operatividad').classList.remove('open');
 }
 
-// Cerrar modal al hacer click fuera de la caja
 document.addEventListener('click', (e) => {
   const modal = document.getElementById('modal-operatividad');
   if(modal && modal.classList.contains('open') && e.target === modal){
@@ -2120,12 +2136,10 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Render del bloque "Porcentaje de Operatividad" (grilla de ladrillos)
 function renderOperatividad(filtered){
   const container = document.getElementById('operatividad-container');
   if(!container) return;
 
-  // Agrupar por molde + numero
   const grupos = {};
   filtered.forEach(p => {
     const key = `${p.molde}__${p.numero}`;
@@ -2133,7 +2147,6 @@ function renderOperatividad(filtered){
     grupos[key].piezas.push(p);
   });
 
-  // Ordenar: por tipo de molde, luego por número ascendente
   const ordenados = Object.values(grupos).sort((a,b) => {
     const cmp = String(a.molde).localeCompare(String(b.molde));
     if(cmp !== 0) return cmp;
@@ -2145,7 +2158,6 @@ function renderOperatividad(filtered){
     return;
   }
 
-  // Calcular % operatividad por molde
   ordenados.forEach(g => {
     g.total = g.piezas.length;
     g.optimas = g.piezas.filter(p => esEstadoIdeal(p.estado)).length;
@@ -2153,14 +2165,14 @@ function renderOperatividad(filtered){
     g.pct = g.total > 0 ? Math.round((g.optimas / g.total) * 100) : 0;
   });
 
-  // Grid de tarjetas
   let html = '<div class="op-grid">';
   ordenados.forEach(g => {
     const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
     const imgFallback = `this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${g.molde}%3C/text%3E%3C/svg%3E'`;
+    const imgSrc = getImagenLadrillo(g.molde, g.numero);
     html += `
       <div class="op-card" data-key="${g.molde}__${g.numero}" title="Ver detalle de ${g.molde} #${g.numero}">
-        <img src="img/ladrillos/${g.molde}.png" alt="${g.molde}" onerror="${imgFallback}">
+        <img src="${imgSrc}" alt="${g.molde}" onerror="${imgFallback}">
         <div class="op-nombre">${g.molde} #${g.numero}</div>
         <div class="op-pct" style="color:${color}">${g.pct}%</div>
         <div class="op-barra"><div class="op-barra-fill" style="width:${g.pct}%;background:${color};"></div></div>
@@ -2172,7 +2184,6 @@ function renderOperatividad(filtered){
 
   container.innerHTML = html;
 
-  // Click en tarjeta → abrir modal con el detalle de ese molde
   container.querySelectorAll('.op-card').forEach(card => {
     card.addEventListener('click', () => {
       const key = card.getAttribute('data-key');
@@ -2228,10 +2239,8 @@ function buildEstadoPiezas(){
     }
   }
 
-  // Porcentaje de Operatividad
   renderOperatividad(filtered);
 
-  // Cards de piezas agrupadas por molde (se mantiene igual)
   const grouped = {};
   filtered.forEach(p => { const key = `${p.molde} #${p.numero}`; if(!grouped[key]) grouped[key] = []; grouped[key].push(p); });
   let cardsHtml = '';
