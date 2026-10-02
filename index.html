@@ -565,6 +565,102 @@ tbody tr:hover td{background:var(--bg3)}
   line-height: 1;
 }
 
+/* ========== DISTRIBUCIÓN DE ESTADOS (REDISEÑO) ========== */
+.dist-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+}
+.dist-chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1 / 1;
+  min-height: 260px;
+  margin: 0 auto;
+}
+.dist-chart-canvas-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.dist-chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  transition: color .2s;
+}
+.dist-chart-center-num {
+  font-family: var(--fh);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--t0);
+  line-height: 1;
+  letter-spacing: -.02em;
+  transition: color .2s;
+}
+.dist-chart-center-lbl {
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t2);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  transition: color .2s;
+}
+.dist-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 8px;
+  width: 100%;
+}
+.dist-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .18s ease;
+  user-select: none;
+}
+.dist-legend-item:hover {
+  background: var(--bg3);
+  border-color: var(--b1);
+  transform: translateY(-1px);
+}
+.dist-legend-item.dim {
+  opacity: .3;
+}
+.dist-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.06);
+}
+.dist-legend-name {
+  font-family: var(--fm);
+  font-size: 11px;
+  color: var(--t1);
+  white-space: nowrap;
+}
+.dist-legend-count {
+  font-family: var(--fm);
+  font-size: 11px;
+  color: var(--t2);
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   #tbl-stock thead th, #tbl-stock tbody td {
     padding: 8px 5px;
@@ -809,8 +905,15 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="g2">
     <div class="card">
       <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución de Estados</div>
-      <div style="height:260px; display:flex; justify-content:center;">
-        <canvas id="chart-estado-piezas" style="max-width:260px; max-height:260px;"></canvas>
+      <div class="dist-chart-wrap">
+        <div class="dist-chart-canvas-wrap">
+          <canvas id="chart-estado-piezas"></canvas>
+          <div class="dist-chart-center">
+            <div class="dist-chart-center-num" id="dist-center-num">0</div>
+            <div class="dist-chart-center-lbl" id="dist-center-lbl">piezas</div>
+          </div>
+        </div>
+        <div class="dist-legend" id="dist-legend"></div>
       </div>
     </div>
     <div class="card">
@@ -858,7 +961,6 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </div>
 
-<!-- Modal de Operatividad -->
 <div class="modal-ov" id="modal-operatividad">
   <div class="modal-box">
     <div class="modal-head">
@@ -904,14 +1006,9 @@ const URLS_GITHUB = {
   ESTAÑO: GITHUB_BASE + 'estano.csv'
 };
 
-// ══════════════════════════════════════════════════════════════════════════
-// MAPA DE IMÁGENES ESPECIALES
-// Cuando en la hoja "Estado de Moldes" el nombre del molde NO coincide con
-// el nombre del archivo de imagen, se agrega acá.
-// Ej: la hoja dice "H12 BR 9T" pero la imagen se llama "H12-9T.png"
-// ══════════════════════════════════════════════════════════════════════════
+// Mapa de imágenes especiales
 const IMAGENES_ESPECIALES = {
-  'H12-9T.png': 'img/ladrillos/H12-9T.png'
+  'H12 BR 9T': 'img/ladrillos/H12-9T.png'
 };
 
 function getImagenLadrillo(molde){
@@ -2164,7 +2261,6 @@ function renderOperatividad(filtered){
   let html = '<div class="op-grid">';
   ordenados.forEach(g => {
     const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
-    // ⬇️ CAMBIO: se usa getImagenLadrillo() para soportar imágenes especiales
     const imgSrc = getImagenLadrillo(g.molde);
     const imgFallback = `this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${g.molde}%3C/text%3E%3C/svg%3E'`;
     html += `
@@ -2188,6 +2284,157 @@ function renderOperatividad(filtered){
       if(g) abrirModalOperatividad(g);
     });
   });
+}
+
+// Render del gráfico de Distribución de Estados (REDISEÑADO)
+function renderDistribucionEstados(estadosCount, totalPiezas){
+  const chartCanvas = document.getElementById('chart-estado-piezas');
+  const legendEl = document.getElementById('dist-legend');
+  const centerNum = document.getElementById('dist-center-num');
+  const centerLbl = document.getElementById('dist-center-lbl');
+  
+  if(!chartCanvas) return;
+  if(window.chartEstadoPiezas) window.chartEstadoPiezas.destroy();
+  
+  const labelsDist = Object.keys(estadosCount);
+  const valuesDist = Object.values(estadosCount);
+  const coloresDist = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444']; // Verde, Azul, Dorado, Rojo
+  const totalDist = valuesDist.reduce((a,b) => a + b, 0);
+  
+  function updateCenter(idx){
+    if(idx === null || idx === undefined){
+      centerNum.textContent = totalDist.toLocaleString();
+      centerNum.style.color = 'var(--t0)';
+      centerLbl.textContent = 'piezas';
+    } else {
+      const pct = totalDist > 0 ? Math.round((valuesDist[idx] / totalDist) * 100) : 0;
+      centerNum.textContent = pct + '%';
+      centerNum.style.color = coloresDist[idx];
+      centerLbl.textContent = labelsDist[idx].toUpperCase();
+    }
+  }
+  
+  // Render leyenda custom
+  if(legendEl){
+    legendEl.innerHTML = labelsDist.map((lbl, i) => {
+      const pct = totalDist > 0 ? Math.round((valuesDist[i]/totalDist)*100) : 0;
+      return `<div class="dist-legend-item" data-idx="${i}">
+        <span class="dist-legend-dot" style="background:${coloresDist[i]}"></span>
+        <span class="dist-legend-name">${lbl}</span>
+        <span class="dist-legend-count">${valuesDist[i]} · ${pct}%</span>
+      </div>`;
+    }).join('');
+  }
+  
+  if(totalPiezas > 0){
+    window.chartEstadoPiezas = new Chart(chartCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: labelsDist,
+        datasets: [{
+          data: valuesDist,
+          backgroundColor: coloresDist,
+          borderColor: '#131720',
+          borderWidth: 3,
+          borderRadius: 8,
+          hoverOffset: 14,
+          hoverBorderColor: '#131720'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '72%',
+        animation: {
+          animateRotate: true,
+          animateScale: false,
+          duration: 900,
+          easing: 'easeOutQuart'
+        },
+        layout: { padding: 8 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(13,16,23,0.96)',
+            borderColor: 'rgba(255,255,255,0.16)',
+            borderWidth: 1,
+            titleColor: '#f0f4ff',
+            bodyColor: '#b8c4d8',
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true,
+            titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' },
+            bodyFont: { family: 'IBM Plex Mono', size: 11 },
+            callbacks: {
+              label: function(ctx){
+                const val = ctx.parsed;
+                const pct = totalDist > 0 ? Math.round((val/totalDist)*100) : 0;
+                return ` ${val} piezas · ${pct}%`;
+              }
+            }
+          }
+        },
+        onHover: (evt, activeEls) => {
+          if(activeEls.length > 0){
+            updateCenter(activeEls[0].index);
+            if(legendEl){
+              legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => {
+                it.classList.toggle('dim', i !== activeEls[0].index);
+              });
+            }
+          } else {
+            updateCenter(null);
+            if(legendEl){
+              legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim'));
+            }
+          }
+        }
+      }
+    });
+    
+    updateCenter(null);
+    
+    // Interacciones de leyenda
+    if(legendEl){
+      legendEl.querySelectorAll('.dist-legend-item').forEach(item => {
+        const idx = parseInt(item.getAttribute('data-idx'));
+        item.addEventListener('mouseenter', () => {
+          updateCenter(idx);
+          const chart = window.chartEstadoPiezas;
+          if(chart){
+            const meta = chart.getDatasetMeta(0);
+            meta.data.forEach((arc, i) => {
+              arc.options.hoverOffset = (i === idx) ? 14 : 0;
+            });
+            chart.update('none');
+            // Atenuamos las otras
+            legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => {
+              if(i !== idx) it.classList.add('dim');
+            });
+          }
+        });
+        item.addEventListener('mouseleave', () => {
+          updateCenter(null);
+          const chart = window.chartEstadoPiezas;
+          if(chart){
+            const meta = chart.getDatasetMeta(0);
+            meta.data.forEach(arc => { arc.options.hoverOffset = 14; });
+            chart.update('none');
+          }
+          legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim'));
+        });
+      });
+    }
+  } else {
+    const ctx = chartCanvas.getContext('2d');
+    ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+    ctx.fillStyle = '#6e7d96';
+    ctx.font = '12px monospace';
+    ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
+    if(legendEl) legendEl.innerHTML = '';
+    if(centerNum) centerNum.textContent = '0';
+    if(centerLbl) centerLbl.textContent = 'piezas';
+  }
 }
 
 function buildEstadoPiezas(){
@@ -2218,23 +2465,9 @@ function buildEstadoPiezas(){
     else if(e.includes('reacondicionado')) estadosCount['Reacondicionado']++;
     else estadosCount['Otro']++;
   });
-  const chartCanvas = document.getElementById('chart-estado-piezas');
-  if(chartCanvas){
-    if(window.chartEstadoPiezas) window.chartEstadoPiezas.destroy();
-    if(totalPiezas > 0){
-      window.chartEstadoPiezas = new Chart(chartCanvas, {
-        type: 'doughnut',
-        data: { labels: Object.keys(estadosCount), datasets: [{ data: Object.values(estadosCount), backgroundColor: ['#3dd68c','#f5a623','#fb923c','#f05252'], borderWidth: 0, cutout: '60%' }] },
-        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
-      });
-    } else {
-      const ctx = chartCanvas.getContext('2d');
-      ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
-      ctx.fillStyle = '#6e7d96';
-      ctx.font = '12px monospace';
-      ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
-    }
-  }
+
+  // Render del gráfico rediseñado
+  renderDistribucionEstados(estadosCount, totalPiezas);
 
   renderOperatividad(filtered);
 
