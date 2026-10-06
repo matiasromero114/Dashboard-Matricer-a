@@ -7,25 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{
-  --bg0:#080a0d;--bg1:#0d1017;--bg2:#131720;--bg3:#1a2030;--bg4:#232c3d;--bg5:#2d3a50;
-  --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.08);--b2:rgba(255,255,255,.16);--b3:rgba(255,255,255,.28);
-  --t0:#f0f4ff;--t1:#b8c4d8;--t2:#6e7d96;--t3:#3d4f6a;
-  --am:#f5a623;--amd:rgba(245,166,35,.13);--amb:rgba(245,166,35,.3);
-  --gr:#3dd68c;--grd:rgba(61,214,140,.1);--grb:rgba(61,214,140,.3);
-  --re:#f05252;--red:rgba(240,82,82,.1);--reb:rgba(240,82,82,.3);
-  --bl:#60a5fa;--bld:rgba(96,165,250,.1);--blb:rgba(96,165,250,.3);
-  --te:#2dd4bf;--or:#fb923c;
-  --fh:'IBM Plex Sans Condensed',sans-serif;
-  --fb:'IBM Plex Sans',sans-serif;
-  --fm:'IBM Plex Mono',monospace;
-  --r:6px;--rl:10px;
-}
+:root{--bg0:#080a0d;--bg1:#0d1017;--bg2:#131720;--bg3:#1a2030;--bg4:#232c3d;--bg5:#2d3a50;--b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.08);--b2:rgba(255,255,255,.16);--b3:rgba(255,255,255,.28);--t0:#f0f4ff;--t1:#b8c4d8;--t2:#6e7d96;--t3:#3d4f6a;--am:#f5a623;--amd:rgba(245,166,35,.13);--amb:rgba(245,166,35,.3);--gr:#3dd68c;--grd:rgba(61,214,140,.1);--grb:rgba(61,214,140,.3);--re:#f05252;--red:rgba(240,82,82,.1);--reb:rgba(240,82,82,.3);--bl:#60a5fa;--bld:rgba(96,165,250,.1);--blb:rgba(96,165,250,.3);--te:#2dd4bf;--or:#fb923c;--fh:'IBM Plex Sans Condensed',sans-serif;--fb:'IBM Plex Sans',sans-serif;--fm:'IBM Plex Mono',monospace;--r:6px;--rl:10px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px}
 body{background:var(--bg0);color:var(--t0);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
 button{cursor:pointer;font-family:inherit;border:none;background:none}
-
 .topbar{background:var(--bg1);border-bottom:1px solid var(--b1);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-icon{width:32px;height:32px;border-radius:var(--r);object-fit:contain}
@@ -36,22 +22,18 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 #clock{font-family:var(--fm);font-size:12px;color:var(--t1)}
 #last-update{font-family:var(--fm);font-size:10px;color:var(--t3)}
-
 .btn-refresh{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);background:var(--am);color:var(--bg0);font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;cursor:pointer;transition:all .15s;flex-shrink:0}
 .btn-refresh:hover{background:#f5b84b;transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,166,35,.35)}
-.btn-refresh:active{transform:translateY(0)}
 .btn-refresh.loading{opacity:.65;cursor:wait;pointer-events:none}
 #ri{display:inline-block;font-size:14px}
 .spinning{animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .fbar{background:var(--bg1);border-bottom:1px solid var(--b0);padding:8px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .fbl{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);white-space:nowrap}
 .chips{display:flex;gap:5px;flex-wrap:wrap}
 .chip{padding:3px 11px;border:1px solid var(--b2);border-radius:999px;font-family:var(--fm);font-size:11px;color:var(--t2);background:transparent;transition:all .15s;cursor:pointer}
 .chip:hover{color:var(--t1);border-color:var(--b3)}
 .chip.active{background:var(--am);border-color:var(--am);color:var(--bg0);font-weight:600}
-
 .navtabs{background:var(--bg1);border-bottom:1px solid var(--b1);padding:0 20px;display:flex;overflow-x:auto}
 .navtabs::-webkit-scrollbar{display:none}
 .navtab{padding:10px 12px;font-family:var(--fh);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t2);border:none;border-bottom:2px solid transparent;background:none;cursor:pointer;white-space:nowrap;transition:all .2s;position:relative;top:1px;display:flex;align-items:center;gap:4px}
@@ -59,22 +41,18 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .navtab.active{color:var(--am);border-bottom-color:var(--am)}
 .tn{background:var(--bg4);border-radius:999px;padding:1px 6px;font-size:9px;font-family:var(--fm)}
 .navtab.active .tn{background:var(--amd);color:var(--am)}
-
 .main{padding:20px;max-width:1600px;margin:0 auto}
 .tab-s{display:none}
 .tab-s.active{display:block;animation:fu .28s ease both}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
 .sh{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:10px}
 .sh-t{font-family:var(--fh);font-size:20px;font-weight:700;letter-spacing:.04em}
 .sh-s{font-family:var(--fm);font-size:11px;color:var(--t2);margin-top:3px;letter-spacing:.04em}
-
 .card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:17px 20px;transition:border-color .2s;margin-bottom:13px}
 .card:hover{border-color:var(--b2)}
 .card:last-child{margin-bottom:0}
 .ct{font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:13px;display:flex;align-items:center;gap:7px}
 .ctd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-
 .krow{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-bottom:13px}
 .kpi{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 17px;position:relative;overflow:hidden}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--rl) var(--rl) 0 0}
@@ -82,21 +60,17 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .kl{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:7px}
 .kv{font-family:var(--fh);font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
 .km{font-size:11px;color:var(--t2)}
-
 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-bottom:13px}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-bottom:13px}
 .g7030{display:grid;grid-template-columns:1fr 310px;gap:13px;margin-bottom:13px}
 @media(max-width:1100px){.g7030{grid-template-columns:1fr}}
 @media(max-width:780px){.g2,.g3{grid-template-columns:1fr}}
-
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-family:var(--fm);font-size:10px;font-weight:500;white-space:nowrap}
 .bg{background:var(--grd);color:var(--gr);border:1px solid var(--grb)}
 .ba{background:var(--amd);color:var(--am);border:1px solid var(--amb)}
 .br{background:var(--red);color:var(--re);border:1px solid var(--reb)}
 .bb{background:var(--bld);color:var(--bl);border:1px solid var(--blb)}
 .bgr{background:var(--bg4);color:var(--t2);border:1px solid var(--b1)}
-.bo{background:rgba(251,146,60,.15);color:var(--or);border:1px solid rgba(251,146,60,.3)}
-
 .al{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:var(--r);border:1px solid;margin-bottom:7px;font-size:12px;line-height:1.5}
 .al:last-child{margin-bottom:0}
 .alr{background:var(--red);border-color:var(--reb)}
@@ -106,7 +80,6 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .aico{font-size:13px;flex-shrink:0;margin-top:1px}
 .at{font-weight:600;color:var(--t0);margin-bottom:1px}
 .ad{color:var(--t1);font-size:11px}
-
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
 thead th{font-family:var(--fm);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);padding:8px 10px;border-bottom:1px solid var(--b1);text-align:left;white-space:nowrap;background:var(--bg3)}
@@ -116,12 +89,10 @@ tbody tr:hover td{background:var(--bg3)}
 .tr{text-align:right}.tm{font-family:var(--fm)}.tg{color:var(--t2);white-space:nowrap}
 .crom-pend{background:rgba(240,82,82,.06)!important}
 .crom-pend td{color:var(--t0)!important}
-
 .lam-tog{display:flex;gap:6px;margin-bottom:13px}
 .ltb{padding:6px 16px;border-radius:var(--r);border:1px solid var(--b2);font-family:var(--fh);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t2);background:transparent;cursor:pointer;transition:all .15s}
 .ltb.active{background:var(--am);border-color:var(--am);color:var(--bg0)}
 .ltb:hover:not(.active){color:var(--t1);border-color:var(--b3)}
-
 .mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:4px;width:100%}
 .mc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;transition:all .2s}
 .mc:hover{border-color:var(--b2);transform:translateY(-1px)}
@@ -135,7 +106,6 @@ tbody tr:hover td{background:var(--bg3)}
 .mobs{font-size:10px;color:var(--t2);margin-top:7px;padding-top:7px;border-top:1px solid var(--b0);line-height:1.4}
 .vpills{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0}
 .vp{background:var(--bg4);border:1px solid var(--b0);border-radius:3px;padding:2px 6px;font-family:var(--fm);font-size:10px;color:var(--t1)}
-
 .stock-search-wrap{display:flex;align-items:center;gap:10px;margin-bottom:13px}
 .stock-search{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;font-family:var(--fm);font-size:12px;color:var(--t0);width:260px;outline:none;transition:border-color .15s}
 .stock-search::placeholder{color:var(--t3)}
@@ -144,25 +114,20 @@ tbody tr:hover td{background:var(--bg3)}
 .low{color:var(--am)!important;font-weight:600}
 .ok-stock{color:var(--gr)!important;font-weight:600}
 .crit-row{background:rgba(240,82,82,.04)!important}
-
 .dbar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .db-lbl{font-family:var(--fm);font-size:11px;color:var(--t2);width:110px;flex-shrink:0;line-height:1.3}
 .db-trk{flex:1;background:var(--bg4);border-radius:3px;height:10px;overflow:hidden}
 .db-fill{height:10px;border-radius:3px;transition:width .4s}
 .db-val{font-family:var(--fm);font-size:11px;color:var(--t1);width:80px;text-align:right;flex-shrink:0}
-.dbar.sin-barra .db-trk{background:transparent}
-
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-family:var(--fh);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;cursor:pointer}
 .btn-a{background:var(--am);color:var(--bg0);border:none}
 .btn-a:hover{background:#f5b84b;transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,166,35,.3)}
 .btn-g{background:transparent;color:var(--t1);border:1px solid var(--b2)}
 .btn-g:hover{border-color:var(--b3);color:var(--t0)}
-
 .notice{background:var(--bld);border:1px solid var(--blb);border-radius:var(--r);padding:10px 14px;margin-bottom:13px;font-size:12px;display:flex;align-items:flex-start;gap:9px}
 .notice-t{color:var(--t1);line-height:1.6}
 .notice-t strong{color:var(--bl)}
 .notice-t code{background:var(--bg4);padding:1px 5px;border-radius:3px;font-family:var(--fm);font-size:10px;color:var(--am)}
-
 .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center}
 .modal-ov.open{display:flex}
 .modal-box{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rl);padding:24px;max-width:800px;width:92%;max-height:82vh;overflow-y:auto}
@@ -170,146 +135,87 @@ tbody tr:hover td{background:var(--bg3)}
 .modal-title{font-family:var(--fh);font-size:16px;font-weight:700}
 .mclose{color:var(--t2);font-size:18px;background:none;border:none;cursor:pointer}
 .mclose:hover{color:var(--t0)}
-
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg1)}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--bg5)}
 .footer{text-align:center;padding:20px;font-family:var(--fm);font-size:10px;color:var(--t3);border-top:1px solid var(--b0);margin-top:32px;letter-spacing:.06em}
-
 .dias-ok{color:var(--gr)}.dias-warn{color:var(--am)}.dias-crit{color:var(--re)}
-
-.gauge-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--bg3);
-  border-radius: var(--rl);
-  padding: 15px;
-  transition: all .2s;
-  width: 100%;
-}
-.gauge-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,.3);
-}
-.gauge-title {
-  font-family: var(--fh);
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--t0);
-}
-.gauge-canvas {
-  width: 100%;
-  max-width: 240px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-.gauge-value {
-  font-family: var(--fm);
-  font-size: 18px;
-  font-weight: 700;
-  margin-top: 8px;
-}
-.gauge-label {
-  font-family: var(--fm);
-  font-size: 9px;
-  color: var(--t2);
-  margin-top: 2px;
-  text-align: center;
-}
-.gauge-status {
-  font-family: var(--fm);
-  font-size: 10px;
-  font-weight: 600;
-  margin-top: 8px;
-  padding: 3px 10px;
-  border-radius: 999px;
-}
-.status-ok { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
-.status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
-.status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
-
-.bar-wrapper { box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
-.bar-real { box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-.bar-nominal-line { box-shadow: 0 0 3px rgba(0,0,0,0.5); }
-#pesos-bars-container { overflow-x: auto; }
-
-.search-estado { background: var(--bg3); border: 1px solid var(--b1); border-radius: var(--r); padding: 8px 14px; font-family: var(--fm); font-size: 12px; color: var(--t0); width: 260px; outline: none; transition: border-color .15s; }
-.search-estado::placeholder { color: var(--t3); }
-.search-estado:focus { border-color: var(--am); }
-.estado-badge-bueno { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
-.estado-badge-cromado { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
-.estado-badge-reacondicionado { background: rgba(251,146,60,.15); color: var(--or); border: 1px solid rgba(251,146,60,.3); }
-.estado-badge-otro { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
-.pieza-item { border-bottom: 1px solid var(--b0); padding: 8px 0; }
-.pieza-item:last-child { border-bottom: none; }
-
-.card-stock-inventario { background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%); border-radius: var(--rl); border: 1px solid var(--b1); overflow-x: auto; transition: all 0.3s ease; margin-bottom: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-.card-stock-inventario:hover { border-color: var(--amb); box-shadow: 0 8px 20px rgba(0,0,0,0.3); transform: translateY(-2px); }
-.card-stock-inventario .ct { background: var(--bg1); margin: 0 0 13px 0; padding: 12px 20px; border-bottom: 1px solid var(--b1); position: relative; font-size: 12px; color: var(--am); letter-spacing: 0.12em; }
-.card-stock-inventario .ct::before { content: "📦"; margin-right: 8px; font-size: 14px; }
-.card-stock-inventario .ct::after { content: ""; position: absolute; bottom: -1px; left: 20px; width: 40px; height: 2px; background: var(--am); }
-#tbl-stock { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: auto; min-width: 800px; }
-#tbl-stock thead th { background: var(--bg1); color: var(--am); font-family: var(--fh); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid var(--b2); white-space: nowrap; text-align: left; }
-#tbl-stock thead th:nth-child(2), #tbl-stock thead th:nth-child(3), #tbl-stock thead th:nth-child(4), #tbl-stock thead th:nth-child(5), #tbl-stock thead th:nth-child(6) { text-align: right; }
-#tbl-stock tbody td { padding: 12px 10px; border-bottom: 1px solid var(--b0); transition: background 0.2s ease; background: var(--bg2); vertical-align: middle; }
-#tbl-stock tbody td.tr { font-family: var(--fm); font-weight: 500; text-align: right; }
-#tbl-stock tbody td:first-child, #tbl-stock tbody td:nth-child(7), #tbl-stock tbody td:nth-child(8) { text-align: left; }
-#tbl-stock .zero, #tbl-stock .low, #tbl-stock .ok-stock { display: inline-block; padding: 2px 8px; border-radius: 20px; min-width: 40px; text-align: center; }
-#tbl-stock .zero { background: rgba(240,82,82,0.15); color: var(--re); font-weight: 700; }
-#tbl-stock .low { background: rgba(245,166,35,0.15); color: var(--am); font-weight: 700; }
-#tbl-stock .ok-stock { background: rgba(61,214,140,0.15); color: var(--gr); font-weight: 700; }
-.badge-stock-completo { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-.badge-stock-parcial { background: var(--amd); color: var(--am); border: 1px solid var(--amb); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-.badge-stock-sin { background: var(--red); color: var(--re); border: 1px solid var(--reb); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-.badge-stock-completo::before { content: "✓"; font-size: 10px; }
-.badge-stock-parcial::before { content: "⚠"; font-size: 10px; }
-.badge-stock-sin::before { content: "✗"; font-size: 10px; }
-
-.op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
-.op-card { background: var(--bg3); border: 1px solid var(--b1); border-radius: var(--rl); padding: 10px 6px; text-align: center; cursor: pointer; transition: all .2s; user-select: none; }
-.op-card:hover { border-color: var(--am); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
-.op-card img { width: 56px; height: 56px; object-fit: contain; display: block; margin: 0 auto 5px; }
-.op-card .op-nombre { font-family: var(--fh); font-size: 12px; font-weight: 700; color: var(--t0); line-height: 1.1; }
-.op-card .op-pct { font-family: var(--fm); font-size: 19px; font-weight: 700; margin-top: 3px; line-height: 1; }
-.op-card .op-barra { background: var(--bg5); height: 4px; border-radius: 2px; overflow: hidden; margin-top: 6px; }
-.op-card .op-barra-fill { height: 100%; border-radius: 2px; transition: width .5s; }
-.op-card .op-sub { font-family: var(--fm); font-size: 9px; color: var(--t2); margin-top: 4px; }
-
-#modal-operatividad .modal-box { max-width: 620px; }
-.op-modal-resumen { display: flex; gap: 22px; margin-bottom: 16px; padding: 14px 16px; background: var(--bg3); border-radius: var(--rl); flex-wrap: wrap; justify-content: space-around; }
-.op-modal-resumen-item { text-align: center; }
-.op-modal-resumen-item .op-num { font-family: var(--fh); font-size: 30px; font-weight: 700; line-height: 1; }
-.op-modal-resumen-item .op-lbl { font-family: var(--fm); font-size: 9px; color: var(--t2); letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
-.op-modal-piezas { display: flex; flex-direction: column; gap: 6px; max-height: 40vh; overflow-y: auto; padding-right: 4px; }
-.op-modal-pieza { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--bg3); border-radius: var(--r); border-left: 3px solid; font-size: 12px; }
-.op-modal-pieza .op-ico { font-weight: 700; font-size: 14px; width: 18px; flex-shrink: 0; text-align: center; }
-.op-modal-pieza .op-comp { flex: 1; color: var(--t0); font-weight: 500; }
-.op-modal-pieza .op-est { font-family: var(--fm); font-size: 10px; text-align: right; }
-.op-modal-pct-final { margin-top: 18px; padding: 16px; border-radius: var(--rl); text-align: center; background: var(--bg3); border: 1px solid var(--b1); }
-.op-modal-pct-final-label { font-family: var(--fm); font-size: 10px; color: var(--t2); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
-.op-modal-pct-final-val { font-family: var(--fh); font-size: 48px; font-weight: 700; line-height: 1; }
-
-.dist-chart-wrap { display: flex; flex-direction: column; gap: 18px; align-items: center; width: 100%; }
-.dist-chart-canvas-wrap { position: relative; width: 100%; max-width: 320px; aspect-ratio: 1 / 1; min-height: 260px; margin: 0 auto; }
-.dist-chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
-.dist-chart-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; user-select: none; transition: color .2s; }
-.dist-chart-center-num { font-family: var(--fh); font-size: 42px; font-weight: 700; color: var(--t0); line-height: 1; letter-spacing: -.02em; transition: color .2s; }
-.dist-chart-center-lbl { font-family: var(--fm); font-size: 10px; color: var(--t2); letter-spacing: .14em; text-transform: uppercase; margin-top: 8px; transition: color .2s; }
-.dist-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 8px; width: 100%; }
-.dist-legend-item { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; background: transparent; border: 1px solid transparent; cursor: pointer; transition: all .18s ease; user-select: none; }
-.dist-legend-item:hover { background: var(--bg3); border-color: var(--b1); transform: translateY(-1px); }
-.dist-legend-item.dim { opacity: .3; }
-.dist-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.06); }
-.dist-legend-name { font-family: var(--fm); font-size: 11px; color: var(--t1); white-space: nowrap; }
-.dist-legend-count { font-family: var(--fm); font-size: 11px; color: var(--t2); white-space: nowrap; }
-
-@media (max-width: 768px) {
-  #tbl-stock thead th, #tbl-stock tbody td { padding: 8px 5px; font-size: 10px; }
-}
+.gauge-container{display:flex;flex-direction:column;align-items:center;background:var(--bg3);border-radius:var(--rl);padding:15px;transition:all .2s;width:100%}
+.gauge-container:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.gauge-canvas{width:100%;max-width:240px;height:auto;display:block;margin:0 auto}
+.gauge-value{font-family:var(--fm);font-size:18px;font-weight:700;margin-top:8px}
+.gauge-label{font-family:var(--fm);font-size:9px;color:var(--t2);margin-top:2px;text-align:center}
+.gauge-status{font-family:var(--fm);font-size:10px;font-weight:600;margin-top:8px;padding:3px 10px;border-radius:999px}
+.status-ok{background:var(--grd);color:var(--gr);border:1px solid var(--grb)}
+.status-warning{background:var(--amd);color:var(--am);border:1px solid var(--amb)}
+.status-critical{background:var(--red);color:var(--re);border:1px solid var(--reb)}
+.search-estado{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 14px;font-family:var(--fm);font-size:12px;color:var(--t0);width:260px;outline:none;transition:border-color .15s}
+.search-estado::placeholder{color:var(--t3)}
+.search-estado:focus{border-color:var(--am)}
+.estado-badge-bueno{background:var(--grd);color:var(--gr);border:1px solid var(--grb)}
+.estado-badge-cromado{background:var(--amd);color:var(--am);border:1px solid var(--amb)}
+.estado-badge-reacondicionado{background:rgba(251,146,60,.15);color:var(--or);border:1px solid rgba(251,146,60,.3)}
+.estado-badge-otro{background:var(--red);color:var(--re);border:1px solid var(--reb)}
+.pieza-item{border-bottom:1px solid var(--b0);padding:8px 0}
+.pieza-item:last-child{border-bottom:none}
+.card-stock-inventario{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border-radius:var(--rl);border:1px solid var(--b1);overflow-x:auto;transition:all .3s ease;margin-bottom:13px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.card-stock-inventario:hover{border-color:var(--amb);box-shadow:0 8px 20px rgba(0,0,0,.3);transform:translateY(-2px)}
+.card-stock-inventario .ct{background:var(--bg1);margin:0 0 13px 0;padding:12px 20px;border-bottom:1px solid var(--b1);position:relative;font-size:12px;color:var(--am);letter-spacing:.12em}
+.card-stock-inventario .ct::before{content:"📦";margin-right:8px;font-size:14px}
+.card-stock-inventario .ct::after{content:"";position:absolute;bottom:-1px;left:20px;width:40px;height:2px;background:var(--am)}
+#tbl-stock{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto;min-width:800px}
+#tbl-stock thead th{background:var(--bg1);color:var(--am);font-family:var(--fh);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:12px 10px;border-bottom:1px solid var(--b2);white-space:nowrap;text-align:left}
+#tbl-stock thead th:nth-child(2),#tbl-stock thead th:nth-child(3),#tbl-stock thead th:nth-child(4),#tbl-stock thead th:nth-child(5),#tbl-stock thead th:nth-child(6){text-align:right}
+#tbl-stock tbody td{padding:12px 10px;border-bottom:1px solid var(--b0);transition:background .2s ease;background:var(--bg2);vertical-align:middle}
+#tbl-stock tbody td.tr{font-family:var(--fm);font-weight:500;text-align:right}
+#tbl-stock tbody td:first-child,#tbl-stock tbody td:nth-child(7),#tbl-stock tbody td:nth-child(8){text-align:left}
+#tbl-stock .zero,#tbl-stock .low,#tbl-stock .ok-stock{display:inline-block;padding:2px 8px;border-radius:20px;min-width:40px;text-align:center}
+#tbl-stock .zero{background:rgba(240,82,82,.15);color:var(--re);font-weight:700}
+#tbl-stock .low{background:rgba(245,166,35,.15);color:var(--am);font-weight:700}
+#tbl-stock .ok-stock{background:rgba(61,214,140,.15);color:var(--gr);font-weight:700}
+.badge-stock-completo{background:var(--grd);color:var(--gr);border:1px solid var(--grb);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.badge-stock-parcial{background:var(--amd);color:var(--am);border:1px solid var(--amb);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.badge-stock-sin{background:var(--red);color:var(--re);border:1px solid var(--reb);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.badge-stock-completo::before{content:"✓";font-size:10px}
+.badge-stock-parcial::before{content:"⚠";font-size:10px}
+.badge-stock-sin::before{content:"✗";font-size:10px}
+.op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}
+.op-card{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rl);padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+.op-card:hover{border-color:var(--am);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.op-card img{width:56px;height:56px;object-fit:contain;display:block;margin:0 auto 5px}
+.op-card .op-nombre{font-family:var(--fh);font-size:12px;font-weight:700;color:var(--t0);line-height:1.1}
+.op-card .op-pct{font-family:var(--fm);font-size:19px;font-weight:700;margin-top:3px;line-height:1}
+.op-card .op-barra{background:var(--bg5);height:4px;border-radius:2px;overflow:hidden;margin-top:6px}
+.op-card .op-barra-fill{height:100%;border-radius:2px;transition:width .5s}
+.op-card .op-sub{font-family:var(--fm);font-size:9px;color:var(--t2);margin-top:4px}
+#modal-operatividad .modal-box{max-width:620px}
+.op-modal-resumen{display:flex;gap:22px;margin-bottom:16px;padding:14px 16px;background:var(--bg3);border-radius:var(--rl);flex-wrap:wrap;justify-content:space-around}
+.op-modal-resumen-item{text-align:center}
+.op-modal-resumen-item .op-num{font-family:var(--fh);font-size:30px;font-weight:700;line-height:1}
+.op-modal-resumen-item .op-lbl{font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.op-modal-piezas{display:flex;flex-direction:column;gap:6px;max-height:40vh;overflow-y:auto;padding-right:4px}
+.op-modal-pieza{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border-radius:var(--r);border-left:3px solid;font-size:12px}
+.op-modal-pieza .op-ico{font-weight:700;font-size:14px;width:18px;flex-shrink:0;text-align:center}
+.op-modal-pieza .op-comp{flex:1;color:var(--t0);font-weight:500}
+.op-modal-pieza .op-est{font-family:var(--fm);font-size:10px;text-align:right}
+.op-modal-pct-final{margin-top:18px;padding:16px;border-radius:var(--rl);text-align:center;background:var(--bg3);border:1px solid var(--b1)}
+.op-modal-pct-final-label{font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.op-modal-pct-final-val{font-family:var(--fh);font-size:48px;font-weight:700;line-height:1}
+.dist-chart-wrap{display:flex;flex-direction:column;gap:18px;align-items:center;width:100%}
+.dist-chart-canvas-wrap{position:relative;width:100%;max-width:320px;aspect-ratio:1/1;min-height:260px;margin:0 auto}
+.dist-chart-canvas-wrap canvas{width:100%!important;height:100%!important;display:block}
+.dist-chart-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;user-select:none}
+.dist-chart-center-num{font-family:var(--fh);font-size:42px;font-weight:700;color:var(--t0);line-height:1;letter-spacing:-.02em}
+.dist-chart-center-lbl{font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
+.dist-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 8px;width:100%}
+.dist-legend-item{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:transparent;border:1px solid transparent;cursor:pointer;transition:all .18s ease;user-select:none}
+.dist-legend-item:hover{background:var(--bg3);border-color:var(--b1);transform:translateY(-1px)}
+.dist-legend-item.dim{opacity:.3}
+.dist-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.06)}
+.dist-legend-name{font-family:var(--fm);font-size:11px;color:var(--t1);white-space:nowrap}
+.dist-legend-count{font-family:var(--fm);font-size:11px;color:var(--t2);white-space:nowrap}
+@media (max-width:768px){#tbl-stock thead th,#tbl-stock tbody td{padding:8px 5px;font-size:10px}}
 </style>
 </head>
 <body>
@@ -317,9 +223,7 @@ tbody tr:hover td{background:var(--bg3)}
 <header class="topbar">
   <div class="logo">
     <img src="logo.png" alt="Logo" class="logo-icon" onerror="this.style.display='none'">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div class="logo-main">Matriceria Planta Cevil</div>
-    </div>
+    <div style="display:flex;align-items:center;gap:10px"><div class="logo-main">Matriceria Planta Cevil</div></div>
   </div>
   <div class="topbar-r">
     <div class="swrap"><div class="dot"></div><span id="dstatus">Cargando...</span></div>
@@ -333,16 +237,11 @@ tbody tr:hover td{background:var(--bg3)}
   <span class="fbl">◆ Tipo de ladrillo</span>
   <div class="chips" id="fchips">
     <button class="chip active" onclick="setF('todos',this)">Todos</button>
-    <button class="chip" onclick="setF('H8',this)">H8</button>
-    <button class="chip" onclick="setF('H12',this)">H12</button>
-    <button class="chip" onclick="setF('H18',this)">H18</button>
-    <button class="chip" onclick="setF('P12',this)">P12</button>
-    <button class="chip" onclick="setF('P18',this)">P18</button>
-    <button class="chip" onclick="setF('L12',this)">L12</button>
-    <button class="chip" onclick="setF('L16',this)">L16</button>
-    <button class="chip" onclick="setF('DM20',this)">DM20</button>
-    <button class="chip" onclick="setF('DM27',this)">DM27</button>
-    <button class="chip" onclick="setF('KB',this)">KB</button>
+    <button class="chip" onclick="setF('H8',this)">H8</button><button class="chip" onclick="setF('H12',this)">H12</button>
+    <button class="chip" onclick="setF('H18',this)">H18</button><button class="chip" onclick="setF('P12',this)">P12</button>
+    <button class="chip" onclick="setF('P18',this)">P18</button><button class="chip" onclick="setF('L12',this)">L12</button>
+    <button class="chip" onclick="setF('L16',this)">L16</button><button class="chip" onclick="setF('DM20',this)">DM20</button>
+    <button class="chip" onclick="setF('DM27',this)">DM27</button><button class="chip" onclick="setF('KB',this)">KB</button>
   </div>
 </div>
 
@@ -357,6 +256,7 @@ tbody tr:hover td{background:var(--bg3)}
 </nav>
 
 <main class="main">
+
 <section class="tab-s active" id="tab-lam">
   <div class="sh">
     <div><div class="sh-t">Control de Camisas — Laminadoras</div><div class="sh-s">Rectificaciones de cilindros · mm retirados por evento · Datos reales</div></div>
@@ -379,10 +279,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw"><table>
-      <thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead>
-      <tbody id="tbody-lam"></tbody>
-    </table></div>
+    <div class="tw"><table><thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead><tbody id="tbody-lam"></tbody></table></div>
   </div>
 </section>
 
@@ -390,17 +287,13 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="sh"><div><div class="sh-t">Seguimiento de Moldes y Cromado</div><div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div></div></div>
   <div class="krow" id="kpi-moldes"></div>
   <div class="g2">
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div><div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center"><canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas></div></div>
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div><div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center"><canvas id="chart-estado-moldes" style="max-width:280px; max-height:280px"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div><div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center"><canvas id="chart-cromado-estado" style="max-width:280px;max-height:280px"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div><div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center"><canvas id="chart-estado-moldes" style="max-width:280px;max-height:280px"></canvas></div></div>
   </div>
   <div class="g7030">
     <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
-      <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div>
-      </div>
-      <div id="pesos-bars-container" style="width:100%; overflow-x:auto; padding-bottom:5px;"></div>
+      <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div><div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div></div>
+      <div id="pesos-bars-container" style="width:100%;overflow-x:auto;padding-bottom:5px"></div>
     </div>
     <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div><div id="alerts-moldes"></div></div>
   </div>
@@ -445,16 +338,13 @@ tbody tr:hover td{background:var(--bg3)}
 <section class="tab-s" id="tab-estadoPiezas">
   <div class="sh">
     <div><div class="sh-t">Estado de Piezas por Molde</div><div class="sh-s">Componentes, estado actual, acciones requeridas y fechas de revisión</div></div>
-    <div style="display:flex; gap:10px;"><input type="text" id="search-estado" class="search-estado" placeholder="Buscar molde (ej: H8 #1)" oninput="filterEstadoPiezas()"></div>
+    <div style="display:flex;gap:10px"><input type="text" id="search-estado" class="search-estado" placeholder="Buscar molde (ej: H8 #1)" oninput="filterEstadoPiezas()"></div>
   </div>
   <div class="krow" id="kpi-estado"></div>
   <div class="g2">
     <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución de Estados</div>
       <div class="dist-chart-wrap">
-        <div class="dist-chart-canvas-wrap">
-          <canvas id="chart-estado-piezas"></canvas>
-          <div class="dist-chart-center"><div class="dist-chart-center-num" id="dist-center-num">0</div><div class="dist-chart-center-lbl" id="dist-center-lbl">piezas</div></div>
-        </div>
+        <div class="dist-chart-canvas-wrap"><canvas id="chart-estado-piezas"></canvas><div class="dist-chart-center"><div class="dist-chart-center-num" id="dist-center-num">0</div><div class="dist-chart-center-lbl" id="dist-center-lbl">piezas</div></div></div>
         <div class="dist-legend" id="dist-legend"></div>
       </div>
     </div>
@@ -462,6 +352,7 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Piezas agrupadas por Molde</div><div id="estado-cards-container" class="mg"></div></div>
 </section>
+
 </main>
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
@@ -473,34 +364,35 @@ tbody tr:hover td{background:var(--bg3)}
 <script>
 'use strict';
 
+// ══════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN KLB12
+// - actualBaseLento/Rapido = la medida que medisteis manualmente
+// - intervencionesBaseLento/Rapido = cuántas filas había en el Sheet
+//   cuando medisteis. A partir de ahí, cada fila NUEVA resta al Actual.
+// ══════════════════════════════════════════════════════════════════════════
 const KLB12_CONFIG = {
   originalFabrica: 175,
   inicioControlLento: 153,
   inicioControlRapido: 106.9,
-  finVida: 20
+  finVida: 20,
+  actualBaseLento: 120,
+  actualBaseRapido: 89,
+  intervencionesBaseLento: 18,
+  intervencionesBaseRapido: 20
 };
 
 const SHEET_ID_LAM = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0';
 const SHEET_ID_SEG = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0';
 function sheetCSV(sheetId, gid){ return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}&gid=${gid}`; }
 const URLS_SHEETS = {
-  CAMISA_KLB12: sheetCSV(SHEET_ID_LAM, '2022492499'),
-  CAMISA_LM1210: sheetCSV(SHEET_ID_LAM, '1294970835'),
-  MOLDES: sheetCSV(SHEET_ID_SEG, '0'),
-  CROMADO: sheetCSV(SHEET_ID_SEG, '2142850839'),
-  STOCK: sheetCSV(SHEET_ID_SEG, '573894203'),
-  VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
-  MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'),
-  ESTAÑO: sheetCSV(SHEET_ID_LAM, '0'),
+  CAMISA_KLB12: sheetCSV(SHEET_ID_LAM, '2022492499'), CAMISA_LM1210: sheetCSV(SHEET_ID_LAM, '1294970835'),
+  MOLDES: sheetCSV(SHEET_ID_SEG, '0'), CROMADO: sheetCSV(SHEET_ID_SEG, '2142850839'),
+  STOCK: sheetCSV(SHEET_ID_SEG, '573894203'), VIDA_UTIL: sheetCSV(SHEET_ID_SEG, '36305866'),
+  MANTENIMIENTO: sheetCSV(SHEET_ID_SEG, '358194513'), ESTAÑO: sheetCSV(SHEET_ID_LAM, '0'),
   ESTADO_PIEZAS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuWo7tg-cxCot76IDBydPW9kqrte9VUiyVmB2sxJlji9Hqklr0zrJDas-wWDMHfu9hLw4WDmacBTfB/pub?output=csv'
 };
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
-const URLS_GITHUB = {
-  CAMISA_KLB12: GITHUB_BASE + 'klb12.csv', CAMISA_LM1210: GITHUB_BASE + 'lm1210.csv',
-  MOLDES: GITHUB_BASE + 'moldes.csv', CROMADO: GITHUB_BASE + 'cromados.csv',
-  STOCK: GITHUB_BASE + 'stock.csv', VIDA_UTIL: GITHUB_BASE + 'vida_util.csv',
-  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv', ESTAÑO: GITHUB_BASE + 'estano.csv'
-};
+const URLS_GITHUB = { CAMISA_KLB12: GITHUB_BASE + 'klb12.csv', CAMISA_LM1210: GITHUB_BASE + 'lm1210.csv', MOLDES: GITHUB_BASE + 'moldes.csv', CROMADO: GITHUB_BASE + 'cromados.csv', STOCK: GITHUB_BASE + 'stock.csv', VIDA_UTIL: GITHUB_BASE + 'vida_util.csv', MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv', ESTAÑO: GITHUB_BASE + 'estano.csv' };
 const IMAGENES_ESPECIALES = { 'H12 BR 9T': 'img/ladrillos/H12-9T.png' };
 function getImagenLadrillo(molde){ return IMAGENES_ESPECIALES[molde] || `img/ladrillos/${molde}.png`; }
 
@@ -509,27 +401,16 @@ const FB = {
   LM1210: { maq:'LM1210', ini:{lento:153,rapido:143}, act:{lento:137.7,rapido:128.8}, rows:[] },
   MOLDES: [], CROMADO: [],
   STOCK: [
-    { molde:'H8', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
-    { molde:'H12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'10/03/2026' },
-    { molde:'H12 Brasil', boquillas:1, aranas:1, dados:1, placaBase:1, frenos:1, rev:'21/11/2025' },
-    { molde:'H18', boquillas:1, aranas:0, dados:1, placaBase:0, frenos:0, rev:'18/12/2025' },
-    { molde:'H18 Brasil', boquillas:1, aranas:1, dados:1, placaBase:1, frenos:1, rev:'09/04/2026' },
-    { molde:'P12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'21/11/2025' },
-    { molde:'P18', boquillas:0, aranas:1, dados:0, placaBase:0, frenos:0, rev:'18/12/2025' },
-    { molde:'L12', boquillas:1, aranas:1, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
-    { molde:'L16', boquillas:1, aranas:1, dados:1, placaBase:0, frenos:0, rev:'21/11/2025' },
-    { molde:'DM20', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
-    { molde:'DM27', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
-    { molde:'KB', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }
+    { molde:'H8', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }, { molde:'H12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'10/03/2026' },
+    { molde:'H12 Brasil', boquillas:1, aranas:1, dados:1, placaBase:1, frenos:1, rev:'21/11/2025' }, { molde:'H18', boquillas:1, aranas:0, dados:1, placaBase:0, frenos:0, rev:'18/12/2025' },
+    { molde:'H18 Brasil', boquillas:1, aranas:1, dados:1, placaBase:1, frenos:1, rev:'09/04/2026' }, { molde:'P12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'P18', boquillas:0, aranas:1, dados:0, placaBase:0, frenos:0, rev:'18/12/2025' }, { molde:'L12', boquillas:1, aranas:1, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'L16', boquillas:1, aranas:1, dados:1, placaBase:0, frenos:0, rev:'21/11/2025' }, { molde:'DM20', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
+    { molde:'DM27', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }, { molde:'KB', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }
   ],
   VIDA_UTIL: [], MANTENIMIENTO: [], ESTADO_PIEZAS: []
 };
-
-let STATE = {
-  filter: 'todos', activeTab: 'lam', activeLam: 'KLB12',
-  data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null, ESTAÑO: null, ESTADO_PIEZAS: null },
-  usingLive: false
-};
+let STATE = { filter: 'todos', activeTab: 'lam', activeLam: 'KLB12', data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null, ESTAÑO: null, ESTADO_PIEZAS: null }, usingLive: false };
 const CReg = {};
 function tick(){ const n=new Date(), p=v=>String(v).padStart(2,'0'); document.getElementById('clock').textContent=`${p(n.getDate())}/${p(n.getMonth()+1)}/${n.getFullYear()} ${p(n.getHours())}:${p(n.getMinutes())}`; }
 tick(); setInterval(tick,60000);
@@ -541,38 +422,13 @@ function fechaToNum(f){ if(!f) return -1; const m = String(f).trim().match(/^(\d
 function normID(s){ return (s||'').trim().toUpperCase().replace(/[\s\-_]+/g,''); }
 
 async function fetchCSV(urlSheets, urlGithub){
-  try{ const res = await fetch(urlSheets + '&cachebust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
-    if(res.ok){ const txt = await res.text(); if(txt && !txt.trim().startsWith('<!') && txt.length > 50){ return { rows: parseCSVText(txt), source: 'sheets' }; } }
-  }catch(e){}
-  if(urlGithub){ try{ const res = await fetch(urlGithub + '?t=' + Date.now(), { cache: 'no-store' });
-    if(res.ok){ const txt = await res.text(); if(txt && !txt.trim().startsWith('<!') && txt.length > 20){ return { rows: parseCSVText(txt), source: 'github' }; } }
-  }catch(e){} }
+  try{ const res = await fetch(urlSheets + '&cachebust=' + Date.now(), { cache: 'no-store', mode: 'cors' }); if(res.ok){ const txt = await res.text(); if(txt && !txt.trim().startsWith('<!') && txt.length > 50){ return { rows: parseCSVText(txt), source: 'sheets' }; } } }catch(e){}
+  if(urlGithub){ try{ const res = await fetch(urlGithub + '?t=' + Date.now(), { cache: 'no-store' }); if(res.ok){ const txt = await res.text(); if(txt && !txt.trim().startsWith('<!') && txt.length > 20){ return { rows: parseCSVText(txt), source: 'github' }; } } }catch(e){} }
   return null;
 }
-function parseCSVText(txt){
-  const rows = []; let cur = [], field = '', inQ = false;
-  const chars = (txt || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  for(let i=0; i<chars.length; i++){ const c=chars[i];
-    if(inQ){ if(c==='"' && chars[i+1]==='"'){ field+='"'; i++; } else if(c==='"'){ inQ=false; } else { field+=c; } }
-    else { if(c==='"'){ inQ=true; } else if(c===','){ cur.push(field.trim()); field=''; } else if(c==='\n'){ cur.push(field.trim()); rows.push(cur); cur=[]; field=''; } else { field+=c; } }
-  }
-  if(field||cur.length) { cur.push(field.trim()); rows.push(cur); }
-  return rows;
-}
-function parseCamisa_KLB12(rows){
-  if(!rows||rows.length<8) return null;
-  const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
-  const actL=sn(rows[2][1]), actR=sn(rows[2][2]);
-  const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({ f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[4]||'').trim(), prox:null }));
-  return {maq:'KLB12', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data};
-}
-function parseCamisa_LM1210(rows){
-  if(!rows||rows.length<8) return null;
-  const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
-  const actL=sn(rows[2][1]), actR=sn(rows[2][2]);
-  const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({ f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[5]||'').trim(), prox:(r[6]||'').trim()||null }));
-  return {maq:'LM1210', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data};
-}
+function parseCSVText(txt){ const rows = []; let cur = [], field = '', inQ = false; const chars = (txt || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n'); for(let i=0; i<chars.length; i++){ const c=chars[i]; if(inQ){ if(c==='"' && chars[i+1]==='"'){ field+='"'; i++; } else if(c==='"'){ inQ=false; } else { field+=c; } } else { if(c==='"'){ inQ=true; } else if(c===','){ cur.push(field.trim()); field=''; } else if(c==='\n'){ cur.push(field.trim()); rows.push(cur); cur=[]; field=''; } else { field+=c; } } } if(field||cur.length) { cur.push(field.trim()); rows.push(cur); } return rows; }
+function parseCamisa_KLB12(rows){ if(!rows||rows.length<8) return null; const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]); const actL=sn(rows[2][1]), actR=sn(rows[2][2]); const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({ f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[4]||'').trim(), prox:null })); return {maq:'KLB12', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data}; }
+function parseCamisa_LM1210(rows){ if(!rows||rows.length<8) return null; const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]); const actL=sn(rows[2][1]), actR=sn(rows[2][2]); const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({ f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[5]||'').trim(), prox:(r[6]||'').trim()||null })); return {maq:'LM1210', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data}; }
 function parseMoldes(rows){
   if(!rows || rows.length < 4) return [];
   let headerIndex = -1;
@@ -583,33 +439,24 @@ function parseMoldes(rows){
     const row = rows[i]; if(!row || row.length < 5) continue;
     const moldeId = (row[0] || '').trim(); if(!moldeId || moldeId === '' || moldeId === 'Molde') continue;
     const nominal = parseFloat(String(row[4] || '0').replace(',', '.'));
-    const vias = [];
-    for(let v = 5; v <= 12; v++){ const val = row[v] ? parseFloat(String(row[v]).replace(',', '.')) : null; if(val !== null && !isNaN(val) && val > 0) vias.push(val); }
-    let promedio = null;
-    const promRaw = (row[13] || '').trim();
-    if(promRaw && promRaw !== '' && promRaw !== '-' && promRaw !== 'S/D'){ promedio = parseFloat(String(promRaw).replace(',', '.')); if(isNaN(promedio)) promedio = null; }
+    const vias = []; for(let v = 5; v <= 12; v++){ const val = row[v] ? parseFloat(String(row[v]).replace(',', '.')) : null; if(val !== null && !isNaN(val) && val > 0) vias.push(val); }
+    let promedio = null; const promRaw = (row[13] || '').trim(); if(promRaw && promRaw !== '' && promRaw !== '-' && promRaw !== 'S/D'){ promedio = parseFloat(String(promRaw).replace(',', '.')); if(isNaN(promedio)) promedio = null; }
     if(!promedio && vias.length > 0) promedio = vias.reduce((a,b) => a + b, 0) / vias.length;
-    resultados.push({ id: normID(moldeId), num: (row[1] || '1').trim(), estado: (row[2] || '').trim(), enPeso: (row[3] || '').trim(), nominal: isNaN(nominal) ? 0 : nominal, prom: promedio, vias: vias, cromado: (row[15] || 'No').trim(), obs: (row[16] || '').trim(), fecha: (row[17] || '').trim() });
+    resultados.push({ id: normID(moldeId), num: (row[1] || '1').trim(), estado: (row[2] || '').trim(), enPeso: (row[3] || '').trim(), nominal: isNaN(nominal) ? 0 : nominal, prom: promedio, vias, cromado: (row[15] || 'No').trim(), obs: (row[16] || '').trim(), fecha: (row[17] || '').trim() });
   }
   return resultados;
 }
-function parseCromado(rows){
-  if(!rows) return null;
-  const hi = rows.findIndex(r=>(r[0]||'').trim()==='Molde' && (r[1]||'').includes('envío'));
-  if(hi<0) return null;
-  return rows.slice(hi+1).filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde').map(r=>({ molde: (r[0]||'').trim(), envio: (r[1]||'').trim(), recep: (r[2]||'').trim()||null, prov: (r[3]||'').trim(), tIda: (r[4]||'').trim(), det: (r[6]||'').trim(), obs: (r[7]||'').trim() }));
-}
+function parseCromado(rows){ if(!rows) return null; const hi = rows.findIndex(r=>(r[0]||'').trim()==='Molde' && (r[1]||'').includes('envío')); if(hi<0) return null; return rows.slice(hi+1).filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde').map(r=>({ molde: (r[0]||'').trim(), envio: (r[1]||'').trim(), recep: (r[2]||'').trim()||null, prov: (r[3]||'').trim(), tIda: (r[4]||'').trim(), det: (r[6]||'').trim(), obs: (r[7]||'').trim() })); }
 function parseStock(rows){
   if(!rows || rows.length === 0) return [];
   let headerIndex = -1;
   for(let i=0; i<Math.min(rows.length, 30); i++){ const row = rows[i]; if(!row) continue; if(row.some(cell => cell && cell.trim().toLowerCase() === 'molde')){ headerIndex = i; break; } }
   const resultados = [];
   if(headerIndex === -1){
-    for(let i=1; i<rows.length; i++){
-      const row = rows[i]; if(!row || row.length < 3) continue;
+    for(let i=1; i<rows.length; i++){ const row = rows[i]; if(!row || row.length < 3) continue;
       let molde = (row[1] || '').trim(); if(!molde || molde === '' || molde === 'Molde') continue;
       molde = molde.replace(/^["']|["']$/g, '').trim();
-      if(molde.length > 0 && molde !== 'Ladrilo') resultados.push({ molde: molde, boquillas: sn(row[3]), aranas: sn(row[4]), dados: sn(row[5]), placaBase: sn(row[6]), frenos: sn(row[7]), rev: (row[8] || '').trim() });
+      if(molde.length > 0 && molde !== 'Ladrilo') resultados.push({ molde, boquillas: sn(row[3]), aranas: sn(row[4]), dados: sn(row[5]), placaBase: sn(row[6]), frenos: sn(row[7]), rev: (row[8] || '').trim() });
     }
     return resultados;
   }
@@ -623,66 +470,22 @@ function parseStock(rows){
   const idxRev = headers.findIndex(h => h.includes('fecha') || h.includes('revisión') || h === 'rev');
   for(let i=headerIndex+1; i<rows.length; i++){
     const row = rows[i]; if(!row || row.length < 2) continue;
-    let molde = (idxMolde !== -1 && row[idxMolde]) ? row[idxMolde].trim() : '';
-    if(!molde) continue;
+    let molde = (idxMolde !== -1 && row[idxMolde]) ? row[idxMolde].trim() : ''; if(!molde) continue;
     molde = molde.replace(/^["']|["']$/g, '').trim();
     if(molde === '' || molde === 'Ladrilo') continue;
     resultados.push({ molde, boquillas: (idxBoquillas !== -1) ? sn(row[idxBoquillas]) : 0, aranas: (idxAranas !== -1) ? sn(row[idxAranas]) : 0, dados: (idxDados !== -1) ? sn(row[idxDados]) : 0, placaBase: (idxPlaca !== -1) ? sn(row[idxPlaca]) : 0, frenos: (idxFrenos !== -1) ? sn(row[idxFrenos]) : 0, rev: (idxRev !== -1 && row[idxRev]) ? row[idxRev].trim() : '' });
   }
   return resultados;
 }
-function parseVidaUtil(rows){
-  if(!rows) return null;
-  const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde');
-  if(hi < 0) return null;
-  return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde').map(r => ({ molde: (r[0]||'').trim(), numero: (r[1]||'').toString().trim(), clave: (r[2]||'').trim(), inicio: (r[3]||'').trim(), fin: (r[4]||'').trim() || null, tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0, horas: (r[6]||'').trim(), pallets: (r[7]||'').trim() || null }));
-}
-function parseMantenimiento(rows){
-  if(!rows || rows.length < 2) return [];
-  const datos = [];
-  for(let i = 0; i < rows.length; i++){
-    const row = rows[i]; if(!row || row.length < 3) continue;
-    const primeraCol = (row[0] || '').trim();
-    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(primeraCol)) datos.push({ fecha: primeraCol, responsable: (row[1] || '').trim(), moldeEquipo: (row[2] || '').trim(), tipoTarea: (row[3] || '').trim(), descripcion: (row[4] || '').trim() });
-  }
-  return datos;
-}
-function parseEstano(rows){
-  if(!rows || rows.length < 3) return null;
-  let guia = ''; if(rows[0] && rows[0][5]) guia = rows[0][5].trim();
-  if(!guia) guia = 'Diferencia crítica: 6 mm entre centro y esquinas. 6 vueltas = 1 mm.';
-  let ultimoRegistro = null;
-  for(let i = rows.length-1; i >= 1; i--){
-    const row = rows[i]; if(!row || row.length < 6) continue;
-    const fecha = row[0] ? row[0].trim() : '';
-    const centro = parseFloat(String(row[1]).replace(',', '.'));
-    const esquina = parseFloat(String(row[2]).replace(',', '.'));
-    const diferencia = parseFloat(String(row[3]).replace(',', '.'));
-    const vueltas = row[4] ? parseFloat(String(row[4]).replace(',', '.')) : null;
-    const observaciones = row[5] ? row[5].trim() : '';
-    if(fecha && !isNaN(centro) && !isNaN(esquina)){ ultimoRegistro = { fecha, centro, esquina, diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia, vueltas, observaciones }; break; }
-  }
-  if(!ultimoRegistro) return null;
-  return { guia, ultimo: ultimoRegistro };
-}
+function parseVidaUtil(rows){ if(!rows) return null; const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde'); if(hi < 0) return null; return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde').map(r => ({ molde: (r[0]||'').trim(), numero: (r[1]||'').toString().trim(), clave: (r[2]||'').trim(), inicio: (r[3]||'').trim(), fin: (r[4]||'').trim() || null, tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0, horas: (r[6]||'').trim(), pallets: (r[7]||'').trim() || null })); }
+function parseMantenimiento(rows){ if(!rows || rows.length < 2) return []; const datos = []; for(let i = 0; i < rows.length; i++){ const row = rows[i]; if(!row || row.length < 3) continue; const primeraCol = (row[0] || '').trim(); if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(primeraCol)) datos.push({ fecha: primeraCol, responsable: (row[1] || '').trim(), moldeEquipo: (row[2] || '').trim(), tipoTarea: (row[3] || '').trim(), descripcion: (row[4] || '').trim() }); } return datos; }
+function parseEstano(rows){ if(!rows || rows.length < 3) return null; let guia = ''; if(rows[0] && rows[0][5]) guia = rows[0][5].trim(); if(!guia) guia = 'Diferencia crítica: 6 mm entre centro y esquinas. 6 vueltas = 1 mm.'; let ultimoRegistro = null; for(let i = rows.length-1; i >= 1; i--){ const row = rows[i]; if(!row || row.length < 6) continue; const fecha = row[0] ? row[0].trim() : ''; const centro = parseFloat(String(row[1]).replace(',', '.')); const esquina = parseFloat(String(row[2]).replace(',', '.')); const diferencia = parseFloat(String(row[3]).replace(',', '.')); const vueltas = row[4] ? parseFloat(String(row[4]).replace(',', '.')) : null; const observaciones = row[5] ? row[5].trim() : ''; if(fecha && !isNaN(centro) && !isNaN(esquina)){ ultimoRegistro = { fecha, centro, esquina, diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia, vueltas, observaciones }; break; } } if(!ultimoRegistro) return null; return { guia, ultimo: ultimoRegistro }; }
 function parseEstadoPiezas(rows){
   if(!rows || rows.length < 2) return [];
   let headerIndex = -1; let idxMolde = -1, idxNumero = -1, idxComponente = -1, idxEstado = -1, idxAccion = -1, idxObservacion = -1, idxFecha = -1;
   for(let i=0; i<Math.min(rows.length, 30); i++){ const row = rows[i]; for(let j=0; j<row.length; j++){ const cell = (row[j] || '').trim().toLowerCase(); if(cell === 'molde'){ headerIndex = i; idxMolde = j; break; } } if(headerIndex !== -1) break; }
   const resultados = [];
-  if(headerIndex === -1){
-    for(let i=0; i<rows.length; i++){ const row = rows[i]; if(!row || row.length < 2) continue;
-      const molde = (row[0] || '').trim(); if(!molde) continue;
-      const numero = (row[1] || '').trim();
-      const componente = (row[3] || '').trim() || 'Pieza';
-      let estado = (row[4] || '').trim();
-      const accion = (row[5] || '').trim(); const observacion = (row[6] || '').trim(); const fecha = (row[7] || '').trim();
-      if(estado.includes('✔')) estado = estado.replace('✔','').trim();
-      if(estado === '') estado = 'Sin especificar';
-      resultados.push({ molde, numero, componente, estado, accion, observacion, fecha });
-    }
-    return resultados;
-  }
+  if(headerIndex === -1){ for(let i=0; i<rows.length; i++){ const row = rows[i]; if(!row || row.length < 2) continue; const molde = (row[0] || '').trim(); if(!molde) continue; const numero = (row[1] || '').trim(); const componente = (row[3] || '').trim() || 'Pieza'; let estado = (row[4] || '').trim(); const accion = (row[5] || '').trim(); const observacion = (row[6] || '').trim(); const fecha = (row[7] || '').trim(); if(estado.includes('✔')) estado = estado.replace('✔','').trim(); if(estado === '') estado = 'Sin especificar'; resultados.push({ molde, numero, componente, estado, accion, observacion, fecha }); } return resultados; }
   const headers = rows[headerIndex];
   const colNames = { numero: ['n°','nº','numero'], componente: ['componente','pieza'], estado: ['estado'], accion: ['acción requerida','accion requerida','acción','accion'], observacion: ['observación','observacion','obs'], fecha: ['operatividad','fecha revisión','fecha'] };
   for(let j=0; j<headers.length; j++){ const h = (headers[j] || '').trim().toLowerCase(); if(h === 'molde') idxMolde = j; else if(colNames.numero.includes(h)) idxNumero = j; else if(colNames.componente.includes(h)) idxComponente = j; else if(colNames.estado.includes(h)) idxEstado = j; else if(colNames.accion.includes(h)) idxAccion = j; else if(colNames.observacion.includes(h)) idxObservacion = j; else if(colNames.fecha.includes(h)) idxFecha = j; }
@@ -704,21 +507,16 @@ function parseEstadoPiezas(rows){
 }
 
 async function cargarDatos(){
-  const btn = document.getElementById('btn-refresh');
-  const ri = document.getElementById('ri');
+  const btn = document.getElementById('btn-refresh'); const ri = document.getElementById('ri');
   btn.classList.add('loading'); ri.classList.add('spinning');
   document.getElementById('dstatus').textContent='Actualizando...';
   let fromSheets=0, fromGithub=0;
   try{
-    const [r1,r2,r3,r4,r5,r6,r7,r8, r9] = await Promise.all([
-      fetchCSV(URLS_SHEETS.CAMISA_KLB12, URLS_GITHUB.CAMISA_KLB12),
-      fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
-      fetchCSV(URLS_SHEETS.MOLDES, URLS_GITHUB.MOLDES),
-      fetchCSV(URLS_SHEETS.CROMADO, URLS_GITHUB.CROMADO),
-      fetchCSV(URLS_SHEETS.STOCK, URLS_GITHUB.STOCK),
-      fetchCSV(URLS_SHEETS.VIDA_UTIL, URLS_GITHUB.VIDA_UTIL),
-      fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO),
-      fetchCSV(URLS_SHEETS.ESTAÑO, URLS_GITHUB.ESTAÑO),
+    const [r1,r2,r3,r4,r5,r6,r7,r8,r9] = await Promise.all([
+      fetchCSV(URLS_SHEETS.CAMISA_KLB12, URLS_GITHUB.CAMISA_KLB12), fetchCSV(URLS_SHEETS.CAMISA_LM1210, URLS_GITHUB.CAMISA_LM1210),
+      fetchCSV(URLS_SHEETS.MOLDES, URLS_GITHUB.MOLDES), fetchCSV(URLS_SHEETS.CROMADO, URLS_GITHUB.CROMADO),
+      fetchCSV(URLS_SHEETS.STOCK, URLS_GITHUB.STOCK), fetchCSV(URLS_SHEETS.VIDA_UTIL, URLS_GITHUB.VIDA_UTIL),
+      fetchCSV(URLS_SHEETS.MANTENIMIENTO, URLS_GITHUB.MANTENIMIENTO), fetchCSV(URLS_SHEETS.ESTAÑO, URLS_GITHUB.ESTAÑO),
       fetchCSV(URLS_SHEETS.ESTADO_PIEZAS, null)
     ]);
     [r1,r2,r3,r4,r5,r6,r7,r8,r9].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
@@ -743,9 +541,7 @@ async function cargarDatos(){
   }catch(e){ console.error(e); }
   const dot = document.querySelector('.dot');
   let label, color;
-  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/9)`; }
-  else if(fromGithub > 0){ label = `GitHub (${fromGithub}/9)`; }
-  else { label = 'Datos locales'; color = 'var(--re)'; }
+  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/9)`; } else if(fromGithub > 0){ label = `GitHub (${fromGithub}/9)`; } else { label = 'Datos locales'; color = 'var(--re)'; }
   dot.style.background = color || 'var(--am)';
   document.getElementById('dstatus').textContent = label;
   const now = new Date();
@@ -763,34 +559,15 @@ function renderAll(){
   else if(STATE.activeTab === 'planos') buildPlanos();
   else if(STATE.activeTab === 'estadoPiezas') buildEstadoPiezas();
 }
-function switchTab(id, btn){
-  document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  document.querySelectorAll('.tab-s').forEach(s => s.classList.remove('active'));
-  const tabToShow = document.getElementById('tab-' + id);
-  if(tabToShow) tabToShow.classList.add('active');
-  STATE.activeTab = id;
-  renderAll();
-}
-function switchLam(m, btn){
-  document.querySelectorAll('.ltb').forEach(b => b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  STATE.activeLam = m;
-  if(STATE.activeTab === 'lam') buildLam();
-}
-function setF(f, btn){
-  STATE.filter = f;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  renderAll();
-}
+function switchTab(id, btn){ document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active')); if(btn) btn.classList.add('active'); document.querySelectorAll('.tab-s').forEach(s => s.classList.remove('active')); const tabToShow = document.getElementById('tab-' + id); if(tabToShow) tabToShow.classList.add('active'); STATE.activeTab = id; renderAll(); }
+function switchLam(m, btn){ document.querySelectorAll('.ltb').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); STATE.activeLam = m; if(STATE.activeTab === 'lam') buildLam(); }
+function setF(f, btn){ STATE.filter = f; document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); if(btn) btn.classList.add('active'); renderAll(); }
 function pesoColor(prom, nominal){ if(prom === null || prom === undefined) return '#555a68'; const dif = (prom - nominal) * 1000; if(dif < 0) return '#3dd68c'; if(dif <= 300) return '#f5a623'; return '#f05252'; }
 
 // ══════════════════════════════════════════════════════════════════════════
 // BUILD LAMINADORAS
-// KLB12: layout con Original fábrica (texto) · Inicio control (barra baja)
-//        · Actual (barra sube) · Fin de vida (texto)
-// LM1210: layout original sin cambios
+// KLB12: "Actual" dinámico = base − mm rectificados en filas nuevas del Sheet
+// LM1210: sin cambios
 // ══════════════════════════════════════════════════════════════════════════
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
@@ -804,117 +581,68 @@ function buildLam(){
   let desgL, desgR, pctL, pctR, cL, cR, barL, barR;
 
   if(STATE.activeLam === 'KLB12'){
-    // ══════════════════════════════════════════════════════════════════
-    // LÓGICA ESPECIAL KLB12
-    // ══════════════════════════════════════════════════════════════════
-    const ini = KLB12_CONFIG.inicioControlLento;      // 153
-    const iniR = KLB12_CONFIG.inicioControlRapido;    // 106.9
-    const orig = KLB12_CONFIG.originalFabrica;        // 175
-    const fin = KLB12_CONFIG.finVida;                 // 20
+    const ini = KLB12_CONFIG.inicioControlLento;
+    const iniR = KLB12_CONFIG.inicioControlRapido;
+    const orig = KLB12_CONFIG.originalFabrica;
+    const fin = KLB12_CONFIG.finVida;
 
-    const actualLento = D.act.lento;
-    const actualRapido = D.act.rapido;
+    // ⬇️ CÁLCULO DINÁMICO DEL "ACTUAL"
+    // Base = 120 (lento) / 89 (rápido) medida manualmente
+    // A la base se le resta SOLO lo que se agregue al Sheet DESPUÉS de la base
+    // (después de las 18 filas / 20 filas que había al momento de medir)
+    const nuevaRectLento = rows.length > KLB12_CONFIG.intervencionesBaseLento
+      ? rows.slice(KLB12_CONFIG.intervencionesBaseLento).reduce((s,r)=>s + (r.l || 0), 0)
+      : 0;
+    const nuevaRectRapido = rows.length > KLB12_CONFIG.intervencionesBaseRapido
+      ? rows.slice(KLB12_CONFIG.intervencionesBaseRapido).reduce((s,r)=>s + (r.r || 0), 0)
+      : 0;
+    const actualLento = Math.max(fin, +(KLB12_CONFIG.actualBaseLento - nuevaRectLento).toFixed(2));
+    const actualRapido = Math.max(fin, +(KLB12_CONFIG.actualBaseRapido - nuevaRectRapido).toFixed(2));
 
-    // Rango útil desde inicio control hasta fin de vida
-    const rangoUtilLento = ini - fin;   // 133
-    const rangoUtilRapido = iniR - fin; // 86.9
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('📊 KLB12 — Actual dinámico');
+    console.log(`LENTO:  Base ${KLB12_CONFIG.actualBaseLento} mm − nuevas rect ${nuevaRectLento.toFixed(2)} mm = ${actualLento} mm`);
+    console.log(`RÁPIDO: Base ${KLB12_CONFIG.actualBaseRapido} mm − nuevas rect ${nuevaRectRapido.toFixed(2)} mm = ${actualRapido} mm`);
+    console.log(`Filas en Sheet: ${rows.length} | Base lento: ${KLB12_CONFIG.intervencionesBaseLento} | Base rápido: ${KLB12_CONFIG.intervencionesBaseRapido}`);
+    console.log('═══════════════════════════════════════════════════════════');
 
-    // Porcentaje de VIDA RESTANTE (para barra de Inicio control — BAJA)
+    const rangoUtilLento = ini - fin;
+    const rangoUtilRapido = iniR - fin;
     const pctVidaRestanteLento = Math.max(0, Math.min(100, ((actualLento - fin) / rangoUtilLento) * 100));
     const pctVidaRestanteRapido = Math.max(0, Math.min(100, ((actualRapido - fin) / rangoUtilRapido) * 100));
-
-    // Porcentaje de DESGASTE (para barra de Actual — SUBE)
     const pctDesgasteLento = 100 - pctVidaRestanteLento;
     const pctDesgasteRapido = 100 - pctVidaRestanteRapido;
-
-    // Colores: barra de Vida (verde si mucha vida, rojo si poca)
     const colorVidaLento = pctVidaRestanteLento > 55 ? 'var(--gr)' : pctVidaRestanteLento > 30 ? 'var(--am)' : 'var(--re)';
     const colorVidaRapido = pctVidaRestanteRapido > 55 ? 'var(--gr)' : pctVidaRestanteRapido > 30 ? 'var(--am)' : 'var(--re)';
-
-    // Colores: barra de Desgaste (verde si poco desgaste, rojo si mucho)
     const colorDesgasteLento = pctDesgasteLento > 70 ? 'var(--re)' : pctDesgasteLento > 45 ? 'var(--am)' : 'var(--gr)';
     const colorDesgasteRapido = pctDesgasteRapido > 70 ? 'var(--re)' : pctDesgasteRapido > 45 ? 'var(--am)' : 'var(--gr)';
 
-    // Para las alertas y KPIs usamos el desgaste
-    pctL = pctDesgasteLento;
-    pctR = pctDesgasteRapido;
-    desgL = ini - actualLento;
-    desgR = iniR - actualRapido;
-    cL = colorDesgasteLento;
-    cR = colorDesgasteRapido;
+    pctL = pctDesgasteLento; pctR = pctDesgasteRapido;
+    desgL = ini - actualLento; desgR = iniR - actualRapido;
+    cL = colorDesgasteLento; cR = colorDesgasteRapido;
 
-    // CÁLCULO INTERNO de desgaste por uso (no se muestra, solo log)
-    const nEventos = rows.length;
-    const desgasteUsoPorEventoLento = nEventos > 0 ? desgL / nEventos : 0;
-    const desgasteUsoPorEventoRapido = nEventos > 0 ? desgR / nEventos : 0;
-    console.log('═══════════════════════════════════════════════════════════');
-    console.log('📊 KLB12 — Desgaste por uso natural');
-    console.log(`Intervenciones: ${nEventos}`);
-    console.log(`LENTO  — ${ini} → ${actualLento} mm · ${desgL.toFixed(1)} mm consumidos · ${desgasteUsoPorEventoLento.toFixed(3)} mm/evento`);
-    console.log(`RÁPIDO — ${iniR} → ${actualRapido} mm · ${desgR.toFixed(1)} mm consumidos · ${desgasteUsoPorEventoRapido.toFixed(3)} mm/evento`);
-    console.log('═══════════════════════════════════════════════════════════');
-
-    // KPIs
     document.getElementById('kpi-lam').innerHTML = `
       <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
       <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
-      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>
-    `;
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
 
-    // Card de desgaste — 4 filas por cilindro
     document.getElementById('dsgaste-bars').innerHTML = `
       <div>
         <div style="font-size:10px;margin-bottom:10px;font-family:var(--fm);letter-spacing:.08em;color:var(--t2)">CILINDRO LENTO</div>
-        <div class="dbar sin-barra">
-          <span class="db-lbl">Original fábrica</span>
-          <div class="db-trk" style="background:transparent"></div>
-          <span class="db-val">${orig} mm</span>
-        </div>
-        <div class="dbar">
-          <span class="db-lbl">Inicio control</span>
-          <div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteLento}%;background:${colorVidaLento}"></div></div>
-          <span class="db-val">${ini} mm</span>
-        </div>
-        <div class="dbar">
-          <span class="db-lbl">Actual</span>
-          <div class="db-trk"><div class="db-fill" style="width:${pctDesgasteLento}%;background:${colorDesgasteLento}"></div></div>
-          <span class="db-val">${actualLento} mm</span>
-        </div>
-        <div class="dbar sin-barra">
-          <span class="db-lbl">Fin de vida</span>
-          <div class="db-trk" style="background:transparent"></div>
-          <span class="db-val">${fin} mm</span>
-        </div>
+        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${orig} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteLento}%;background:${colorVidaLento}"></div></div><span class="db-val">${ini} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${pctDesgasteLento}%;background:${colorDesgasteLento}"></div></div><span class="db-val">${actualLento} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${fin} mm</span></div>
       </div>
       <div style="margin-top:18px">
         <div style="font-size:10px;margin-bottom:10px;font-family:var(--fm);letter-spacing:.08em;color:var(--t2)">CILINDRO RÁPIDO</div>
-        <div class="dbar sin-barra">
-          <span class="db-lbl">Original fábrica</span>
-          <div class="db-trk" style="background:transparent"></div>
-          <span class="db-val">${orig} mm</span>
-        </div>
-        <div class="dbar">
-          <span class="db-lbl">Inicio control</span>
-          <div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteRapido}%;background:${colorVidaRapido}"></div></div>
-          <span class="db-val">${iniR} mm</span>
-        </div>
-        <div class="dbar">
-          <span class="db-lbl">Actual</span>
-          <div class="db-trk"><div class="db-fill" style="width:${pctDesgasteRapido}%;background:${colorDesgasteRapido}"></div></div>
-          <span class="db-val">${actualRapido} mm</span>
-        </div>
-        <div class="dbar sin-barra">
-          <span class="db-lbl">Fin de vida</span>
-          <div class="db-trk" style="background:transparent"></div>
-          <span class="db-val">${fin} mm</span>
-        </div>
-      </div>
-    `;
+        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${orig} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteRapido}%;background:${colorVidaRapido}"></div></div><span class="db-val">${iniR} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${pctDesgasteRapido}%;background:${colorDesgasteRapido}"></div></div><span class="db-val">${actualRapido} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${fin} mm</span></div>
+      </div>`;
   } else {
-    // ══════════════════════════════════════════════════════════════════
-    // LÓGICA ORIGINAL LM1210 — sin cambios
-    // ══════════════════════════════════════════════════════════════════
     desgL = D.ini.lento - D.act.lento;
     desgR = D.ini.rapido - D.act.rapido;
     pctL = Math.min(desgL/D.ini.lento*100,100);
@@ -927,8 +655,7 @@ function buildLam(){
       <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
       <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
-      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>
-    `;
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>`;
 
     document.getElementById('dsgaste-bars').innerHTML = `
       <div><div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
@@ -938,54 +665,48 @@ function buildLam(){
       <div><div style="font-size:10px;margin-bottom:10px">Cilindro Rápido</div>
       <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span class="db-val">${D.ini.rapido} mm</span></div>
       <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.rapido/D.ini.rapido*100).toFixed(0)}%;background:${cR}"></div></div><span class="db-val">${D.act.rapido} mm</span></div>
-      <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span class="db-val">${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>
-    `;
+      <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span class="db-val">${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>`;
   }
 
-  // Alertas
   let alHtml = '';
-  if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm consumidos (${pctL.toFixed(1)}%)</div></div></div>`;
-  if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm consumidos (${pctR.toFixed(1)}%)</div></div></div>`;
+  if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm (${pctL.toFixed(1)}%)</div></div></div>`;
+  if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm (${pctR.toFixed(1)}%)</div></div></div>`;
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
 
-  // Estaño
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
     const reg = tinData.ultimo;
     let colorEstado = '', mensaje = '';
     const idealMin = 1.2, idealMax = 1.5;
-    if(reg.diferencia >= 6){ colorEstado = 'var(--re)'; mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm entre centro y esquina'; }
-    else if(reg.esquina < idealMin || reg.esquina > idealMax){ colorEstado = 'var(--am)'; mensaje = '⚠ ACERCAR: Esquina fuera del rango ideal (1.2–1.5 mm)'; }
-    else { colorEstado = 'var(--gr)'; mensaje = '✓ Correcto: dentro de parámetros'; }
+    if(reg.diferencia >= 6){ colorEstado = 'var(--re)'; mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm'; }
+    else if(reg.esquina < idealMin || reg.esquina > idealMax){ colorEstado = 'var(--am)'; mensaje = '⚠ ACERCAR: Esquina fuera del rango (1.2–1.5 mm)'; }
+    else { colorEstado = 'var(--gr)'; mensaje = '✓ Correcto'; }
     let vueltasNecesarias = '';
-    if(reg.esquina > idealMax){ const vueltas = (reg.esquina - idealMax) * 6; vueltasNecesarias = `🔧 ≈ ${vueltas.toFixed(1)} vueltas para alcanzar ${idealMax} mm.`; }
-    else if(reg.esquina < idealMin){ vueltasNecesarias = `⚠ Esquina por debajo de ${idealMin} mm.`; }
-    else { vueltasNecesarias = `✓ Esquina dentro del rango (${idealMin}–${idealMax} mm).`; }
+    if(reg.esquina > idealMax){ vueltasNecesarias = `🔧 ≈ ${((reg.esquina-idealMax)*6).toFixed(1)} vueltas para ${idealMax} mm.`; }
+    else if(reg.esquina < idealMin){ vueltasNecesarias = `⚠ Esquina bajo ${idealMin} mm.`; }
+    else { vueltasNecesarias = `✓ Dentro del rango.`; }
     tinContainer.innerHTML = `
-      <div style="margin-top: 12px; border-top: 1px solid var(--b1); padding-top: 12px;">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><span style="font-size:16px;">📏</span><span style="font-family:var(--fh); font-size:13px; letter-spacing:.1em;">CONTROL ESTAÑO · Último: ${reg.fecha}</span></div>
-        <div style="display:flex; justify-content:space-around; gap:15px; background:var(--bg3); padding:10px; border-radius:var(--r);">
-          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">CENTRO</div><div style="font-size:20px; font-weight:700;">${reg.centro.toFixed(2)} mm</div></div>
-          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">ESQUINA</div><div style="font-size:20px; font-weight:700; color:${colorEstado}">${reg.esquina.toFixed(2)} mm</div></div>
-          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">DIFERENCIA</div><div style="font-size:20px; font-weight:700;">${reg.diferencia.toFixed(2)} mm</div></div>
+      <div style="margin-top:12px;border-top:1px solid var(--b1);padding-top:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px">📏</span><span style="font-family:var(--fh);font-size:13px;letter-spacing:.1em">CONTROL ESTAÑO · ${reg.fecha}</span></div>
+        <div style="display:flex;justify-content:space-around;gap:15px;background:var(--bg3);padding:10px;border-radius:var(--r)">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">CENTRO</div><div style="font-size:20px;font-weight:700">${reg.centro.toFixed(2)} mm</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">ESQUINA</div><div style="font-size:20px;font-weight:700;color:${colorEstado}">${reg.esquina.toFixed(2)} mm</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">DIFERENCIA</div><div style="font-size:20px;font-weight:700">${reg.diferencia.toFixed(2)} mm</div></div>
         </div>
-        <div style="text-align:center; margin:10px 0;"><div style="background:${colorEstado}20; color:${colorEstado}; border:1px solid ${colorEstado}40; padding:5px 10px; border-radius:999px; display:inline-block; font-size:11px;">${mensaje}</div></div>
-        <div style="font-size:11px; color:var(--t1); background:var(--bg4); padding:8px; border-radius:var(--r); margin-top:5px;">
+        <div style="text-align:center;margin:10px 0"><div style="background:${colorEstado}20;color:${colorEstado};border:1px solid ${colorEstado}40;padding:5px 10px;border-radius:999px;display:inline-block;font-size:11px">${mensaje}</div></div>
+        <div style="font-size:11px;color:var(--t1);background:var(--bg4);padding:8px;border-radius:var(--r);margin-top:5px">
           <div><strong>📝 Observación:</strong> ${reg.observaciones || 'Sin observaciones'}</div>
-          <div style="margin-top:5px;"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div>
-          <div style="margin-top:5px;"><strong>📐 Guía:</strong> ${tinData.guia}</div>
+          <div style="margin-top:5px"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div>
+          <div style="margin-top:5px"><strong>📐 Guía:</strong> ${tinData.guia}</div>
         </div>
       </div>`;
-  } else {
-    tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px;">⚠️ No se encontraron datos de Control de Estaño.</div>`;
-  }
+  } else { tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px">⚠️ No se encontraron datos de Control de Estaño.</div>`; }
 
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
 
-  // Gráficos
   if(window.chartCamisa) window.chartCamisa.destroy();
   window.chartCamisa = new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
   let acumL=0,acumR=0, acumLArr=[],acumRArr=[];
@@ -997,37 +718,20 @@ function buildLam(){
 
 // ========== BUILD MOLDES ==========
 function renderPesoBars(filtered){
-  const container = document.getElementById('pesos-bars-container');
-  if(!container) return;
-  if(!filtered.length){ container.innerHTML = '<div class="al alg">No hay moldes para mostrar</div>'; return; }
-  let html = '<div style="display:flex;flex-direction:column;gap:14px;">';
+  const container = document.getElementById('pesos-bars-container'); if(!container) return;
+  if(!filtered.length){ container.innerHTML = '<div class="al alg">No hay moldes</div>'; return; }
+  let html = '<div style="display:flex;flex-direction:column;gap:14px">';
   filtered.forEach(m => {
     const nominal = m.nominal; const real = m.prom;
     const tieneDatos = (real !== null && !isNaN(real) && nominal > 0);
     let barWidthPercent = 0, barColor = '#6e7d96', valueText = '';
-    if(tieneDatos){
-      barWidthPercent = Math.min((real/nominal)*100, 200);
-      const diffG = (real - nominal) * 1000;
-      if(diffG < 0) barColor = '#3dd68c'; else if(diffG <= 300) barColor = '#f5a623'; else barColor = '#f05252';
-      valueText = `${real.toFixed(3)} / ${nominal.toFixed(1)} kg`;
-    } else { valueText = 'S/D'; }
-    html += `<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-      <div style="min-width: 90px; font-family:var(--fh); font-weight:600; font-size:13px; color:var(--t0);">${m.id} #${m.num}</div>
-      <div style="flex:1; min-width:200px;">
-        <div class="bar-wrapper" style="position:relative; width:100%; max-width:350px; height:24px; background:var(--bg4); border-radius:12px; overflow:visible;">
-          <div style="position:absolute; left:0; top:0; height:100%; width:${barWidthPercent}%; background:${barColor}; border-radius:12px; transition:width 0.2s ease;"></div>
-          <div style="position:absolute; left:100%; top:0; height:100%; width:2px; background:white; transform:translateX(-1px); box-shadow:0 0 3px rgba(0,0,0,0.5); z-index:2;"></div>
-        </div>
-      </div>
-      <div style="min-width: 100px; text-align:right; font-family:var(--fm); font-size:11px; color:var(--t1);">${valueText}</div>
-    </div>`;
+    if(tieneDatos){ barWidthPercent = Math.min((real/nominal)*100, 200); const diffG = (real - nominal) * 1000; if(diffG < 0) barColor = '#3dd68c'; else if(diffG <= 300) barColor = '#f5a623'; else barColor = '#f05252'; valueText = `${real.toFixed(3)} / ${nominal.toFixed(1)} kg`; } else { valueText = 'S/D'; }
+    html += `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="min-width:90px;font-family:var(--fh);font-weight:600;font-size:13px;color:var(--t0)">${m.id} #${m.num}</div><div style="flex:1;min-width:200px"><div style="position:relative;width:100%;max-width:350px;height:24px;background:var(--bg4);border-radius:12px;overflow:visible"><div style="position:absolute;left:0;top:0;height:100%;width:${barWidthPercent}%;background:${barColor};border-radius:12px;transition:width .2s ease"></div><div style="position:absolute;left:100%;top:0;height:100%;width:2px;background:white;transform:translateX(-1px);box-shadow:0 0 3px rgba(0,0,0,.5);z-index:2"></div></div></div><div style="min-width:100px;text-align:right;font-family:var(--fm);font-size:11px;color:var(--t1)">${valueText}</div></div>`;
   });
-  html += '</div>';
-  container.innerHTML = html;
+  html += '</div>'; container.innerHTML = html;
 }
 function dibujarGraficoEstadoMoldes(){
-  const data = STATE.data.MOLDES || [];
-  const filtered = STATE.filter === 'todos' ? data : data.filter(m => m.id === normID(STATE.filter));
+  const data = STATE.data.MOLDES || []; const filtered = STATE.filter === 'todos' ? data : data.filter(m => m.id === normID(STATE.filter));
   let operativo=0, noOperativo=0, enCalibracion=0, enFabricacion=0, irrecuperable=0;
   filtered.forEach(m => { const e = (m.estado||'').trim(); if(e === 'Operativo') operativo++; else if(e === 'No operativo') noOperativo++; else if(e === 'En calibración' || e === 'En laboratorio') enCalibracion++; else if(e === 'En fabricación') enFabricacion++; else if(e === 'Irrecuperable') irrecuperable++; });
   const canvas = document.getElementById('chart-estado-moldes'); if(!canvas) return;
@@ -1045,11 +749,7 @@ function buildMoldes(){
   const fab = data.filter(m => m.estado === 'En fabricación').length;
   const crom = data.filter(m => m.cromado === 'Sí' || m.cromado === 'En proceso').length;
   const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).length;
-  document.getElementById('kpi-moldes').innerHTML = `
-    <div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div>
-    <div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div>
-    <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div>
-    <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>`;
+  document.getElementById('kpi-moldes').innerHTML = `<div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div><div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div><div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div><div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>`;
   renderPesoBars(filtered);
   let alHtml = '';
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
@@ -1088,7 +788,7 @@ function buildMoldes(){
 function dibujarGraficoCromado(){
   const data = STATE.data.MOLDES || []; if(!data.length) return;
   let cromadoSi = 0, cromadoNo = 0, cromadoProceso = 0;
-  data.forEach(molde => { const cromado = (molde.cromado || '').toString().toLowerCase().trim(); if(cromado === 'sí' || cromado === 'si' || cromado === 's') cromadoSi++; else if(cromado === 'en proceso' || cromado === 'proceso') cromadoProceso++; else cromadoNo++; });
+  data.forEach(molde => { const c = (molde.cromado || '').toString().toLowerCase().trim(); if(c === 'sí' || c === 'si' || c === 's') cromadoSi++; else if(c === 'en proceso' || c === 'proceso') cromadoProceso++; else cromadoNo++; });
   const canvas = document.getElementById('chart-cromado-estado'); if(!canvas) return;
   if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
   window.chartCromadoEstado = new Chart(canvas, { type: 'doughnut', data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } } });
@@ -1104,10 +804,7 @@ function buildStock(){
   const total=data.length, sinStock=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, parcial=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].some(v=>v===0)&&![s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, completo=total-sinStock-parcial;
   document.getElementById('kpi-stock').innerHTML = `<div class="kpi ka"><div class="kl">Tipos</div><div class="kv">${total}</div></div><div class="kpi kg"><div class="kl">Completo</div><div class="kv">${completo}</div></div><div class="kpi ka"><div class="kl">Parcial</div><div class="kv">${parcial}</div></div><div class="kpi kr"><div class="kl">Sin stock</div><div class="kv">${sinStock}</div></div>`;
   const tbody = document.getElementById('tbody-stock'); if(!tbody) return;
-  tbody.innerHTML = STOCK_FILTERED.map(s => {
-    const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0);
-    return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`;
-  }).join('');
+  tbody.innerHTML = STOCK_FILTERED.map(s => { const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0); return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`; }).join('');
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
 }
 function filterStock(){
@@ -1116,37 +813,23 @@ function filterStock(){
   const src = STATE.filter === 'todos' ? data : data.filter(s => normID(s.molde).includes(normID(STATE.filter)));
   STOCK_FILTERED = q ? src.filter(s => s.molde.toLowerCase().includes(q)) : src;
   const tbody = document.getElementById('tbody-stock'); if(!tbody) return;
-  tbody.innerHTML = STOCK_FILTERED.map(s => {
-    const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0);
-    return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`;
-  }).join('');
+  tbody.innerHTML = STOCK_FILTERED.map(s => { const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0); return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`; }).join('');
   const total = src.length;
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
 }
 function genFaltantes(){
-  const data = STATE.data.STOCK || [];
-  const cols = ['boquillas', 'aranas', 'dados', 'placaBase', 'frenos'];
+  const data = STATE.data.STOCK || []; const cols = ['boquillas', 'aranas', 'dados', 'placaBase', 'frenos'];
   const labels = {'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
   const falt = []; data.forEach(s => { cols.forEach(c => { if(s[c] === 0) falt.push({molde: s.molde, rep: labels[c]}); }); });
-  const mc = document.getElementById('modal-content');
-  const now = new Date().toLocaleDateString('es-AR');
+  const mc = document.getElementById('modal-content'); const now = new Date().toLocaleDateString('es-AR');
   if(!falt.length){ mc.innerHTML = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin faltantes</div><div class="ad">Todos los repuestos tienen al menos una unidad en stock.</div></div></div>`; }
-  else { const porMolde = {}; falt.forEach(f => { if(!porMolde[f.molde]) porMolde[f.molde] = []; porMolde[f.molde].push(f.rep); }); mc.innerHTML = `<div style="font-family:var(--fm);font-size:11px;color:var(--t2);margin-bottom:12px">${falt.length} ítem(s) en cero — ${now}</div>` + Object.entries(porMolde).map(([molde, reps]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b0)"><div><div style="font-weight:600;font-size:13px;color:var(--t0)">${molde}</div><div style="font-size:11px;color:var(--t2)">${reps.join(', ')}</div></div><span class="badge br">Stock: 0</span></div>`).join(''); }
+  else { const porMolde = {}; falt.forEach(f => { if(!porMolde[f.molde]) porMolde[f.molde] = []; porMolde[f.molde].push(f.rep); }); mc.innerHTML = `<div style="font-family:var(--fm);font-size:11px;color:var(--t2);margin-bottom:12px">${falt.length} ítem(s) — ${now}</div>` + Object.entries(porMolde).map(([molde, reps]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b0)"><div><div style="font-weight:600;font-size:13px;color:var(--t0)">${molde}</div><div style="font-size:11px;color:var(--t2)">${reps.join(', ')}</div></div><span class="badge br">Stock: 0</span></div>`).join(''); }
   document.getElementById('modal-falt').classList.add('open');
 }
-function copyFalt(){
-  const data = STATE.data.STOCK || []; const cols=['boquillas','aranas','dados','placaBase','frenos']; const labels={'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
-  const falt=[]; data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push(`• ${s.molde} — ${labels[c]}: Stock 0`); }); });
-  const txt = `LISTA DE FALTANTES — CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n${falt.length?falt.join('\n'):'Sin faltantes'}`;
-  navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada'));
-}
+function copyFalt(){ const data = STATE.data.STOCK || []; const cols=['boquillas','aranas','dados','placaBase','frenos']; const labels={'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'}; const falt=[]; data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push(`• ${s.molde} — ${labels[c]}: Stock 0`); }); }); const txt = `LISTA DE FALTANTES — CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n${falt.length?falt.join('\n'):'Sin faltantes'}`; navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada')); }
 
 // ========== BUILD MANTENIMIENTO ==========
-function getTareaBadge(tipo){
-  const colores = { 'Desarmado de molde': { bg: 'var(--amd)', color: 'var(--am)', icon: '🔧' }, 'Armado de molde': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🔨' }, 'Ajustes': { bg: 'var(--bld)', color: 'var(--bl)', icon: '⚙️' }, 'Calibracion': { bg: 'var(--bld)', color: 'var(--bl)', icon: '📏' }, 'Fabricacion': { bg: 'var(--amd)', color: 'var(--am)', icon: '🏭' }, 'Mantenimiento': { bg: 'var(--red)', color: 'var(--re)', icon: '🛠️' }, 'Orden y Limpieza': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🧹' }, 'Seguimiento': { bg: 'var(--bld)', color: 'var(--bl)', icon: '👁️' } };
-  const c = colores[tipo] || { bg: 'var(--bg4)', color: 'var(--t2)', icon: '📋' };
-  return `<span style="display:inline-flex;align-items:center;gap:4px;background:${c.bg};color:${c.color};border-radius:999px;padding:3px 10px;font-family:var(--fm);font-size:10px;font-weight:500">${c.icon} ${tipo}</span>`;
-}
+function getTareaBadge(tipo){ const colores = { 'Desarmado de molde': { bg: 'var(--amd)', color: 'var(--am)', icon: '🔧' }, 'Armado de molde': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🔨' }, 'Ajustes': { bg: 'var(--bld)', color: 'var(--bl)', icon: '⚙️' }, 'Calibracion': { bg: 'var(--bld)', color: 'var(--bl)', icon: '📏' }, 'Fabricacion': { bg: 'var(--amd)', color: 'var(--am)', icon: '🏭' }, 'Mantenimiento': { bg: 'var(--red)', color: 'var(--re)', icon: '🛠️' }, 'Orden y Limpieza': { bg: 'var(--grd)', color: 'var(--gr)', icon: '🧹' }, 'Seguimiento': { bg: 'var(--bld)', color: 'var(--bl)', icon: '👁️' } }; const c = colores[tipo] || { bg: 'var(--bg4)', color: 'var(--t2)', icon: '📋' }; return `<span style="display:inline-flex;align-items:center;gap:4px;background:${c.bg};color:${c.color};border-radius:999px;padding:3px 10px;font-family:var(--fm);font-size:10px;font-weight:500">${c.icon} ${tipo}</span>`; }
 function buildMantenimiento(){
   const data = STATE.data.MANTENIMIENTO || [];
   document.getElementById('tn4').textContent = data.length;
@@ -1172,8 +855,7 @@ function buildMantenimiento(){
 
 // ========== BUILD VIDA ÚTIL ==========
 function buildVidaUtil(){
-  const data = STATE.data.VIDA_UTIL || [];
-  const LIMITE_BASE = 12000;
+  const data = STATE.data.VIDA_UTIL || []; const LIMITE_BASE = 12000;
   const container = document.getElementById('gauges-container');
   if(!data.length){ document.getElementById('tn5').textContent = 0; container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>'; return; }
   const grupos = {};
@@ -1181,16 +863,14 @@ function buildVidaUtil(){
   const ciclosVigentes = [];
   Object.values(grupos).forEach(filas => {
     const ordenadas = [...filas].sort((a,b) => { const fa = fechaToNum(a.inicio); const fb = fechaToNum(b.inicio); if(fb !== fa) return fb - fa; return b._ordenOriginal - a._ordenOriginal; });
-    const vigente = ordenadas[0];
-    const anteriores = ordenadas.slice(1);
+    const vigente = ordenadas[0]; const anteriores = ordenadas.slice(1);
     const tnAnterior = anteriores.reduce((s, r) => s + (parseFloat(r.tnProducidas) || 0), 0);
     ciclosVigentes.push({ ...vigente, _numCiclo: filas.length, _tnAnterior: tnAnterior, _tnHistorico: tnAnterior + (parseFloat(vigente.tnProducidas) || 0) });
   });
   document.getElementById('tn5').textContent = ciclosVigentes.length;
   container.innerHTML = '';
   ciclosVigentes.forEach(molde => {
-    const tn = molde.tnProducidas;
-    const esInfinito = (molde.numero === '3');
+    const tn = molde.tnProducidas; const esInfinito = (molde.numero === '3');
     let porcentajeReal = (tn / LIMITE_BASE) * 100;
     let status = '', statusText = '', color = '';
     if(esInfinito){ if(porcentajeReal >= 100){ status='warning'; statusText='∞ Sin límite definido (supera 100%)'; color='#f5a623'; } else { status='ok'; statusText='∞ Sin límite definido'; color='#3dd68c'; } }
@@ -1206,18 +886,7 @@ function buildVidaUtil(){
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;gap:10px;margin-bottom:8px">
-        <div style="text-align:left;min-width:0">
-          <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);line-height:1.1">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
-          <div style="font-size:11px;color:var(--t2);margin-top:3px">${molde.clave || ''}</div>
-        </div>${badgeHtml}
-      </div>
-      <canvas id="${canvasId}" width="240" height="240" class="gauge-canvas"></canvas>
-      <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
-      <div style="font-size:10px; color:var(--t2); margin-top:4px; text-align:center">Inicio: ${inicio} · Fin: ${fin}</div>
-      <div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div>
-      <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>`;
+    card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;gap:10px;margin-bottom:8px"><div style="text-align:left;min-width:0"><div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);line-height:1.1">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div><div style="font-size:11px;color:var(--t2);margin-top:3px">${molde.clave || ''}</div></div>${badgeHtml}</div><canvas id="${canvasId}" width="240" height="240" class="gauge-canvas"></canvas><div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div><div style="font-size:10px;color:var(--t2);margin-top:4px;text-align:center">Inicio: ${inicio} · Fin: ${fin}</div><div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div><div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>`;
     container.appendChild(card);
     setTimeout(() => drawDoughnut(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
@@ -1241,21 +910,9 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
 
 // ========== BUILD PLANOS ==========
 function buildPlanos(){
-  const tiposLadrillos = [
-    { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' }, { id: 'H12', nombre: 'H12', img: 'img/ladrillos/H12.png' },
-    { id: 'H18', nombre: 'H18', img: 'img/ladrillos/H18.png' }, { id: 'P12', nombre: 'P12', img: 'img/ladrillos/P12.png' },
-    { id: 'P18', nombre: 'P18', img: 'img/ladrillos/P18.png' }, { id: 'L12', nombre: 'L12', img: 'img/ladrillos/L12.png' },
-    { id: 'L16', nombre: 'L16', img: 'img/ladrillos/L16.png' }, { id: 'DM20', nombre: 'DM20', img: 'img/ladrillos/DM20.png' },
-    { id: 'DM27', nombre: 'DM27', img: 'img/ladrillos/DM27.png' }, { id: 'KB', nombre: 'KB', img: 'img/ladrillos/KB.png' }
-  ];
+  const tiposLadrillos = [ { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' }, { id: 'H12', nombre: 'H12', img: 'img/ladrillos/H12.png' }, { id: 'H18', nombre: 'H18', img: 'img/ladrillos/H18.png' }, { id: 'P12', nombre: 'P12', img: 'img/ladrillos/P12.png' }, { id: 'P18', nombre: 'P18', img: 'img/ladrillos/P18.png' }, { id: 'L12', nombre: 'L12', img: 'img/ladrillos/L12.png' }, { id: 'L16', nombre: 'L16', img: 'img/ladrillos/L16.png' }, { id: 'DM20', nombre: 'DM20', img: 'img/ladrillos/DM20.png' }, { id: 'DM27', nombre: 'DM27', img: 'img/ladrillos/DM27.png' }, { id: 'KB', nombre: 'KB', img: 'img/ladrillos/KB.png' } ];
   const planosMoldes = tiposLadrillos.map(t => ({ id: t.id, nombre: t.nombre, img: `img/planos/molde-${t.id}.jpg` }));
-  const planosCMP = [
-    { nombre: 'Araña modificada H12', img: 'img/planos/Araña-modificada-H12.jpg' }, { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/Medida-Boquilla-H12.jpg' },
-    { nombre: 'Boquilla H12', img: 'img/planos/Boquilla-H12.jpg' }, { nombre: 'Boquilla H18', img: 'img/planos/Boquilla-H18.jpg' },
-    { nombre: 'Boquilla P18', img: 'img/planos/Boquilla-P18.jpg' }, { nombre: 'Dados H12', img: 'img/planos/Dados-H12.jpg' },
-    { nombre: 'Dados H18', img: 'img/planos/Dados-H18.jpg' }, { nombre: 'Plano H18', img: 'img/planos/Plano-H18.jpg' },
-    { nombre: 'Modificaciones H12 BR', img: 'img/planos/Modificaciones-H12-BR.jpg' }, { nombre: 'Piezas araña H12', img: 'img/planos/Piezas-Araña-H12.jpg' }
-  ];
+  const planosCMP = [ { nombre: 'Araña modificada H12', img: 'img/planos/Araña-modificada-H12.jpg' }, { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/Medida-Boquilla-H12.jpg' }, { nombre: 'Boquilla H12', img: 'img/planos/Boquilla-H12.jpg' }, { nombre: 'Boquilla H18', img: 'img/planos/Boquilla-H18.jpg' }, { nombre: 'Boquilla P18', img: 'img/planos/Boquilla-P18.jpg' }, { nombre: 'Dados H12', img: 'img/planos/Dados-H12.jpg' }, { nombre: 'Dados H18', img: 'img/planos/Dados-H18.jpg' }, { nombre: 'Plano H18', img: 'img/planos/Plano-H18.jpg' }, { nombre: 'Modificaciones H12 BR', img: 'img/planos/Modificaciones-H12-BR.jpg' }, { nombre: 'Piezas araña H12', img: 'img/planos/Piezas-Araña-H12.jpg' } ];
   document.getElementById('ladrillos-gallery').innerHTML = tiposLadrillos.map(t => `<div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${t.img}" alt="${t.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.opacity=.3"><div><div class="mcn">${t.nombre}</div><div class="mcnum">Referencia visual</div></div></div></div>`).join('');
   document.getElementById('planos-moldes-gallery').innerHTML = planosMoldes.map(p => `<div class="mc" onclick="verPlano('${p.img}', 'Plano - ${p.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${p.img}" alt="Plano ${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.style.opacity=.3"><div><div class="mcn">${p.nombre}</div><div class="mcnum">Plano técnico - click para ampliar</div></div></div></div>`).join('');
   let cmpContainer = document.getElementById('planos-cmp-gallery');
@@ -1263,13 +920,7 @@ function buildPlanos(){
   cmpContainer.innerHTML = planosCMP.map(p => `<div class="mc" onclick="verPlano('${p.img}', '${p.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${p.img}" alt="${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.style.opacity=.3"><div><div class="mcn">${p.nombre}</div><div class="mcnum">Plano CMP - click para ampliar</div></div></div></div>`).join('');
   document.getElementById('tn6').textContent = tiposLadrillos.length + planosMoldes.length + planosCMP.length;
 }
-function verPlano(imgUrl, titulo){
-  document.getElementById('plano-title').textContent = titulo;
-  const imgElement = document.getElementById('plano-img');
-  imgElement.src = imgUrl;
-  imgElement.onerror = () => { imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%236e7d96"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ctext x="12" y="16" text-anchor="middle" fill="%236e7d96" font-size="10"%3EImagen no disponible%3C/text%3E%3C/svg%3E'; };
-  document.getElementById('modal-plano').classList.add('open');
-}
+function verPlano(imgUrl, titulo){ document.getElementById('plano-title').textContent = titulo; const imgElement = document.getElementById('plano-img'); imgElement.src = imgUrl; imgElement.onerror = () => { imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%236e7d96"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ctext x="12" y="16" text-anchor="middle" fill="%236e7d96" font-size="10"%3EImagen no disponible%3C/text%3E%3C/svg%3E'; }; document.getElementById('modal-plano').classList.add('open'); }
 
 // ========== BUILD ESTADO PIEZAS ==========
 let ESTADO_FILTER_TEXT = '';
@@ -1278,37 +929,22 @@ function esEstadoIdeal(estado){ const e = (estado || '').trim().toLowerCase(); r
 function abrirModalOperatividad(g){
   const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
   document.getElementById('op-modal-title').textContent = `${g.molde} #${g.numero} — Detalle de piezas`;
-  document.getElementById('op-modal-content').innerHTML = `
-    <div class="op-modal-resumen">
-      <div class="op-modal-resumen-item"><div class="op-num" style="color:var(--gr);">${g.optimas}</div><div class="op-lbl">Óptimas</div></div>
-      <div class="op-modal-resumen-item"><div class="op-num" style="color:var(--re);">${g.deficientes}</div><div class="op-lbl">Deficientes</div></div>
-      <div class="op-modal-resumen-item"><div class="op-num" style="color:var(--t0);">${g.total}</div><div class="op-lbl">Total piezas</div></div>
-    </div>
-    <div class="op-modal-piezas">${g.piezas.map(p => { const ideal = esEstadoIdeal(p.estado); const ico = ideal ? '✓' : '✗'; const col = ideal ? 'var(--gr)' : 'var(--re)'; return `<div class="op-modal-pieza" style="border-left-color:${col};"><span class="op-ico" style="color:${col};">${ico}</span><span class="op-comp">${p.componente || 'Pieza'}</span><span class="op-est" style="color:${col};">${p.estado || 'Sin especificar'}</span></div>`; }).join('')}</div>
-    <div class="op-modal-pct-final"><div class="op-modal-pct-final-label">Porcentaje de Operatividad</div><div class="op-modal-pct-final-val" style="color:${color};">${g.pct}%</div></div>`;
+  document.getElementById('op-modal-content').innerHTML = `<div class="op-modal-resumen"><div class="op-modal-resumen-item"><div class="op-num" style="color:var(--gr)">${g.optimas}</div><div class="op-lbl">Óptimas</div></div><div class="op-modal-resumen-item"><div class="op-num" style="color:var(--re)">${g.deficientes}</div><div class="op-lbl">Deficientes</div></div><div class="op-modal-resumen-item"><div class="op-num" style="color:var(--t0)">${g.total}</div><div class="op-lbl">Total piezas</div></div></div><div class="op-modal-piezas">${g.piezas.map(p => { const ideal = esEstadoIdeal(p.estado); const ico = ideal ? '✓' : '✗'; const col = ideal ? 'var(--gr)' : 'var(--re)'; return `<div class="op-modal-pieza" style="border-left-color:${col}"><span class="op-ico" style="color:${col}">${ico}</span><span class="op-comp">${p.componente || 'Pieza'}</span><span class="op-est" style="color:${col}">${p.estado || 'Sin especificar'}</span></div>`; }).join('')}</div><div class="op-modal-pct-final"><div class="op-modal-pct-final-label">Porcentaje de Operatividad</div><div class="op-modal-pct-final-val" style="color:${color}">${g.pct}%</div></div>`;
   document.getElementById('modal-operatividad').classList.add('open');
 }
 function cerrarModalOperatividad(){ document.getElementById('modal-operatividad').classList.remove('open'); }
 document.addEventListener('click', (e) => { const modal = document.getElementById('modal-operatividad'); if(modal && modal.classList.contains('open') && e.target === modal) cerrarModalOperatividad(); });
-
 function renderOperatividad(filtered){
   const container = document.getElementById('operatividad-container'); if(!container) return;
-  const grupos = {};
-  filtered.forEach(p => { const key = `${p.molde}__${p.numero}`; if(!grupos[key]) grupos[key] = { molde: p.molde, numero: p.numero, piezas: [] }; grupos[key].piezas.push(p); });
+  const grupos = {}; filtered.forEach(p => { const key = `${p.molde}__${p.numero}`; if(!grupos[key]) grupos[key] = { molde: p.molde, numero: p.numero, piezas: [] }; grupos[key].piezas.push(p); });
   const ordenados = Object.values(grupos).sort((a,b) => { const cmp = String(a.molde).localeCompare(String(b.molde)); if(cmp !== 0) return cmp; return String(a.numero).localeCompare(String(b.numero), undefined, { numeric: true }); });
-  if(ordenados.length === 0){ container.innerHTML = '<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin piezas</div><div class="ad">Probá cambiar el filtro.</div></div></div>'; return; }
+  if(ordenados.length === 0){ container.innerHTML = '<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin piezas</div></div></div>'; return; }
   ordenados.forEach(g => { g.total = g.piezas.length; g.optimas = g.piezas.filter(p => esEstadoIdeal(p.estado)).length; g.deficientes = g.total - g.optimas; g.pct = g.total > 0 ? Math.round((g.optimas / g.total) * 100) : 0; });
   let html = '<div class="op-grid">';
-  ordenados.forEach(g => {
-    const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
-    const imgSrc = getImagenLadrillo(g.molde);
-    html += `<div class="op-card" data-key="${g.molde}__${g.numero}" title="Ver detalle de ${g.molde} #${g.numero}"><img src="${imgSrc}" alt="${g.molde}" onerror="this.style.opacity=.3"><div class="op-nombre">${g.molde} #${g.numero}</div><div class="op-pct" style="color:${color}">${g.pct}%</div><div class="op-barra"><div class="op-barra-fill" style="width:${g.pct}%;background:${color};"></div></div><div class="op-sub">${g.optimas}/${g.total} óptimas</div></div>`;
-  });
-  html += '</div>';
-  container.innerHTML = html;
+  ordenados.forEach(g => { const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)'; const imgSrc = getImagenLadrillo(g.molde); html += `<div class="op-card" data-key="${g.molde}__${g.numero}" title="Ver detalle de ${g.molde} #${g.numero}"><img src="${imgSrc}" alt="${g.molde}" onerror="this.style.opacity=.3"><div class="op-nombre">${g.molde} #${g.numero}</div><div class="op-pct" style="color:${color}">${g.pct}%</div><div class="op-barra"><div class="op-barra-fill" style="width:${g.pct}%;background:${color}"></div></div><div class="op-sub">${g.optimas}/${g.total} óptimas</div></div>`; });
+  html += '</div>'; container.innerHTML = html;
   container.querySelectorAll('.op-card').forEach(card => { card.addEventListener('click', () => { const key = card.getAttribute('data-key'); const g = ordenados.find(x => `${x.molde}__${x.numero}` === key); if(g) abrirModalOperatividad(g); }); });
 }
-
 function renderDistribucionEstados(estadosCount, totalPiezas){
   const chartCanvas = document.getElementById('chart-estado-piezas');
   const legendEl = document.getElementById('dist-legend');
@@ -1316,34 +952,19 @@ function renderDistribucionEstados(estadosCount, totalPiezas){
   const centerLbl = document.getElementById('dist-center-lbl');
   if(!chartCanvas) return;
   if(window.chartEstadoPiezas) window.chartEstadoPiezas.destroy();
-  const labelsDist = Object.keys(estadosCount);
-  const valuesDist = Object.values(estadosCount);
+  const labelsDist = Object.keys(estadosCount); const valuesDist = Object.values(estadosCount);
   const coloresDist = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'];
   const totalDist = valuesDist.reduce((a,b) => a + b, 0);
-  function updateCenter(idx){
-    if(idx === null || idx === undefined){ centerNum.textContent = totalDist.toLocaleString(); centerNum.style.color = 'var(--t0)'; centerLbl.textContent = 'piezas'; }
-    else { const pct = totalDist > 0 ? Math.round((valuesDist[idx] / totalDist) * 100) : 0; centerNum.textContent = pct + '%'; centerNum.style.color = coloresDist[idx]; centerLbl.textContent = labelsDist[idx].toUpperCase(); }
-  }
+  function updateCenter(idx){ if(idx === null || idx === undefined){ centerNum.textContent = totalDist.toLocaleString(); centerNum.style.color = 'var(--t0)'; centerLbl.textContent = 'piezas'; } else { const pct = totalDist > 0 ? Math.round((valuesDist[idx] / totalDist) * 100) : 0; centerNum.textContent = pct + '%'; centerNum.style.color = coloresDist[idx]; centerLbl.textContent = labelsDist[idx].toUpperCase(); } }
   if(legendEl){ legendEl.innerHTML = labelsDist.map((lbl, i) => { const pct = totalDist > 0 ? Math.round((valuesDist[i]/totalDist)*100) : 0; return `<div class="dist-legend-item" data-idx="${i}"><span class="dist-legend-dot" style="background:${coloresDist[i]}"></span><span class="dist-legend-name">${lbl}</span><span class="dist-legend-count">${valuesDist[i]} · ${pct}%</span></div>`; }).join(''); }
   if(totalPiezas > 0){
-    window.chartEstadoPiezas = new Chart(chartCanvas, { type: 'doughnut', data: { labels: labelsDist, datasets: [{ data: valuesDist, backgroundColor: coloresDist, borderColor: '#131720', borderWidth: 3, borderRadius: 8, hoverOffset: 14, hoverBorderColor: '#131720' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '72%', animation: { animateRotate: true, animateScale: false, duration: 900, easing: 'easeOutQuart' }, layout: { padding: 8 }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,0.96)', borderColor: 'rgba(255,255,255,0.16)', borderWidth: 1, titleColor: '#f0f4ff', bodyColor: '#b8c4d8', padding: 12, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: function(ctx){ const val = ctx.parsed; const pct = totalDist > 0 ? Math.round((val/totalDist)*100) : 0; return ` ${val} piezas · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(activeEls.length > 0){ updateCenter(activeEls[0].index); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => { it.classList.toggle('dim', i !== activeEls[0].index); }); } } else { updateCenter(null); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim')); } } } } });
+    window.chartEstadoPiezas = new Chart(chartCanvas, { type: 'doughnut', data: { labels: labelsDist, datasets: [{ data: valuesDist, backgroundColor: coloresDist, borderColor: '#131720', borderWidth: 3, borderRadius: 8, hoverOffset: 14, hoverBorderColor: '#131720' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '72%', animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' }, layout: { padding: 8 }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,.96)', borderColor: 'rgba(255,255,255,.16)', borderWidth: 1, titleColor: '#f0f4ff', bodyColor: '#b8c4d8', padding: 12, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: function(ctx){ const val = ctx.parsed; const pct = totalDist > 0 ? Math.round((val/totalDist)*100) : 0; return ` ${val} piezas · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(activeEls.length > 0){ updateCenter(activeEls[0].index); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => { it.classList.toggle('dim', i !== activeEls[0].index); }); } } else { updateCenter(null); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim')); } } } } });
     updateCenter(null);
-    if(legendEl){
-      legendEl.querySelectorAll('.dist-legend-item').forEach(item => {
-        const idx = parseInt(item.getAttribute('data-idx'));
-        item.addEventListener('mouseenter', () => { updateCenter(idx); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => { if(i !== idx) it.classList.add('dim'); }); } });
-        item.addEventListener('mouseleave', () => { updateCenter(null); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim')); } });
-      });
-    }
-  } else {
-    const ctx = chartCanvas.getContext('2d'); ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height); ctx.fillStyle = '#6e7d96'; ctx.font = '12px monospace'; ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
-    if(legendEl) legendEl.innerHTML = ''; if(centerNum) centerNum.textContent = '0'; if(centerLbl) centerLbl.textContent = 'piezas';
-  }
+    if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach(item => { const idx = parseInt(item.getAttribute('data-idx')); item.addEventListener('mouseenter', () => { updateCenter(idx); if(legendEl) legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => { if(i !== idx) it.classList.add('dim'); }); }); item.addEventListener('mouseleave', () => { updateCenter(null); if(legendEl) legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim')); }); }); }
+  } else { const ctx = chartCanvas.getContext('2d'); ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height); ctx.fillStyle = '#6e7d96'; ctx.font = '12px monospace'; ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2); if(legendEl) legendEl.innerHTML = ''; if(centerNum) centerNum.textContent = '0'; if(centerLbl) centerLbl.textContent = 'piezas'; }
 }
-
 function buildEstadoPiezas(){
-  const data = STATE.data.ESTADO_PIEZAS || [];
-  const filterType = STATE.filter;
+  const data = STATE.data.ESTADO_PIEZAS || []; const filterType = STATE.filter;
   let filtered = filterType === 'todos' ? data : data.filter(p => normID(p.molde) === normID(filterType));
   if(ESTADO_FILTER_TEXT){ filtered = filtered.filter(p => `${p.molde} ${p.numero}`.toLowerCase().includes(ESTADO_FILTER_TEXT)); }
   document.getElementById('tn7').textContent = filtered.length;
@@ -1352,12 +973,7 @@ function buildEstadoPiezas(){
   const conAccion = filtered.filter(p => p.accion && p.accion.trim() !== '').length;
   const cromadoReacond = filtered.filter(p => p.estado.toLowerCase().includes('cromado') || p.estado.toLowerCase().includes('reacondicionado')).length;
   const moldesUnicos = new Set(filtered.map(p => `${p.molde} ${p.numero}`)).size;
-  document.getElementById('kpi-estado').innerHTML = `
-    <div class="kpi kg"><div class="kl">Total piezas</div><div class="kv">${totalPiezas}</div><div class="km">registros</div></div>
-    <div class="kpi kb"><div class="kl">Buen estado</div><div class="kv" style="color:var(--gr)">${buenEstado}</div><div class="km">piezas</div></div>
-    <div class="kpi ka"><div class="kl">Con acción requerida</div><div class="kv" style="color:var(--am)">${conAccion}</div><div class="km">pendientes</div></div>
-    <div class="kpi kr"><div class="kl">Cromado / Reacond.</div><div class="kv" style="color:var(--or)">${cromadoReacond}</div><div class="km">necesitan atención</div></div>
-    <div class="kpi ${moldesUnicos>0?'kg':'bgr'}"><div class="kl">Moldes distintos</div><div class="kv">${moldesUnicos}</div><div class="km">con piezas</div></div>`;
+  document.getElementById('kpi-estado').innerHTML = `<div class="kpi kg"><div class="kl">Total piezas</div><div class="kv">${totalPiezas}</div><div class="km">registros</div></div><div class="kpi kb"><div class="kl">Buen estado</div><div class="kv" style="color:var(--gr)">${buenEstado}</div><div class="km">piezas</div></div><div class="kpi ka"><div class="kl">Con acción requerida</div><div class="kv" style="color:var(--am)">${conAccion}</div><div class="km">pendientes</div></div><div class="kpi kr"><div class="kl">Cromado / Reacond.</div><div class="kv" style="color:var(--or)">${cromadoReacond}</div><div class="km">necesitan atención</div></div><div class="kpi ${moldesUnicos>0?'kg':'bgr'}"><div class="kl">Moldes distintos</div><div class="kv">${moldesUnicos}</div><div class="km">con piezas</div></div>`;
   const estadosCount = { 'Buen estado':0, 'Cromado':0, 'Reacondicionado':0, 'Otro':0 };
   filtered.forEach(p => { const e = p.estado.toLowerCase(); if(e.includes('buen')) estadosCount['Buen estado']++; else if(e.includes('cromado')) estadosCount['Cromado']++; else if(e.includes('reacondicionado')) estadosCount['Reacondicionado']++; else estadosCount['Otro']++; });
   renderDistribucionEstados(estadosCount, totalPiezas);
@@ -1366,7 +982,7 @@ function buildEstadoPiezas(){
   filtered.forEach(p => { const key = `${p.molde} #${p.numero}`; if(!grouped[key]) grouped[key] = []; grouped[key].push(p); });
   let cardsHtml = '';
   if(Object.keys(grouped).length === 0){ cardsHtml = '<div class="al alg">No hay piezas.</div>'; }
-  else { for(const [moldeKey, piezas] of Object.entries(grouped)){ cardsHtml += `<div class="mc"><div class="mch"><div><div class="mcn">${moldeKey}</div><div class="mcnum">${piezas.length} pieza(s)</div></div><span class="badge bb">${piezas[0].molde}</span></div><div style="margin-top:8px;">`; piezas.forEach(p => { let badgeClass = 'estado-badge-otro'; if(p.estado.toLowerCase().includes('buen')) badgeClass = 'estado-badge-bueno'; else if(p.estado.toLowerCase().includes('cromado')) badgeClass = 'estado-badge-cromado'; else if(p.estado.toLowerCase().includes('reacondicionado')) badgeClass = 'estado-badge-reacondicionado'; cardsHtml += `<div class="pieza-item"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:600;">${p.componente}</span><span class="badge ${badgeClass}">${p.estado}</span></div>${p.accion ? `<div style="font-size:11px; color:var(--am);">🔧 ${p.accion}</div>` : ''}${p.observacion ? `<div style="font-size:10px; color:var(--t2);">📝 ${p.observacion}</div>` : ''}${p.fecha ? `<div style="font-size:9px; color:var(--t3);">📅 ${p.fecha}</div>` : ''}</div>`; }); cardsHtml += `</div></div>`; } }
+  else { for(const [moldeKey, piezas] of Object.entries(grouped)){ cardsHtml += `<div class="mc"><div class="mch"><div><div class="mcn">${moldeKey}</div><div class="mcnum">${piezas.length} pieza(s)</div></div><span class="badge bb">${piezas[0].molde}</span></div><div style="margin-top:8px">`; piezas.forEach(p => { let badgeClass = 'estado-badge-otro'; if(p.estado.toLowerCase().includes('buen')) badgeClass = 'estado-badge-bueno'; else if(p.estado.toLowerCase().includes('cromado')) badgeClass = 'estado-badge-cromado'; else if(p.estado.toLowerCase().includes('reacondicionado')) badgeClass = 'estado-badge-reacondicionado'; cardsHtml += `<div class="pieza-item"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600">${p.componente}</span><span class="badge ${badgeClass}">${p.estado}</span></div>${p.accion ? `<div style="font-size:11px;color:var(--am)">🔧 ${p.accion}</div>` : ''}${p.observacion ? `<div style="font-size:10px;color:var(--t2)">📝 ${p.observacion}</div>` : ''}${p.fecha ? `<div style="font-size:9px;color:var(--t3)">📅 ${p.fecha}</div>` : ''}</div>`; }); cardsHtml += `</div></div>`; } }
   document.getElementById('estado-cards-container').innerHTML = cardsHtml;
 }
 
