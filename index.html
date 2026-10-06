@@ -146,10 +146,11 @@ tbody tr:hover td{background:var(--bg3)}
 .crit-row{background:rgba(240,82,82,.04)!important}
 
 .dbar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.db-lbl{font-family:var(--fm);font-size:11px;color:var(--t2);width:90px;flex-shrink:0;line-height:1.3}
+.db-lbl{font-family:var(--fm);font-size:11px;color:var(--t2);width:110px;flex-shrink:0;line-height:1.3}
 .db-trk{flex:1;background:var(--bg4);border-radius:3px;height:10px;overflow:hidden}
-.db-fill{height:10px;border-radius:3px}
+.db-fill{height:10px;border-radius:3px;transition:width .4s}
 .db-val{font-family:var(--fm);font-size:11px;color:var(--t1);width:80px;text-align:right;flex-shrink:0}
+.dbar.sin-barra .db-trk{background:transparent}
 
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-family:var(--fh);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;cursor:pointer}
 .btn-a{background:var(--am);color:var(--bg0);border:none}
@@ -231,441 +232,83 @@ tbody tr:hover td{background:var(--bg3)}
 .status-warning { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
 .status-critical { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
 
-.bar-wrapper {
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
-}
-.bar-real {
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-.bar-nominal-line {
-  box-shadow: 0 0 3px rgba(0,0,0,0.5);
-}
-#pesos-bars-container {
-  overflow-x: auto;
-}
+.bar-wrapper { box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
+.bar-real { box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.bar-nominal-line { box-shadow: 0 0 3px rgba(0,0,0,0.5); }
+#pesos-bars-container { overflow-x: auto; }
 
-.search-estado {
-  background: var(--bg3);
-  border: 1px solid var(--b1);
-  border-radius: var(--r);
-  padding: 8px 14px;
-  font-family: var(--fm);
-  font-size: 12px;
-  color: var(--t0);
-  width: 260px;
-  outline: none;
-  transition: border-color .15s;
-}
-.search-estado::placeholder {
-  color: var(--t3);
-}
-.search-estado:focus {
-  border-color: var(--am);
-}
+.search-estado { background: var(--bg3); border: 1px solid var(--b1); border-radius: var(--r); padding: 8px 14px; font-family: var(--fm); font-size: 12px; color: var(--t0); width: 260px; outline: none; transition: border-color .15s; }
+.search-estado::placeholder { color: var(--t3); }
+.search-estado:focus { border-color: var(--am); }
 .estado-badge-bueno { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); }
 .estado-badge-cromado { background: var(--amd); color: var(--am); border: 1px solid var(--amb); }
 .estado-badge-reacondicionado { background: rgba(251,146,60,.15); color: var(--or); border: 1px solid rgba(251,146,60,.3); }
 .estado-badge-otro { background: var(--red); color: var(--re); border: 1px solid var(--reb); }
-.pieza-item {
-  border-bottom: 1px solid var(--b0);
-  padding: 8px 0;
-}
-.pieza-item:last-child {
-  border-bottom: none;
-}
+.pieza-item { border-bottom: 1px solid var(--b0); padding: 8px 0; }
+.pieza-item:last-child { border-bottom: none; }
 
-.card-stock-inventario {
-  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
-  border-radius: var(--rl);
-  border: 1px solid var(--b1);
-  overflow-x: auto;
-  transition: all 0.3s ease;
-  margin-bottom: 13px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-.card-stock-inventario:hover {
-  border-color: var(--amb);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  transform: translateY(-2px);
-}
-.card-stock-inventario .ct {
-  background: var(--bg1);
-  margin: 0 0 13px 0;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--b1);
-  position: relative;
-  font-size: 12px;
-  color: var(--am);
-  letter-spacing: 0.12em;
-}
-.card-stock-inventario .ct::before {
-  content: "📦";
-  margin-right: 8px;
-  font-size: 14px;
-}
-.card-stock-inventario .ct::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 20px;
-  width: 40px;
-  height: 2px;
-  background: var(--am);
-}
-#tbl-stock {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  table-layout: auto;
-  min-width: 800px;
-}
-#tbl-stock thead th {
-  background: var(--bg1);
-  color: var(--am);
-  font-family: var(--fh);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--b2);
-  white-space: nowrap;
-  text-align: left;
-}
-#tbl-stock thead th:nth-child(2),
-#tbl-stock thead th:nth-child(3),
-#tbl-stock thead th:nth-child(4),
-#tbl-stock thead th:nth-child(5),
-#tbl-stock thead th:nth-child(6) {
-  text-align: right;
-}
-#tbl-stock tbody td {
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--b0);
-  transition: background 0.2s ease;
-  background: var(--bg2);
-  vertical-align: middle;
-}
-#tbl-stock tbody td.tr {
-  font-family: var(--fm);
-  font-weight: 500;
-  text-align: right;
-}
-#tbl-stock tbody td:first-child,
-#tbl-stock tbody td:nth-child(7),
-#tbl-stock tbody td:nth-child(8) {
-  text-align: left;
-}
-#tbl-stock .zero, #tbl-stock .low, #tbl-stock .ok-stock {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  min-width: 40px;
-  text-align: center;
-}
-#tbl-stock .zero {
-  background: rgba(240,82,82,0.15);
-  color: var(--re);
-  font-weight: 700;
-}
-#tbl-stock .low {
-  background: rgba(245,166,35,0.15);
-  color: var(--am);
-  font-weight: 700;
-}
-#tbl-stock .ok-stock {
-  background: rgba(61,214,140,0.15);
-  color: var(--gr);
-  font-weight: 700;
-}
-.badge-stock-completo {
-  background: var(--grd);
-  color: var(--gr);
-  border: 1px solid var(--grb);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.badge-stock-parcial {
-  background: var(--amd);
-  color: var(--am);
-  border: 1px solid var(--amb);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.badge-stock-sin {
-  background: var(--red);
-  color: var(--re);
-  border: 1px solid var(--reb);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
+.card-stock-inventario { background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%); border-radius: var(--rl); border: 1px solid var(--b1); overflow-x: auto; transition: all 0.3s ease; margin-bottom: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.card-stock-inventario:hover { border-color: var(--amb); box-shadow: 0 8px 20px rgba(0,0,0,0.3); transform: translateY(-2px); }
+.card-stock-inventario .ct { background: var(--bg1); margin: 0 0 13px 0; padding: 12px 20px; border-bottom: 1px solid var(--b1); position: relative; font-size: 12px; color: var(--am); letter-spacing: 0.12em; }
+.card-stock-inventario .ct::before { content: "📦"; margin-right: 8px; font-size: 14px; }
+.card-stock-inventario .ct::after { content: ""; position: absolute; bottom: -1px; left: 20px; width: 40px; height: 2px; background: var(--am); }
+#tbl-stock { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: auto; min-width: 800px; }
+#tbl-stock thead th { background: var(--bg1); color: var(--am); font-family: var(--fh); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid var(--b2); white-space: nowrap; text-align: left; }
+#tbl-stock thead th:nth-child(2), #tbl-stock thead th:nth-child(3), #tbl-stock thead th:nth-child(4), #tbl-stock thead th:nth-child(5), #tbl-stock thead th:nth-child(6) { text-align: right; }
+#tbl-stock tbody td { padding: 12px 10px; border-bottom: 1px solid var(--b0); transition: background 0.2s ease; background: var(--bg2); vertical-align: middle; }
+#tbl-stock tbody td.tr { font-family: var(--fm); font-weight: 500; text-align: right; }
+#tbl-stock tbody td:first-child, #tbl-stock tbody td:nth-child(7), #tbl-stock tbody td:nth-child(8) { text-align: left; }
+#tbl-stock .zero, #tbl-stock .low, #tbl-stock .ok-stock { display: inline-block; padding: 2px 8px; border-radius: 20px; min-width: 40px; text-align: center; }
+#tbl-stock .zero { background: rgba(240,82,82,0.15); color: var(--re); font-weight: 700; }
+#tbl-stock .low { background: rgba(245,166,35,0.15); color: var(--am); font-weight: 700; }
+#tbl-stock .ok-stock { background: rgba(61,214,140,0.15); color: var(--gr); font-weight: 700; }
+.badge-stock-completo { background: var(--grd); color: var(--gr); border: 1px solid var(--grb); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+.badge-stock-parcial { background: var(--amd); color: var(--am); border: 1px solid var(--amb); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+.badge-stock-sin { background: var(--red); color: var(--re); border: 1px solid var(--reb); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
 .badge-stock-completo::before { content: "✓"; font-size: 10px; }
 .badge-stock-parcial::before { content: "⚠"; font-size: 10px; }
 .badge-stock-sin::before { content: "✗"; font-size: 10px; }
 
-/* ========== OPERATIVIDAD ========== */
-.op-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-  gap: 10px;
-}
-.op-card {
-  background: var(--bg3);
-  border: 1px solid var(--b1);
-  border-radius: var(--rl);
-  padding: 10px 6px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .2s;
-  user-select: none;
-}
-.op-card:hover {
-  border-color: var(--am);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,.3);
-}
-.op-card img {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 5px;
-}
-.op-card .op-nombre {
-  font-family: var(--fh);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--t0);
-  line-height: 1.1;
-}
-.op-card .op-pct {
-  font-family: var(--fm);
-  font-size: 19px;
-  font-weight: 700;
-  margin-top: 3px;
-  line-height: 1;
-}
-.op-card .op-barra {
-  background: var(--bg5);
-  height: 4px;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-.op-card .op-barra-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width .5s;
-}
-.op-card .op-sub {
-  font-family: var(--fm);
-  font-size: 9px;
-  color: var(--t2);
-  margin-top: 4px;
-}
+.op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
+.op-card { background: var(--bg3); border: 1px solid var(--b1); border-radius: var(--rl); padding: 10px 6px; text-align: center; cursor: pointer; transition: all .2s; user-select: none; }
+.op-card:hover { border-color: var(--am); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.op-card img { width: 56px; height: 56px; object-fit: contain; display: block; margin: 0 auto 5px; }
+.op-card .op-nombre { font-family: var(--fh); font-size: 12px; font-weight: 700; color: var(--t0); line-height: 1.1; }
+.op-card .op-pct { font-family: var(--fm); font-size: 19px; font-weight: 700; margin-top: 3px; line-height: 1; }
+.op-card .op-barra { background: var(--bg5); height: 4px; border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.op-card .op-barra-fill { height: 100%; border-radius: 2px; transition: width .5s; }
+.op-card .op-sub { font-family: var(--fm); font-size: 9px; color: var(--t2); margin-top: 4px; }
 
-/* Modal operatividad */
 #modal-operatividad .modal-box { max-width: 620px; }
-.op-modal-resumen {
-  display: flex;
-  gap: 22px;
-  margin-bottom: 16px;
-  padding: 14px 16px;
-  background: var(--bg3);
-  border-radius: var(--rl);
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-.op-modal-resumen-item {
-  text-align: center;
-}
-.op-modal-resumen-item .op-num {
-  font-family: var(--fh);
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1;
-}
-.op-modal-resumen-item .op-lbl {
-  font-family: var(--fm);
-  font-size: 9px;
-  color: var(--t2);
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  margin-top: 6px;
-}
-.op-modal-piezas {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 40vh;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-.op-modal-pieza {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  background: var(--bg3);
-  border-radius: var(--r);
-  border-left: 3px solid;
-  font-size: 12px;
-}
-.op-modal-pieza .op-ico {
-  font-weight: 700;
-  font-size: 14px;
-  width: 18px;
-  flex-shrink: 0;
-  text-align: center;
-}
-.op-modal-pieza .op-comp {
-  flex: 1;
-  color: var(--t0);
-  font-weight: 500;
-}
-.op-modal-pieza .op-est {
-  font-family: var(--fm);
-  font-size: 10px;
-  text-align: right;
-}
-.op-modal-pct-final {
-  margin-top: 18px;
-  padding: 16px;
-  border-radius: var(--rl);
-  text-align: center;
-  background: var(--bg3);
-  border: 1px solid var(--b1);
-}
-.op-modal-pct-final-label {
-  font-family: var(--fm);
-  font-size: 10px;
-  color: var(--t2);
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.op-modal-pct-final-val {
-  font-family: var(--fh);
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1;
-}
+.op-modal-resumen { display: flex; gap: 22px; margin-bottom: 16px; padding: 14px 16px; background: var(--bg3); border-radius: var(--rl); flex-wrap: wrap; justify-content: space-around; }
+.op-modal-resumen-item { text-align: center; }
+.op-modal-resumen-item .op-num { font-family: var(--fh); font-size: 30px; font-weight: 700; line-height: 1; }
+.op-modal-resumen-item .op-lbl { font-family: var(--fm); font-size: 9px; color: var(--t2); letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+.op-modal-piezas { display: flex; flex-direction: column; gap: 6px; max-height: 40vh; overflow-y: auto; padding-right: 4px; }
+.op-modal-pieza { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--bg3); border-radius: var(--r); border-left: 3px solid; font-size: 12px; }
+.op-modal-pieza .op-ico { font-weight: 700; font-size: 14px; width: 18px; flex-shrink: 0; text-align: center; }
+.op-modal-pieza .op-comp { flex: 1; color: var(--t0); font-weight: 500; }
+.op-modal-pieza .op-est { font-family: var(--fm); font-size: 10px; text-align: right; }
+.op-modal-pct-final { margin-top: 18px; padding: 16px; border-radius: var(--rl); text-align: center; background: var(--bg3); border: 1px solid var(--b1); }
+.op-modal-pct-final-label { font-family: var(--fm); font-size: 10px; color: var(--t2); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
+.op-modal-pct-final-val { font-family: var(--fh); font-size: 48px; font-weight: 700; line-height: 1; }
 
-/* ========== DISTRIBUCIÓN DE ESTADOS (REDISEÑO) ========== */
-.dist-chart-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  align-items: center;
-  width: 100%;
-}
-.dist-chart-canvas-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 320px;
-  aspect-ratio: 1 / 1;
-  min-height: 260px;
-  margin: 0 auto;
-}
-.dist-chart-canvas-wrap canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-.dist-chart-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  pointer-events: none;
-  user-select: none;
-  transition: color .2s;
-}
-.dist-chart-center-num {
-  font-family: var(--fh);
-  font-size: 42px;
-  font-weight: 700;
-  color: var(--t0);
-  line-height: 1;
-  letter-spacing: -.02em;
-  transition: color .2s;
-}
-.dist-chart-center-lbl {
-  font-family: var(--fm);
-  font-size: 10px;
-  color: var(--t2);
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  margin-top: 8px;
-  transition: color .2s;
-}
-.dist-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 8px;
-  width: 100%;
-}
-.dist-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: transparent;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all .18s ease;
-  user-select: none;
-}
-.dist-legend-item:hover {
-  background: var(--bg3);
-  border-color: var(--b1);
-  transform: translateY(-1px);
-}
-.dist-legend-item.dim {
-  opacity: .3;
-}
-.dist-legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 2px rgba(255,255,255,.06);
-}
-.dist-legend-name {
-  font-family: var(--fm);
-  font-size: 11px;
-  color: var(--t1);
-  white-space: nowrap;
-}
-.dist-legend-count {
-  font-family: var(--fm);
-  font-size: 11px;
-  color: var(--t2);
-  white-space: nowrap;
-}
+.dist-chart-wrap { display: flex; flex-direction: column; gap: 18px; align-items: center; width: 100%; }
+.dist-chart-canvas-wrap { position: relative; width: 100%; max-width: 320px; aspect-ratio: 1 / 1; min-height: 260px; margin: 0 auto; }
+.dist-chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+.dist-chart-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; user-select: none; transition: color .2s; }
+.dist-chart-center-num { font-family: var(--fh); font-size: 42px; font-weight: 700; color: var(--t0); line-height: 1; letter-spacing: -.02em; transition: color .2s; }
+.dist-chart-center-lbl { font-family: var(--fm); font-size: 10px; color: var(--t2); letter-spacing: .14em; text-transform: uppercase; margin-top: 8px; transition: color .2s; }
+.dist-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 8px; width: 100%; }
+.dist-legend-item { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; background: transparent; border: 1px solid transparent; cursor: pointer; transition: all .18s ease; user-select: none; }
+.dist-legend-item:hover { background: var(--bg3); border-color: var(--b1); transform: translateY(-1px); }
+.dist-legend-item.dim { opacity: .3; }
+.dist-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.06); }
+.dist-legend-name { font-family: var(--fm); font-size: 11px; color: var(--t1); white-space: nowrap; }
+.dist-legend-count { font-family: var(--fm); font-size: 11px; color: var(--t2); white-space: nowrap; }
 
 @media (max-width: 768px) {
-  #tbl-stock thead th, #tbl-stock tbody td {
-    padding: 8px 5px;
-    font-size: 10px;
-  }
+  #tbl-stock thead th, #tbl-stock tbody td { padding: 8px 5px; font-size: 10px; }
 }
 </style>
 </head>
@@ -682,9 +325,7 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="swrap"><div class="dot"></div><span id="dstatus">Cargando...</span></div>
     <span id="last-update"></span>
     <span id="clock">—</span>
-    <button class="btn-refresh" id="btn-refresh" onclick="recargar()">
-      <span id="ri">↻</span> Actualizar datos
-    </button>
+    <button class="btn-refresh" id="btn-refresh" onclick="recargar()"><span id="ri">↻</span> Actualizar datos</button>
   </div>
 </header>
 
@@ -716,26 +357,15 @@ tbody tr:hover td{background:var(--bg3)}
 </nav>
 
 <main class="main">
-
 <section class="tab-s active" id="tab-lam">
   <div class="sh">
-    <div>
-      <div class="sh-t">Control de Camisas — Laminadoras</div>
-      <div class="sh-s">Rectificaciones de cilindros · mm retirados por evento · Datos reales</div>
-    </div>
-    <div class="lam-tog">
-      <button class="ltb active" onclick="switchLam('KLB12',this)">KLB12</button>
-      <button class="ltb" onclick="switchLam('LM1210',this)">LM1210</button>
-    </div>
+    <div><div class="sh-t">Control de Camisas — Laminadoras</div><div class="sh-s">Rectificaciones de cilindros · mm retirados por evento · Datos reales</div></div>
+    <div class="lam-tog"><button class="ltb active" onclick="switchLam('KLB12',this)">KLB12</button><button class="ltb" onclick="switchLam('LM1210',this)">LM1210</button></div>
   </div>
   <div class="krow" id="kpi-lam"></div>
   <div class="g2">
     <div class="card"><div class="ct"><div class="ctd" style="background:var(--or)"></div>Desgaste acumulado de camisas</div><div id="dsgaste-bars"></div></div>
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--re)"></div>Estado y alertas</div>
-      <div id="lam-alerts"></div>
-      <div id="tin-data" style="margin-top:15px;"></div>
-    </div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Estado y alertas</div><div id="lam-alerts"></div><div id="tin-data" style="margin-top:15px;"></div></div>
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--am)"></div>mm retirados por rectificación (eje Y en mm)</div>
@@ -749,76 +379,34 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--t2)"></div>Historial completo de intervenciones</div>
-    <div class="tw">
-      <table>
-        <thead>
-          <tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr>
-        </thead>
-        <tbody id="tbody-lam"></tbody>
-      </table>
-    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Fecha</th><th class="tr">Lento (mm)</th><th class="tr">Rápido (mm)</th><th class="tr">Total (mm)</th><th>Observaciones</th><th>Responsable</th><th id="col-prox" style="display:none">Próximo Rectif.</th></tr></thead>
+      <tbody id="tbody-lam"></tbody>
+    </table></div>
   </div>
 </section>
 
 <section class="tab-s" id="tab-moldes">
-  <div class="sh">
-    <div>
-      <div class="sh-t">Seguimiento de Moldes y Cromado</div>
-      <div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div>
-    </div>
-  </div>
+  <div class="sh"><div><div class="sh-t">Seguimiento de Moldes y Cromado</div><div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div></div></div>
   <div class="krow" id="kpi-moldes"></div>
-  
   <div class="g2">
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div>
-      <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
-        <canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas>
-      </div>
-    </div>
-    
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div>
-      <div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center">
-        <canvas id="chart-estado-moldes" style="max-width:280px; max-height:280px"></canvas>
-      </div>
-    </div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div><div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center"><canvas id="chart-cromado-estado" style="max-width:280px; max-height:280px"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div><div style="position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center"><canvas id="chart-estado-moldes" style="max-width:280px; max-height:280px"></canvas></div></div>
   </div>
-  
   <div class="g7030">
-    <div class="card" style="margin-bottom:0">
-      <div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
+    <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
       <div style="display:flex;gap:13px;margin-bottom:11px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#3dd68c"></div>Por debajo del nominal</div>
         <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f5a623"></div>Dentro de ±300 g</div>
         <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:10px;height:10px;border-radius:2px;background:#f05252"></div>Más de +300 g sobre nominal</div>
-        <div style="display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--t2)"><div style="width:2px;height:12px;background:white"></div>Nominal (línea blanca)</div>
       </div>
       <div id="pesos-bars-container" style="width:100%; overflow-x:auto; padding-bottom:5px;"></div>
     </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div>
-      <div id="alerts-moldes"></div>
-    </div>
+    <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Alertas críticas</div><div id="alerts-moldes"></div></div>
   </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Detalle por molde</div>
-    <div class="mg" id="molde-cards"></div>
-  </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial de Cromados · <span style="color:var(--re)">■</span> fila resaltada = aún en proceso</div>
-    <div class="notice" style="margin-bottom:11px">
-      <div style="font-size:14px;flex-shrink:0">ℹ</div>
-      <div class="notice-t">Filas <strong style="color:var(--re)">resaltadas en rojo</strong> = moldes enviados a cromado <strong>sin fecha de recepción</strong></div>
-    </div>
-    <div class="tw">
-      <table>
-        <thead>
-          <tr><th>Molde</th><th>Fecha Envío</th><th>Fecha Recepción</th><th class="tr">Días</th><th>Proveedor</th><th>Transporte Ida</th><th>Detalle</th><th>Observaciones</th></tr>
-        </thead>
-        <tbody id="tbody-cromado"></tbody>
-      </table>
-    </div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Detalle por molde</div><div class="mg" id="molde-cards"></div></div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial de Cromados · <span style="color:var(--re)">■</span> fila resaltada = aún en proceso</div>
+    <div class="tw"><table><thead><tr><th>Molde</th><th>Fecha Envío</th><th>Fecha Recepción</th><th class="tr">Días</th><th>Proveedor</th><th>Transporte Ida</th><th>Detalle</th><th>Observaciones</th></tr></thead><tbody id="tbody-cromado"></tbody></table></div>
   </div>
 </section>
 
@@ -826,45 +414,19 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="sh"><div><div class="sh-t">Stock de Repuestos de Moldes</div><div class="sh-s">Boquillas · Arañas · Dados · Placa Base · Frenos · 11 tipos de molde</div></div><button class="btn btn-a" onclick="genFaltantes()">▼ Generar lista de faltantes</button></div>
   <div class="krow" id="kpi-stock"></div>
   <div class="stock-search-wrap"><span style="font-family:var(--fm);font-size:11px;color:var(--t2);">Buscar molde:</span><input class="stock-search" id="stock-search" type="text" placeholder="Ej: H8, H12, P18, DM20..." oninput="filterStock()"><span id="stock-count" style="font-family:var(--fm);font-size:11px;color:var(--t2)"></span></div>
-  
-  <div class="card-stock-inventario">
-    <div class="ct">Inventario por tipo de molde</div>
-    <div class="tw">
-      <table id="tbl-stock">
-        <thead>
-          <tr><th>Tipo de Molde</th><th class="tr">Boquillas</th><th class="tr">Arañas [juegos]</th><th class="tr">Dados [juegos]</th><th class="tr">Placa Base</th><th class="tr">Frenos [juegos]</th><th>Fecha Revisión</th><th>Estado general</th></tr>
-        </thead>
-        <tbody id="tbody-stock"></tbody>
-      </table>
-    </div>
+  <div class="card-stock-inventario"><div class="ct">Inventario por tipo de molde</div>
+    <div class="tw"><table id="tbl-stock"><thead><tr><th>Tipo de Molde</th><th class="tr">Boquillas</th><th class="tr">Arañas [juegos]</th><th class="tr">Dados [juegos]</th><th class="tr">Placa Base</th><th class="tr">Frenos [juegos]</th><th>Fecha Revisión</th><th>Estado general</th></tr></thead><tbody id="tbody-stock"></tbody></table></div>
   </div>
 </section>
 
 <section class="tab-s" id="tab-mantenimiento">
-  <div class="sh">
-    <div>
-      <div class="sh-t">Registro de Mantenimiento de Moldes</div>
-      <div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div>
-    </div>
-  </div>
+  <div class="sh"><div><div class="sh-t">Registro de Mantenimiento de Moldes</div><div class="sh-s">Historial completo de intervenciones · Tareas realizadas</div></div></div>
   <div class="g2">
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Distribución por tipo de tarea</div>
-      <div id="chart-tareas-tipo" style="min-height:280px">Cargando...</div>
-    </div>
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div>
-      <div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div>
-    </div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--gr)"></div>Distribución por tipo de tarea</div><div id="chart-tareas-tipo" style="min-height:280px">Cargando...</div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Top responsables</div><div id="chart-tareas-responsable" style="min-height:280px">Cargando...</div></div>
   </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead>
-        <tbody id="tbody-mantenimiento"></tbody>
-      </table>
-    </div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Historial completo · Total: <span id="total-intervenciones">0</span> registros</div>
+    <div class="tw"><table><thead><tr><th>Fecha</th><th>Responsable</th><th>Molde/Equipo</th><th>Tipo de tarea</th><th>Descripción</th></tr></thead><tbody id="tbody-mantenimiento"></tbody></table></div>
   </div>
 </section>
 
@@ -875,123 +437,52 @@ tbody tr:hover td{background:var(--bg3)}
 </section>
 
 <section class="tab-s" id="tab-planos">
-  <div class="sh">
-    <div>
-      <div class="sh-t">Planos y Referencias Técnicas</div>
-      <div class="sh-s">Tipos de ladrillos · Planos de moldes · Documentación técnica</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Tipos de Ladrillos · Referencia visual</div>
-    <div class="mg" id="ladrillos-gallery"></div>
-  </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Planos de Moldes · Hacer clic para ampliar</div>
-    <div class="mg" id="planos-moldes-gallery"></div>
-  </div>
+  <div class="sh"><div><div class="sh-t">Planos y Referencias Técnicas</div><div class="sh-s">Tipos de ladrillos · Planos de moldes · Documentación técnica</div></div></div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--gr)"></div>Tipos de Ladrillos · Referencia visual</div><div class="mg" id="ladrillos-gallery"></div></div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Planos de Moldes · Hacer clic para ampliar</div><div class="mg" id="planos-moldes-gallery"></div></div>
 </section>
 
 <section class="tab-s" id="tab-estadoPiezas">
   <div class="sh">
-    <div>
-      <div class="sh-t">Estado de Piezas por Molde</div>
-      <div class="sh-s">Componentes, estado actual, acciones requeridas y fechas de revisión</div>
-    </div>
-    <div style="display:flex; gap:10px;">
-      <input type="text" id="search-estado" class="search-estado" placeholder="Buscar molde (ej: H8 #1)" oninput="filterEstadoPiezas()">
-    </div>
+    <div><div class="sh-t">Estado de Piezas por Molde</div><div class="sh-s">Componentes, estado actual, acciones requeridas y fechas de revisión</div></div>
+    <div style="display:flex; gap:10px;"><input type="text" id="search-estado" class="search-estado" placeholder="Buscar molde (ej: H8 #1)" oninput="filterEstadoPiezas()"></div>
   </div>
   <div class="krow" id="kpi-estado"></div>
   <div class="g2">
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución de Estados</div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Distribución de Estados</div>
       <div class="dist-chart-wrap">
         <div class="dist-chart-canvas-wrap">
           <canvas id="chart-estado-piezas"></canvas>
-          <div class="dist-chart-center">
-            <div class="dist-chart-center-num" id="dist-center-num">0</div>
-            <div class="dist-chart-center-lbl" id="dist-center-lbl">piezas</div>
-          </div>
+          <div class="dist-chart-center"><div class="dist-chart-center-num" id="dist-center-num">0</div><div class="dist-chart-center-lbl" id="dist-center-lbl">piezas</div></div>
         </div>
         <div class="dist-legend" id="dist-legend"></div>
       </div>
     </div>
-    <div class="card">
-      <div class="ct"><div class="ctd" style="background:var(--gr)"></div>Porcentaje de Operatividad</div>
-      <div id="operatividad-container"></div>
-    </div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--gr)"></div>Porcentaje de Operatividad</div><div id="operatividad-container"></div></div>
   </div>
-  <div class="card">
-    <div class="ct"><div class="ctd" style="background:var(--te)"></div>Piezas agrupadas por Molde</div>
-    <div id="estado-cards-container" class="mg"></div>
-  </div>
+  <div class="card"><div class="ct"><div class="ctd" style="background:var(--te)"></div>Piezas agrupadas por Molde</div><div id="estado-cards-container" class="mg"></div></div>
 </section>
-
 </main>
 
 <footer class="footer">Matriceria Planta Cevil · Sistema de Control de Producción v3 · Datos: Google Sheets</footer>
 
-<div class="modal-ov" id="modal-falt">
-  <div class="modal-box" style="max-width:500px">
-    <div class="modal-head">
-      <div class="modal-title">Lista de Faltantes — Compras</div>
-      <button class="mclose" onclick="document.getElementById('modal-falt').classList.remove('open')">✕</button>
-    </div>
-    <div id="modal-content"></div>
-    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-g" onclick="copyFalt()">Copiar texto</button>
-      <button class="btn btn-a" onclick="document.getElementById('modal-falt').classList.remove('open')">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-ov" id="modal-plano">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-title" id="plano-title">Plano</div>
-      <button class="mclose" onclick="document.getElementById('modal-plano').classList.remove('open')">✕</button>
-    </div>
-    <div id="plano-content" style="text-align:center">
-      <img id="plano-img" src="" style="max-width:100%;max-height:60vh;border-radius:var(--r)">
-    </div>
-    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-g" onclick="window.open(document.getElementById('plano-img').src,'_blank')">Abrir en nueva pestaña</button>
-      <button class="btn btn-a" onclick="document.getElementById('modal-plano').classList.remove('open')">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-ov" id="modal-operatividad">
-  <div class="modal-box">
-    <div class="modal-head">
-      <div class="modal-title" id="op-modal-title">Detalle de Operatividad</div>
-      <button class="mclose" onclick="cerrarModalOperatividad()">✕</button>
-    </div>
-    <div id="op-modal-content"></div>
-    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-a" onclick="cerrarModalOperatividad()">Cerrar</button>
-    </div>
-  </div>
-</div>
+<div class="modal-ov" id="modal-falt"><div class="modal-box" style="max-width:500px"><div class="modal-head"><div class="modal-title">Lista de Faltantes — Compras</div><button class="mclose" onclick="document.getElementById('modal-falt').classList.remove('open')">✕</button></div><div id="modal-content"></div><div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-g" onclick="copyFalt()">Copiar texto</button><button class="btn btn-a" onclick="document.getElementById('modal-falt').classList.remove('open')">Cerrar</button></div></div></div>
+<div class="modal-ov" id="modal-plano"><div class="modal-box"><div class="modal-head"><div class="modal-title" id="plano-title">Plano</div><button class="mclose" onclick="document.getElementById('modal-plano').classList.remove('open')">✕</button></div><div id="plano-content" style="text-align:center"><img id="plano-img" src="" style="max-width:100%;max-height:60vh;border-radius:var(--r)"></div><div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-g" onclick="window.open(document.getElementById('plano-img').src,'_blank')">Abrir en nueva pestaña</button><button class="btn btn-a" onclick="document.getElementById('modal-plano').classList.remove('open')">Cerrar</button></div></div></div>
+<div class="modal-ov" id="modal-operatividad"><div class="modal-box"><div class="modal-head"><div class="modal-title" id="op-modal-title">Detalle de Operatividad</div><button class="mclose" onclick="cerrarModalOperatividad()">✕</button></div><div id="op-modal-content"></div><div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-a" onclick="cerrarModalOperatividad()">Cerrar</button></div></div></div>
 
 <script>
 'use strict';
 
-// ══════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN ESPECIAL KLB12 (para el cálculo de vida útil de camisas)
-// ══════════════════════════════════════════════════════════════════════════
 const KLB12_CONFIG = {
-  originalFabrica: 175,        // Medida original de fábrica de la camisa
-  inicioControlLento: 153,     // Diámetro al que se empezó a medir (lento)
-  inicioControlRapido: 106.9,  // Diámetro al que se empezó a medir (rápido)
-  finVida: 20                  // Medida a la que se considera fin de vida útil
+  originalFabrica: 175,
+  inicioControlLento: 153,
+  inicioControlRapido: 106.9,
+  finVida: 20
 };
 
 const SHEET_ID_LAM = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0';
 const SHEET_ID_SEG = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0';
-
 function sheetCSV(sheetId, gid){ return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}&gid=${gid}`; }
-
 const URLS_SHEETS = {
   CAMISA_KLB12: sheetCSV(SHEET_ID_LAM, '2022492499'),
   CAMISA_LM1210: sheetCSV(SHEET_ID_LAM, '1294970835'),
@@ -1003,33 +494,20 @@ const URLS_SHEETS = {
   ESTAÑO: sheetCSV(SHEET_ID_LAM, '0'),
   ESTADO_PIEZAS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuWo7tg-cxCot76IDBydPW9kqrte9VUiyVmB2sxJlji9Hqklr0zrJDas-wWDMHfu9hLw4WDmacBTfB/pub?output=csv'
 };
-
 const GITHUB_BASE = 'https://raw.githubusercontent.com/matiasromero114/Dashboard-Matricer-a/main/data/';
 const URLS_GITHUB = {
-  CAMISA_KLB12: GITHUB_BASE + 'klb12.csv',
-  CAMISA_LM1210: GITHUB_BASE + 'lm1210.csv',
-  MOLDES: GITHUB_BASE + 'moldes.csv',
-  CROMADO: GITHUB_BASE + 'cromados.csv',
-  STOCK: GITHUB_BASE + 'stock.csv',
-  VIDA_UTIL: GITHUB_BASE + 'vida_util.csv',
-  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv',
-  ESTAÑO: GITHUB_BASE + 'estano.csv'
+  CAMISA_KLB12: GITHUB_BASE + 'klb12.csv', CAMISA_LM1210: GITHUB_BASE + 'lm1210.csv',
+  MOLDES: GITHUB_BASE + 'moldes.csv', CROMADO: GITHUB_BASE + 'cromados.csv',
+  STOCK: GITHUB_BASE + 'stock.csv', VIDA_UTIL: GITHUB_BASE + 'vida_util.csv',
+  MANTENIMIENTO: GITHUB_BASE + 'mantenimiento.csv', ESTAÑO: GITHUB_BASE + 'estano.csv'
 };
-
-const IMAGENES_ESPECIALES = {
-  'H12 BR 9T': 'img/ladrillos/H12-9T.png'
-};
-
-function getImagenLadrillo(molde){
-  if(IMAGENES_ESPECIALES[molde]) return IMAGENES_ESPECIALES[molde];
-  return `img/ladrillos/${molde}.png`;
-}
+const IMAGENES_ESPECIALES = { 'H12 BR 9T': 'img/ladrillos/H12-9T.png' };
+function getImagenLadrillo(molde){ return IMAGENES_ESPECIALES[molde] || `img/ladrillos/${molde}.png`; }
 
 const FB = {
-  KLB12: { maq:'KLB12', ini:{lento:153,rapido:143}, act:{lento:138.7,rapido:119.8}, rows:[] },
+  KLB12: { maq:'KLB12', ini:{lento:153,rapido:143}, act:{lento:120,rapido:89}, rows:[] },
   LM1210: { maq:'LM1210', ini:{lento:153,rapido:143}, act:{lento:137.7,rapido:128.8}, rows:[] },
-  MOLDES: [],
-  CROMADO: [],
+  MOLDES: [], CROMADO: [],
   STOCK: [
     { molde:'H8', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
     { molde:'H12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'10/03/2026' },
@@ -1044,209 +522,95 @@ const FB = {
     { molde:'DM27', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' },
     { molde:'KB', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }
   ],
-  VIDA_UTIL: [],
-  MANTENIMIENTO: [],
-  ESTADO_PIEZAS: []
+  VIDA_UTIL: [], MANTENIMIENTO: [], ESTADO_PIEZAS: []
 };
 
 let STATE = {
-  filter: 'todos',
-  activeTab: 'lam',
-  activeLam: 'KLB12',
+  filter: 'todos', activeTab: 'lam', activeLam: 'KLB12',
   data: { KLB12: null, LM1210: null, MOLDES: null, CROMADO: null, STOCK: null, VIDA_UTIL: null, MANTENIMIENTO: null, ESTAÑO: null, ESTADO_PIEZAS: null },
   usingLive: false
 };
-
 const CReg = {};
-
-function tick(){
-  const n=new Date(), p=v=>String(v).padStart(2,'0');
-  document.getElementById('clock').textContent=`${p(n.getDate())}/${p(n.getMonth()+1)}/${n.getFullYear()} ${p(n.getHours())}:${p(n.getMinutes())}`;
-}
+function tick(){ const n=new Date(), p=v=>String(v).padStart(2,'0'); document.getElementById('clock').textContent=`${p(n.getDate())}/${p(n.getMonth()+1)}/${n.getFullYear()} ${p(n.getHours())}:${p(n.getMinutes())}`; }
 tick(); setInterval(tick,60000);
-
 function dc(id){ if(CReg[id]){CReg[id].destroy();delete CReg[id];} }
 function sn(v,d=0){ if(v===null||v===undefined||v===''||v==='S/D'||v==='-')return d; const n=parseFloat(String(v).replace(',','.')); return isNaN(n)?d:n; }
-function diasEntre(a,b){
-  try{
-    const [da,ma,ya]=a.split('/').map(Number);
-    const [db,mb,yb]=b.split('/').map(Number);
-    return Math.round((new Date(yb,mb-1,db)-new Date(ya,ma-1,da))/(1000*60*60*24));
-  }catch{return null;}
-}
-function diasBadge(d){
-  if(d===null)return '—';
-  const cls=d<=14?'dias-ok':d<=25?'dias-warn':'dias-crit';
-  return `<span class="${cls} tm">${d} días</span>`;
-}
-
-function fechaToNum(f){
-  if(!f) return -1;
-  const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(!m) return -1;
-  return new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1])).getTime();
-}
-
+function diasEntre(a,b){ try{ const [da,ma,ya]=a.split('/').map(Number); const [db,mb,yb]=b.split('/').map(Number); return Math.round((new Date(yb,mb-1,db)-new Date(ya,ma-1,da))/(1000*60*60*24)); }catch{return null;} }
+function diasBadge(d){ if(d===null)return '—'; const cls=d<=14?'dias-ok':d<=25?'dias-warn':'dias-crit'; return `<span class="${cls} tm">${d} días</span>`; }
+function fechaToNum(f){ if(!f) return -1; const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if(!m) return -1; return new Date(parseInt(m[3]), parseInt(m[2])-1, parseInt(m[1])).getTime(); }
 function normID(s){ return (s||'').trim().toUpperCase().replace(/[\s\-_]+/g,''); }
 
 async function fetchCSV(urlSheets, urlGithub){
-  try{
-    const res = await fetch(urlSheets + '&cachebust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
-    if(res.ok){
-      const txt = await res.text();
-      if(txt && !txt.trim().startsWith('<!') && txt.length > 50){
-        return { rows: parseCSVText(txt), source: 'sheets' };
-      }
-    }
+  try{ const res = await fetch(urlSheets + '&cachebust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
+    if(res.ok){ const txt = await res.text(); if(txt && !txt.trim().startsWith('<!') && txt.length > 50){ return { rows: parseCSVText(txt), source: 'sheets' }; } }
   }catch(e){}
-  if(urlGithub){
-    try{
-      const res = await fetch(urlGithub + '?t=' + Date.now(), { cache: 'no-store' });
-      if(res.ok){
-        const txt = await res.text();
-        if(txt && !txt.trim().startsWith('<!') && txt.length > 20){
-          return { rows: parseCSVText(txt), source: 'github' };
-        }
-      }
-    }catch(e){}
-  }
+  if(urlGithub){ try{ const res = await fetch(urlGithub + '?t=' + Date.now(), { cache: 'no-store' });
+    if(res.ok){ const txt = await res.text(); if(txt && !txt.trim().startsWith('<!') && txt.length > 20){ return { rows: parseCSVText(txt), source: 'github' }; } }
+  }catch(e){} }
   return null;
 }
-
 function parseCSVText(txt){
-  const rows = [];
-  let cur = [], field = '', inQ = false;
+  const rows = []; let cur = [], field = '', inQ = false;
   const chars = (txt || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  for(let i=0; i<chars.length; i++){
-    const c=chars[i];
-    if(inQ){
-      if(c==='"' && chars[i+1]==='"'){ field+='"'; i++; }
-      else if(c==='"'){ inQ=false; }
-      else { field+=c; }
-    } else {
-      if(c==='"'){ inQ=true; }
-      else if(c===','){ cur.push(field.trim()); field=''; }
-      else if(c==='\n'){ cur.push(field.trim()); rows.push(cur); cur=[]; field=''; }
-      else { field+=c; }
-    }
+  for(let i=0; i<chars.length; i++){ const c=chars[i];
+    if(inQ){ if(c==='"' && chars[i+1]==='"'){ field+='"'; i++; } else if(c==='"'){ inQ=false; } else { field+=c; } }
+    else { if(c==='"'){ inQ=true; } else if(c===','){ cur.push(field.trim()); field=''; } else if(c==='\n'){ cur.push(field.trim()); rows.push(cur); cur=[]; field=''; } else { field+=c; } }
   }
   if(field||cur.length) { cur.push(field.trim()); rows.push(cur); }
   return rows;
 }
-
 function parseCamisa_KLB12(rows){
   if(!rows||rows.length<8) return null;
   const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
   const actL=sn(rows[2][1]), actR=sn(rows[2][2]);
-  const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({
-    f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[4]||'').trim(), prox:null
-  }));
+  const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({ f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[4]||'').trim(), prox:null }));
   return {maq:'KLB12', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data};
 }
-
 function parseCamisa_LM1210(rows){
   if(!rows||rows.length<8) return null;
   const iniL=sn(rows[1][1]), iniR=sn(rows[1][2]);
   const actL=sn(rows[2][1]), actR=sn(rows[2][2]);
-  const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({
-    f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[5]||'').trim(), prox:(r[6]||'').trim()||null
-  }));
+  const data = rows.slice(7).filter(r=>(r[0]||'').trim() && /\d/.test(r[0])).map(r=>({ f: r[0].trim(), l: sn(r[1]), r: sn(r[2]), obs: (r[3]||'').trim(), resp:(r[5]||'').trim(), prox:(r[6]||'').trim()||null }));
   return {maq:'LM1210', ini:{lento:iniL,rapido:iniR}, act:{lento:actL,rapido:actR}, rows:data};
 }
-
 function parseMoldes(rows){
   if(!rows || rows.length < 4) return [];
   let headerIndex = -1;
-  for(let i = 0; i < Math.min(rows.length, 20); i++){
-    const firstCol = (rows[i][0] || '').trim();
-    if(firstCol === 'Molde'){
-      headerIndex = i;
-      break;
-    }
-  }
+  for(let i = 0; i < Math.min(rows.length, 20); i++){ const firstCol = (rows[i][0] || '').trim(); if(firstCol === 'Molde'){ headerIndex = i; break; } }
   if(headerIndex === -1){ return []; }
   const resultados = [];
   for(let i = headerIndex + 1; i < rows.length; i++){
-    const row = rows[i];
-    if(!row || row.length < 5) continue;
-    const moldeId = (row[0] || '').trim();
-    if(!moldeId || moldeId === '' || moldeId === 'Molde') continue;
+    const row = rows[i]; if(!row || row.length < 5) continue;
+    const moldeId = (row[0] || '').trim(); if(!moldeId || moldeId === '' || moldeId === 'Molde') continue;
     const nominal = parseFloat(String(row[4] || '0').replace(',', '.'));
     const vias = [];
-    for(let v = 5; v <= 12; v++){
-      const val = row[v] ? parseFloat(String(row[v]).replace(',', '.')) : null;
-      if(val !== null && !isNaN(val) && val > 0){
-        vias.push(val);
-      }
-    }
+    for(let v = 5; v <= 12; v++){ const val = row[v] ? parseFloat(String(row[v]).replace(',', '.')) : null; if(val !== null && !isNaN(val) && val > 0) vias.push(val); }
     let promedio = null;
     const promRaw = (row[13] || '').trim();
-    if(promRaw && promRaw !== '' && promRaw !== '-' && promRaw !== 'S/D'){
-      promedio = parseFloat(String(promRaw).replace(',', '.'));
-      if(isNaN(promedio)) promedio = null;
-    }
-    if(!promedio && vias.length > 0){
-      promedio = vias.reduce((a,b) => a + b, 0) / vias.length;
-    }
-    resultados.push({
-      id: normID(moldeId),
-      num: (row[1] || '1').trim(),
-      estado: (row[2] || '').trim(),
-      enPeso: (row[3] || '').trim(),
-      nominal: isNaN(nominal) ? 0 : nominal,
-      prom: promedio,
-      vias: vias,
-      cromado: (row[15] || 'No').trim(),
-      obs: (row[16] || '').trim(),
-      fecha: (row[17] || '').trim()
-    });
+    if(promRaw && promRaw !== '' && promRaw !== '-' && promRaw !== 'S/D'){ promedio = parseFloat(String(promRaw).replace(',', '.')); if(isNaN(promedio)) promedio = null; }
+    if(!promedio && vias.length > 0) promedio = vias.reduce((a,b) => a + b, 0) / vias.length;
+    resultados.push({ id: normID(moldeId), num: (row[1] || '1').trim(), estado: (row[2] || '').trim(), enPeso: (row[3] || '').trim(), nominal: isNaN(nominal) ? 0 : nominal, prom: promedio, vias: vias, cromado: (row[15] || 'No').trim(), obs: (row[16] || '').trim(), fecha: (row[17] || '').trim() });
   }
-  console.log('📊 Moldes parseados:', resultados.length, 'registros');
   return resultados;
 }
-
 function parseCromado(rows){
   if(!rows) return null;
   const hi = rows.findIndex(r=>(r[0]||'').trim()==='Molde' && (r[1]||'').includes('envío'));
   if(hi<0) return null;
-  return rows.slice(hi+1).filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde').map(r=>({
-    molde: (r[0]||'').trim(), envio: (r[1]||'').trim(), recep: (r[2]||'').trim()||null, prov: (r[3]||'').trim(), tIda: (r[4]||'').trim(), det: (r[6]||'').trim(), obs: (r[7]||'').trim()
-  }));
+  return rows.slice(hi+1).filter(r=>(r[0]||'').trim() && (r[0]||'').trim()!=='Molde').map(r=>({ molde: (r[0]||'').trim(), envio: (r[1]||'').trim(), recep: (r[2]||'').trim()||null, prov: (r[3]||'').trim(), tIda: (r[4]||'').trim(), det: (r[6]||'').trim(), obs: (r[7]||'').trim() }));
 }
-
 function parseStock(rows){
   if(!rows || rows.length === 0) return [];
   let headerIndex = -1;
-  for(let i=0; i<Math.min(rows.length, 30); i++){
-    const row = rows[i];
-    if(!row) continue;
-    if(row.some(cell => cell && cell.trim().toLowerCase() === 'molde')){
-      headerIndex = i;
-      break;
-    }
-  }
+  for(let i=0; i<Math.min(rows.length, 30); i++){ const row = rows[i]; if(!row) continue; if(row.some(cell => cell && cell.trim().toLowerCase() === 'molde')){ headerIndex = i; break; } }
+  const resultados = [];
   if(headerIndex === -1){
-    console.warn('⚠️ No se encontró cabecera "Molde" en Stock. Usando índices por defecto.');
-    const resultados = [];
     for(let i=1; i<rows.length; i++){
-      const row = rows[i];
-      if(!row || row.length < 3) continue;
-      let molde = (row[1] || '').trim();
-      if(!molde || molde === '' || molde === 'Molde') continue;
+      const row = rows[i]; if(!row || row.length < 3) continue;
+      let molde = (row[1] || '').trim(); if(!molde || molde === '' || molde === 'Molde') continue;
       molde = molde.replace(/^["']|["']$/g, '').trim();
-      if(molde.length > 0 && molde !== 'Ladrilo'){
-        resultados.push({
-          molde: molde,
-          boquillas: sn(row[3]),
-          aranas: sn(row[4]),
-          dados: sn(row[5]),
-          placaBase: sn(row[6]),
-          frenos: sn(row[7]),
-          rev: (row[8] || '').trim()
-        });
-      }
+      if(molde.length > 0 && molde !== 'Ladrilo') resultados.push({ molde: molde, boquillas: sn(row[3]), aranas: sn(row[4]), dados: sn(row[5]), placaBase: sn(row[6]), frenos: sn(row[7]), rev: (row[8] || '').trim() });
     }
-    console.log('📦 Stock parseado (fallback):', resultados.length, 'registros');
     return resultados;
   }
   const headers = rows[headerIndex].map(c => (c||'').trim().toLowerCase());
@@ -1257,161 +621,74 @@ function parseStock(rows){
   const idxPlaca = headers.findIndex(h => h.includes('placa base'));
   const idxFrenos = headers.findIndex(h => h.includes('freno'));
   const idxRev = headers.findIndex(h => h.includes('fecha') || h.includes('revisión') || h === 'rev');
-  
-  const resultados = [];
   for(let i=headerIndex+1; i<rows.length; i++){
-    const row = rows[i];
-    if(!row || row.length < 2) continue;
+    const row = rows[i]; if(!row || row.length < 2) continue;
     let molde = (idxMolde !== -1 && row[idxMolde]) ? row[idxMolde].trim() : '';
     if(!molde) continue;
     molde = molde.replace(/^["']|["']$/g, '').trim();
     if(molde === '' || molde === 'Ladrilo') continue;
-    const boquillas = (idxBoquillas !== -1) ? sn(row[idxBoquillas]) : 0;
-    const aranas = (idxAranas !== -1) ? sn(row[idxAranas]) : 0;
-    const dados = (idxDados !== -1) ? sn(row[idxDados]) : 0;
-    const placaBase = (idxPlaca !== -1) ? sn(row[idxPlaca]) : 0;
-    const frenos = (idxFrenos !== -1) ? sn(row[idxFrenos]) : 0;
-    const rev = (idxRev !== -1 && row[idxRev]) ? row[idxRev].trim() : '';
-    resultados.push({ molde, boquillas, aranas, dados, placaBase, frenos, rev });
+    resultados.push({ molde, boquillas: (idxBoquillas !== -1) ? sn(row[idxBoquillas]) : 0, aranas: (idxAranas !== -1) ? sn(row[idxAranas]) : 0, dados: (idxDados !== -1) ? sn(row[idxDados]) : 0, placaBase: (idxPlaca !== -1) ? sn(row[idxPlaca]) : 0, frenos: (idxFrenos !== -1) ? sn(row[idxFrenos]) : 0, rev: (idxRev !== -1 && row[idxRev]) ? row[idxRev].trim() : '' });
   }
-  console.log('📦 Stock parseado con mapeo:', resultados.length, 'registros');
   return resultados;
 }
-
 function parseVidaUtil(rows){
   if(!rows) return null;
   const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde');
   if(hi < 0) return null;
-  return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde').map(r => ({
-    molde: (r[0]||'').trim(),
-    numero: (r[1]||'').toString().trim(),
-    clave: (r[2]||'').trim(),
-    inicio: (r[3]||'').trim(),
-    fin: (r[4]||'').trim() || null,
-    tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0,
-    horas: (r[6]||'').trim(),
-    pallets: (r[7]||'').trim() || null
-  }));
+  return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde').map(r => ({ molde: (r[0]||'').trim(), numero: (r[1]||'').toString().trim(), clave: (r[2]||'').trim(), inicio: (r[3]||'').trim(), fin: (r[4]||'').trim() || null, tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0, horas: (r[6]||'').trim(), pallets: (r[7]||'').trim() || null }));
 }
-
 function parseMantenimiento(rows){
   if(!rows || rows.length < 2) return [];
   const datos = [];
   for(let i = 0; i < rows.length; i++){
-    const row = rows[i];
-    if(!row || row.length < 3) continue;
+    const row = rows[i]; if(!row || row.length < 3) continue;
     const primeraCol = (row[0] || '').trim();
-    const esFecha = /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(primeraCol);
-    if(esFecha){
-      datos.push({
-        fecha: primeraCol,
-        responsable: (row[1] || '').trim(),
-        moldeEquipo: (row[2] || '').trim(),
-        tipoTarea: (row[3] || '').trim(),
-        descripcion: (row[4] || '').trim()
-      });
-    }
+    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(primeraCol)) datos.push({ fecha: primeraCol, responsable: (row[1] || '').trim(), moldeEquipo: (row[2] || '').trim(), tipoTarea: (row[3] || '').trim(), descripcion: (row[4] || '').trim() });
   }
-  console.log('📋 Mantenimiento encontrado:', datos.length, 'registros');
   return datos;
 }
-
 function parseEstano(rows){
   if(!rows || rows.length < 3) return null;
-  let guia = '';
-  if(rows[0] && rows[0][5]) guia = rows[0][5].trim();
+  let guia = ''; if(rows[0] && rows[0][5]) guia = rows[0][5].trim();
   if(!guia) guia = 'Diferencia crítica: 6 mm entre centro y esquinas. 6 vueltas = 1 mm.';
   let ultimoRegistro = null;
   for(let i = rows.length-1; i >= 1; i--){
-    const row = rows[i];
-    if(!row || row.length < 6) continue;
+    const row = rows[i]; if(!row || row.length < 6) continue;
     const fecha = row[0] ? row[0].trim() : '';
     const centro = parseFloat(String(row[1]).replace(',', '.'));
     const esquina = parseFloat(String(row[2]).replace(',', '.'));
     const diferencia = parseFloat(String(row[3]).replace(',', '.'));
     const vueltas = row[4] ? parseFloat(String(row[4]).replace(',', '.')) : null;
     const observaciones = row[5] ? row[5].trim() : '';
-    if(fecha && !isNaN(centro) && !isNaN(esquina)){
-      ultimoRegistro = {
-        fecha: fecha,
-        centro: centro,
-        esquina: esquina,
-        diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia,
-        vueltas: vueltas,
-        observaciones: observaciones
-      };
-      break;
-    }
+    if(fecha && !isNaN(centro) && !isNaN(esquina)){ ultimoRegistro = { fecha, centro, esquina, diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia, vueltas, observaciones }; break; }
   }
   if(!ultimoRegistro) return null;
   return { guia, ultimo: ultimoRegistro };
 }
-
 function parseEstadoPiezas(rows){
-  if(!rows || rows.length < 2){
-    console.warn('⚠️ No hay filas para parsear Estado de Piezas');
-    return [];
-  }
-  let headerIndex = -1;
-  let idxMolde = -1, idxNumero = -1, idxComponente = -1, idxEstado = -1, idxAccion = -1, idxObservacion = -1, idxFecha = -1;
-  for(let i=0; i<Math.min(rows.length, 30); i++){
-    const row = rows[i];
-    for(let j=0; j<row.length; j++){
-      const cell = (row[j] || '').trim().toLowerCase();
-      if(cell === 'molde'){
-        headerIndex = i;
-        idxMolde = j;
-        break;
-      }
-    }
-    if(headerIndex !== -1) break;
-  }
+  if(!rows || rows.length < 2) return [];
+  let headerIndex = -1; let idxMolde = -1, idxNumero = -1, idxComponente = -1, idxEstado = -1, idxAccion = -1, idxObservacion = -1, idxFecha = -1;
+  for(let i=0; i<Math.min(rows.length, 30); i++){ const row = rows[i]; for(let j=0; j<row.length; j++){ const cell = (row[j] || '').trim().toLowerCase(); if(cell === 'molde'){ headerIndex = i; idxMolde = j; break; } } if(headerIndex !== -1) break; }
+  const resultados = [];
   if(headerIndex === -1){
-    console.warn('⚠️ No se encontró fila "Molde". Usando primera fila como datos.');
-    const resultados = [];
-    for(let i=0; i<rows.length; i++){
-      const row = rows[i];
-      if(!row || row.length < 2) continue;
-      const molde = (row[0] || '').trim();
-      if(!molde) continue;
+    for(let i=0; i<rows.length; i++){ const row = rows[i]; if(!row || row.length < 2) continue;
+      const molde = (row[0] || '').trim(); if(!molde) continue;
       const numero = (row[1] || '').trim();
       const componente = (row[3] || '').trim() || 'Pieza';
       let estado = (row[4] || '').trim();
-      const accion = (row[5] || '').trim();
-      const observacion = (row[6] || '').trim();
-      const fecha = (row[7] || '').trim();
+      const accion = (row[5] || '').trim(); const observacion = (row[6] || '').trim(); const fecha = (row[7] || '').trim();
       if(estado.includes('✔')) estado = estado.replace('✔','').trim();
       if(estado === '') estado = 'Sin especificar';
       resultados.push({ molde, numero, componente, estado, accion, observacion, fecha });
     }
-    console.log(`🔧 Estado de Piezas parseado (sin cabecera): ${resultados.length} registros.`);
     return resultados;
   }
   const headers = rows[headerIndex];
-  const colNames = {
-    numero: ['n°','nº','numero'],
-    componente: ['componente','pieza'],
-    estado: ['estado'],
-    accion: ['acción requerida','accion requerida','acción','accion'],
-    observacion: ['observación','observacion','obs'],
-    fecha: ['operatividad','fecha revisión','fecha']
-  };
-  for(let j=0; j<headers.length; j++){
-    const h = (headers[j] || '').trim().toLowerCase();
-    if(h === 'molde') idxMolde = j;
-    else if(colNames.numero.includes(h)) idxNumero = j;
-    else if(colNames.componente.includes(h)) idxComponente = j;
-    else if(colNames.estado.includes(h)) idxEstado = j;
-    else if(colNames.accion.includes(h)) idxAccion = j;
-    else if(colNames.observacion.includes(h)) idxObservacion = j;
-    else if(colNames.fecha.includes(h)) idxFecha = j;
-  }
-  const resultados = [];
+  const colNames = { numero: ['n°','nº','numero'], componente: ['componente','pieza'], estado: ['estado'], accion: ['acción requerida','accion requerida','acción','accion'], observacion: ['observación','observacion','obs'], fecha: ['operatividad','fecha revisión','fecha'] };
+  for(let j=0; j<headers.length; j++){ const h = (headers[j] || '').trim().toLowerCase(); if(h === 'molde') idxMolde = j; else if(colNames.numero.includes(h)) idxNumero = j; else if(colNames.componente.includes(h)) idxComponente = j; else if(colNames.estado.includes(h)) idxEstado = j; else if(colNames.accion.includes(h)) idxAccion = j; else if(colNames.observacion.includes(h)) idxObservacion = j; else if(colNames.fecha.includes(h)) idxFecha = j; }
   for(let i=headerIndex+1; i<rows.length; i++){
-    const row = rows[i];
-    if(!row || row.length < 2) continue;
-    const molde = (idxMolde >=0 && row[idxMolde]) ? row[idxMolde].trim() : '';
-    if(!molde) continue;
+    const row = rows[i]; if(!row || row.length < 2) continue;
+    const molde = (idxMolde >=0 && row[idxMolde]) ? row[idxMolde].trim() : ''; if(!molde) continue;
     const numero = (idxNumero >=0 && row[idxNumero]) ? row[idxNumero].trim() : '';
     let componente = (idxComponente >=0 && row[idxComponente]) ? row[idxComponente].trim() : 'Pieza';
     let estado = (idxEstado >=0 && row[idxEstado]) ? row[idxEstado].trim() : '';
@@ -1423,15 +700,13 @@ function parseEstadoPiezas(rows){
     if(componente === '') componente = 'Pieza';
     resultados.push({ molde, numero, componente, estado, accion, observacion, fecha });
   }
-  console.log(`🔧 Estado de Piezas parseado: ${resultados.length} registros.`);
   return resultados;
 }
 
 async function cargarDatos(){
   const btn = document.getElementById('btn-refresh');
   const ri = document.getElementById('ri');
-  btn.classList.add('loading');
-  ri.classList.add('spinning');
+  btn.classList.add('loading'); ri.classList.add('spinning');
   document.getElementById('dstatus').textContent='Actualizando...';
   let fromSheets=0, fromGithub=0;
   try{
@@ -1447,15 +722,15 @@ async function cargarDatos(){
       fetchCSV(URLS_SHEETS.ESTADO_PIEZAS, null)
     ]);
     [r1,r2,r3,r4,r5,r6,r7,r8,r9].forEach(r=>{ if(r?.source==='sheets') fromSheets++; if(r?.source==='github') fromGithub++; });
-    if(r1){ const p=parseCamisa_KLB12(r1.rows); if(p&&p.rows.length){ STATE.data.KLB12=p; console.log('✅ KLB12:',p.rows.length,'['+r1.source+']'); } }
-    if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length){ STATE.data.LM1210=p; console.log('✅ LM1210:',p.rows.length,'['+r2.source+']'); } }
-    if(r3){ const p=parseMoldes(r3.rows); if(p&&p.length){ STATE.data.MOLDES=p; console.log('✅ Moldes:',p.length,'['+r3.source+']'); } }
-    if(r4){ const p=parseCromado(r4.rows); if(p&&p.length){ STATE.data.CROMADO=p; console.log('✅ Cromado:',p.length,'['+r4.source+']'); } }
-    if(r5){ const p=parseStock(r5.rows); if(p&&p.length){ STATE.data.STOCK=p; console.log('✅ Stock:',p.length,'['+r5.source+']'); } }
-    if(r6){ const p=parseVidaUtil(r6.rows); if(p&&p.length){ STATE.data.VIDA_UTIL=p; console.log('✅ VidaUtil:',p.length,'['+r6.source+']'); } }
-    if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length){ STATE.data.MANTENIMIENTO=p; console.log('✅ Mantenimiento:',p.length,'['+r7.source+']'); } }
-    if(r8){ const p=parseEstano(r8.rows); if(p){ STATE.data.ESTAÑO=p; console.log('✅ Estaño:',p); } }
-    if(r9){ const p=parseEstadoPiezas(r9.rows); if(p&&p.length){ STATE.data.ESTADO_PIEZAS=p; console.log('✅ Estado Piezas:',p.length,'['+r9.source+']'); } }
+    if(r1){ const p=parseCamisa_KLB12(r1.rows); if(p&&p.rows.length) STATE.data.KLB12=p; }
+    if(r2){ const p=parseCamisa_LM1210(r2.rows); if(p&&p.rows.length) STATE.data.LM1210=p; }
+    if(r3){ const p=parseMoldes(r3.rows); if(p&&p.length) STATE.data.MOLDES=p; }
+    if(r4){ const p=parseCromado(r4.rows); if(p&&p.length) STATE.data.CROMADO=p; }
+    if(r5){ const p=parseStock(r5.rows); if(p&&p.length) STATE.data.STOCK=p; }
+    if(r6){ const p=parseVidaUtil(r6.rows); if(p&&p.length) STATE.data.VIDA_UTIL=p; }
+    if(r7){ const p=parseMantenimiento(r7.rows); if(p&&p.length) STATE.data.MANTENIMIENTO=p; }
+    if(r8){ const p=parseEstano(r8.rows); if(p) STATE.data.ESTAÑO=p; }
+    if(r9){ const p=parseEstadoPiezas(r9.rows); if(p&&p.length) STATE.data.ESTADO_PIEZAS=p; }
     if(!STATE.data.KLB12) STATE.data.KLB12 = FB.KLB12;
     if(!STATE.data.LM1210) STATE.data.LM1210 = FB.LM1210;
     if(!STATE.data.MOLDES) STATE.data.MOLDES = FB.MOLDES;
@@ -1468,20 +743,17 @@ async function cargarDatos(){
   }catch(e){ console.error(e); }
   const dot = document.querySelector('.dot');
   let label, color;
-  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/9)`;
-  } else if(fromGithub > 0){ label = `GitHub (${fromGithub}/9)`;
-  } else { label = 'Datos locales'; color = 'var(--re)'; }
+  if(fromSheets > 0){ label = `Sheets en vivo ✓ (${fromSheets}/9)`; }
+  else if(fromGithub > 0){ label = `GitHub (${fromGithub}/9)`; }
+  else { label = 'Datos locales'; color = 'var(--re)'; }
   dot.style.background = color || 'var(--am)';
   document.getElementById('dstatus').textContent = label;
   const now = new Date();
   document.getElementById('last-update').textContent = `Últ. act: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
-  btn.classList.remove('loading');
-  ri.classList.remove('spinning');
+  btn.classList.remove('loading'); ri.classList.remove('spinning');
   renderAll();
 }
-
 function recargar(){ cargarDatos(); }
-
 function renderAll(){
   if(STATE.activeTab === 'lam') buildLam();
   else if(STATE.activeTab === 'moldes') buildMoldes();
@@ -1491,7 +763,6 @@ function renderAll(){
   else if(STATE.activeTab === 'planos') buildPlanos();
   else if(STATE.activeTab === 'estadoPiezas') buildEstadoPiezas();
 }
-
 function switchTab(id, btn){
   document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -1501,32 +772,26 @@ function switchTab(id, btn){
   STATE.activeTab = id;
   renderAll();
 }
-
 function switchLam(m, btn){
   document.querySelectorAll('.ltb').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   STATE.activeLam = m;
   if(STATE.activeTab === 'lam') buildLam();
 }
-
 function setF(f, btn){
   STATE.filter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   if(btn) btn.classList.add('active');
   renderAll();
 }
+function pesoColor(prom, nominal){ if(prom === null || prom === undefined) return '#555a68'; const dif = (prom - nominal) * 1000; if(dif < 0) return '#3dd68c'; if(dif <= 300) return '#f5a623'; return '#f05252'; }
 
-function pesoColor(prom, nominal){
-  if(prom === null || prom === undefined) return '#555a68';
-  const dif = (prom - nominal) * 1000;
-  if(dif < 0) return '#3dd68c';
-  if(dif <= 300) return '#f5a623';
-  return '#f05252';
-}
-
-// ========== BUILD LAMINADORAS ==========
-// Modificado: maneja lógica especial para KLB12 (con Fin de vida = 20mm)
-// y mantiene la lógica original para LM1210.
+// ══════════════════════════════════════════════════════════════════════════
+// BUILD LAMINADORAS
+// KLB12: layout con Original fábrica (texto) · Inicio control (barra baja)
+//        · Actual (barra sube) · Fin de vida (texto)
+// LM1210: layout original sin cambios
+// ══════════════════════════════════════════════════════════════════════════
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
   if(!D) return;
@@ -1536,107 +801,135 @@ function buildLam(){
   const totalR = rows.reduce((s,r)=>s+r.r,0);
   const maxEvL = Math.max(...rows.map(r=>r.l));
   const maxEvR = Math.max(...rows.map(r=>r.r));
-  
   let desgL, desgR, pctL, pctR, cL, cR, barL, barR;
-  
+
   if(STATE.activeLam === 'KLB12'){
     // ══════════════════════════════════════════════════════════════════
-    // LÓGICA ESPECIAL KLB12 — Inicio control 153/106.9 · Fin vida 20 mm
-    // El "Actual" se lee del Sheet (el usuario lo actualiza manualmente).
+    // LÓGICA ESPECIAL KLB12
     // ══════════════════════════════════════════════════════════════════
     const ini = KLB12_CONFIG.inicioControlLento;      // 153
     const iniR = KLB12_CONFIG.inicioControlRapido;    // 106.9
     const orig = KLB12_CONFIG.originalFabrica;        // 175
     const fin = KLB12_CONFIG.finVida;                 // 20
-    
-    const actualLento = D.act.lento;   // viene del Sheet (120)
-    const actualRapido = D.act.rapido; // viene del Sheet (89)
-    
-    // Consumido desde inicio control
-    const consumidoLento = ini - actualLento;
-    const consumidoRapido = iniR - actualRapido;
-    
-    // Rango útil (desde inicio control hasta fin de vida)
-    const rangoUtilLento = ini - fin;
-    const rangoUtilRapido = iniR - fin;
-    
-    // Porcentaje consumido
-    pctL = Math.min((consumidoLento / rangoUtilLento) * 100, 100);
-    pctR = Math.min((consumidoRapido / rangoUtilRapido) * 100, 100);
-    
-    // Guardamos desgaste como mm consumidos desde inicio control
-    desgL = consumidoLento;
-    desgR = consumidoRapido;
-    
-    barL = pctL;
-    barR = pctR;
-    
-    cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
-    cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
-    
-    // CÁLCULO INTERNO (no se ve en la card):
-    // Desgaste por uso = (Desgaste total desde inicio control) / N° intervenciones
+
+    const actualLento = D.act.lento;
+    const actualRapido = D.act.rapido;
+
+    // Rango útil desde inicio control hasta fin de vida
+    const rangoUtilLento = ini - fin;   // 133
+    const rangoUtilRapido = iniR - fin; // 86.9
+
+    // Porcentaje de VIDA RESTANTE (para barra de Inicio control — BAJA)
+    const pctVidaRestanteLento = Math.max(0, Math.min(100, ((actualLento - fin) / rangoUtilLento) * 100));
+    const pctVidaRestanteRapido = Math.max(0, Math.min(100, ((actualRapido - fin) / rangoUtilRapido) * 100));
+
+    // Porcentaje de DESGASTE (para barra de Actual — SUBE)
+    const pctDesgasteLento = 100 - pctVidaRestanteLento;
+    const pctDesgasteRapido = 100 - pctVidaRestanteRapido;
+
+    // Colores: barra de Vida (verde si mucha vida, rojo si poca)
+    const colorVidaLento = pctVidaRestanteLento > 55 ? 'var(--gr)' : pctVidaRestanteLento > 30 ? 'var(--am)' : 'var(--re)';
+    const colorVidaRapido = pctVidaRestanteRapido > 55 ? 'var(--gr)' : pctVidaRestanteRapido > 30 ? 'var(--am)' : 'var(--re)';
+
+    // Colores: barra de Desgaste (verde si poco desgaste, rojo si mucho)
+    const colorDesgasteLento = pctDesgasteLento > 70 ? 'var(--re)' : pctDesgasteLento > 45 ? 'var(--am)' : 'var(--gr)';
+    const colorDesgasteRapido = pctDesgasteRapido > 70 ? 'var(--re)' : pctDesgasteRapido > 45 ? 'var(--am)' : 'var(--gr)';
+
+    // Para las alertas y KPIs usamos el desgaste
+    pctL = pctDesgasteLento;
+    pctR = pctDesgasteRapido;
+    desgL = ini - actualLento;
+    desgR = iniR - actualRapido;
+    cL = colorDesgasteLento;
+    cR = colorDesgasteRapido;
+
+    // CÁLCULO INTERNO de desgaste por uso (no se muestra, solo log)
     const nEventos = rows.length;
-    const desgasteUsoPorEventoLento = nEventos > 0 ? consumidoLento / nEventos : 0;
-    const desgasteUsoPorEventoRapido = nEventos > 0 ? consumidoRapido / nEventos : 0;
-    
+    const desgasteUsoPorEventoLento = nEventos > 0 ? desgL / nEventos : 0;
+    const desgasteUsoPorEventoRapido = nEventos > 0 ? desgR / nEventos : 0;
     console.log('═══════════════════════════════════════════════════════════');
-    console.log('📊 KLB12 — Cálculo de desgaste por uso natural');
-    console.log('───────────────────────────────────────────────────────────');
-    console.log(`Intervenciones registradas: ${nEventos}`);
-    console.log(`LENTO  — Inicio control: ${ini} mm · Actual: ${actualLento} mm`);
-    console.log(`         Desgaste total: ${consumidoLento.toFixed(1)} mm`);
-    console.log(`         Desgaste por uso por evento: ${desgasteUsoPorEventoLento.toFixed(3)} mm`);
-    console.log(`RÁPIDO — Inicio control: ${iniR} mm · Actual: ${actualRapido} mm`);
-    console.log(`         Desgaste total: ${consumidoRapido.toFixed(1)} mm`);
-    console.log(`         Desgaste por uso por evento: ${desgasteUsoPorEventoRapido.toFixed(3)} mm`);
+    console.log('📊 KLB12 — Desgaste por uso natural');
+    console.log(`Intervenciones: ${nEventos}`);
+    console.log(`LENTO  — ${ini} → ${actualLento} mm · ${desgL.toFixed(1)} mm consumidos · ${desgasteUsoPorEventoLento.toFixed(3)} mm/evento`);
+    console.log(`RÁPIDO — ${iniR} → ${actualRapido} mm · ${desgR.toFixed(1)} mm consumidos · ${desgasteUsoPorEventoRapido.toFixed(3)} mm/evento`);
     console.log('═══════════════════════════════════════════════════════════');
-    
-    // KPIs para KLB12
+
+    // KPIs
     document.getElementById('kpi-lam').innerHTML = `
       <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
       <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
       <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>
     `;
-    
-    // Card de desgaste con las 4 filas
+
+    // Card de desgaste — 4 filas por cilindro
     document.getElementById('dsgaste-bars').innerHTML = `
       <div>
-        <div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
-        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk"><div class="db-fill" style="width:100%;background:var(--bg5)"></div></div><span class="db-val">${orig} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${(ini/orig*100).toFixed(0)}%"></div></div><span class="db-val">${ini} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(actualLento/orig*100).toFixed(0)}%;background:${cL}"></div></div><span class="db-val">${actualLento} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk"><div class="db-fill" style="width:${(fin/orig*100).toFixed(0)}%;background:var(--re);opacity:.6"></div></div><span class="db-val">${fin} mm</span></div>
+        <div style="font-size:10px;margin-bottom:10px;font-family:var(--fm);letter-spacing:.08em;color:var(--t2)">CILINDRO LENTO</div>
+        <div class="dbar sin-barra">
+          <span class="db-lbl">Original fábrica</span>
+          <div class="db-trk" style="background:transparent"></div>
+          <span class="db-val">${orig} mm</span>
+        </div>
+        <div class="dbar">
+          <span class="db-lbl">Inicio control</span>
+          <div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteLento}%;background:${colorVidaLento}"></div></div>
+          <span class="db-val">${ini} mm</span>
+        </div>
+        <div class="dbar">
+          <span class="db-lbl">Actual</span>
+          <div class="db-trk"><div class="db-fill" style="width:${pctDesgasteLento}%;background:${colorDesgasteLento}"></div></div>
+          <span class="db-val">${actualLento} mm</span>
+        </div>
+        <div class="dbar sin-barra">
+          <span class="db-lbl">Fin de vida</span>
+          <div class="db-trk" style="background:transparent"></div>
+          <span class="db-val">${fin} mm</span>
+        </div>
       </div>
-      <div style="margin-top:16px">
-        <div style="font-size:10px;margin-bottom:10px">Cilindro Rápido</div>
-        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk"><div class="db-fill" style="width:100%;background:var(--bg5)"></div></div><span class="db-val">${orig} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${(iniR/orig*100).toFixed(0)}%"></div></div><span class="db-val">${iniR} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(actualRapido/orig*100).toFixed(0)}%;background:${cR}"></div></div><span class="db-val">${actualRapido} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk"><div class="db-fill" style="width:${(fin/orig*100).toFixed(0)}%;background:var(--re);opacity:.6"></div></div><span class="db-val">${fin} mm</span></div>
+      <div style="margin-top:18px">
+        <div style="font-size:10px;margin-bottom:10px;font-family:var(--fm);letter-spacing:.08em;color:var(--t2)">CILINDRO RÁPIDO</div>
+        <div class="dbar sin-barra">
+          <span class="db-lbl">Original fábrica</span>
+          <div class="db-trk" style="background:transparent"></div>
+          <span class="db-val">${orig} mm</span>
+        </div>
+        <div class="dbar">
+          <span class="db-lbl">Inicio control</span>
+          <div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteRapido}%;background:${colorVidaRapido}"></div></div>
+          <span class="db-val">${iniR} mm</span>
+        </div>
+        <div class="dbar">
+          <span class="db-lbl">Actual</span>
+          <div class="db-trk"><div class="db-fill" style="width:${pctDesgasteRapido}%;background:${colorDesgasteRapido}"></div></div>
+          <span class="db-val">${actualRapido} mm</span>
+        </div>
+        <div class="dbar sin-barra">
+          <span class="db-lbl">Fin de vida</span>
+          <div class="db-trk" style="background:transparent"></div>
+          <span class="db-val">${fin} mm</span>
+        </div>
       </div>
     `;
   } else {
     // ══════════════════════════════════════════════════════════════════
-    // LÓGICA ORIGINAL (LM1210) — Sin cambios
+    // LÓGICA ORIGINAL LM1210 — sin cambios
     // ══════════════════════════════════════════════════════════════════
     desgL = D.ini.lento - D.act.lento;
     desgR = D.ini.rapido - D.act.rapido;
     pctL = Math.min(desgL/D.ini.lento*100,100);
     pctR = Math.min(desgR/D.ini.rapido*100,100);
-    barL = Math.min(pctL,100);
-    barR = Math.min(pctR,100);
+    barL = Math.min(pctL,100); barR = Math.min(pctR,100);
     cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
     cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
-    
+
     document.getElementById('kpi-lam').innerHTML = `
       <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
       <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
       <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>
     `;
-    
+
     document.getElementById('dsgaste-bars').innerHTML = `
       <div><div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
       <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span class="db-val">${D.ini.lento} mm</span></div>
@@ -1648,101 +941,57 @@ function buildLam(){
       <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span class="db-val">${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>
     `;
   }
-  
-  // Alertas (comunes a ambas máquinas)
+
+  // Alertas
   let alHtml = '';
-  if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm (${pctL.toFixed(1)}%)</div></div></div>`;
-  if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm (${pctR.toFixed(1)}%)</div></div></div>`;
+  if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm consumidos (${pctL.toFixed(1)}%)</div></div></div>`;
+  if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm consumidos (${pctR.toFixed(1)}%)</div></div></div>`;
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
-  
-  // Estaño (sin cambios)
+
+  // Estaño
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
     const reg = tinData.ultimo;
-    const centro = reg.centro;
-    const esquina = reg.esquina;
-    const diferencia = reg.diferencia;
-    const observacion = reg.observaciones || 'Sin observaciones';
-    const fecha = reg.fecha;
-    let estado = '', colorEstado = '', mensaje = '';
+    let colorEstado = '', mensaje = '';
     const idealMin = 1.2, idealMax = 1.5;
-    const diferenciaCritica = (diferencia >= 6);
-    if(diferenciaCritica){
-      estado = 'critical';
-      colorEstado = 'var(--re)';
-      mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm entre centro y esquina';
-    } else if(esquina < idealMin || esquina > idealMax){
-      estado = 'warning';
-      colorEstado = 'var(--am)';
-      mensaje = '⚠ ACERCAR: Esquina fuera del rango ideal (1.2–1.5 mm)';
-    } else {
-      estado = 'ok';
-      colorEstado = 'var(--gr)';
-      mensaje = '✓ Correcto: dentro de parámetros';
-    }
+    if(reg.diferencia >= 6){ colorEstado = 'var(--re)'; mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm entre centro y esquina'; }
+    else if(reg.esquina < idealMin || reg.esquina > idealMax){ colorEstado = 'var(--am)'; mensaje = '⚠ ACERCAR: Esquina fuera del rango ideal (1.2–1.5 mm)'; }
+    else { colorEstado = 'var(--gr)'; mensaje = '✓ Correcto: dentro de parámetros'; }
     let vueltasNecesarias = '';
-    if(esquina > idealMax){
-      const vueltas = (esquina - idealMax) * 6;
-      vueltasNecesarias = `🔧 Se necesitan ≈ ${vueltas.toFixed(1)} vueltas para alcanzar ${idealMax} mm.`;
-    } else if(esquina < idealMin){
-      vueltasNecesarias = `⚠ Esquina por debajo de ${idealMin} mm. Revisar ajuste.`;
-    } else {
-      vueltasNecesarias = `✓ Esquina dentro del rango (${idealMin}–${idealMax} mm).`;
-    }
-    const html = `
+    if(reg.esquina > idealMax){ const vueltas = (reg.esquina - idealMax) * 6; vueltasNecesarias = `🔧 ≈ ${vueltas.toFixed(1)} vueltas para alcanzar ${idealMax} mm.`; }
+    else if(reg.esquina < idealMin){ vueltasNecesarias = `⚠ Esquina por debajo de ${idealMin} mm.`; }
+    else { vueltasNecesarias = `✓ Esquina dentro del rango (${idealMin}–${idealMax} mm).`; }
+    tinContainer.innerHTML = `
       <div style="margin-top: 12px; border-top: 1px solid var(--b1); padding-top: 12px;">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-          <span style="font-size:16px;">📏</span>
-          <span style="font-family:var(--fh); font-size:13px; letter-spacing:.1em;">CONTROL ESTAÑO · Último control: ${fecha}</span>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><span style="font-size:16px;">📏</span><span style="font-family:var(--fh); font-size:13px; letter-spacing:.1em;">CONTROL ESTAÑO · Último: ${reg.fecha}</span></div>
+        <div style="display:flex; justify-content:space-around; gap:15px; background:var(--bg3); padding:10px; border-radius:var(--r);">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">CENTRO</div><div style="font-size:20px; font-weight:700;">${reg.centro.toFixed(2)} mm</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">ESQUINA</div><div style="font-size:20px; font-weight:700; color:${colorEstado}">${reg.esquina.toFixed(2)} mm</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">DIFERENCIA</div><div style="font-size:20px; font-weight:700;">${reg.diferencia.toFixed(2)} mm</div></div>
         </div>
-        <div class="tin-diagram" style="display:flex; justify-content:space-around; gap:15px; background:var(--bg3); padding:10px; border-radius:var(--r);">
-          <div class="tin-point" style="text-align:center">
-            <div class="tin-label">CENTRO</div>
-            <div class="tin-value" style="font-size:20px; font-weight:700;">${centro.toFixed(2)} mm</div>
-          </div>
-          <div class="tin-point" style="text-align:center">
-            <div class="tin-label">ESQUINA</div>
-            <div class="tin-value" style="font-size:20px; font-weight:700; color:${colorEstado}">${esquina.toFixed(2)} mm</div>
-          </div>
-          <div class="tin-point" style="text-align:center">
-            <div class="tin-label">DIFERENCIA</div>
-            <div class="tin-value" style="font-size:20px; font-weight:700;">${diferencia.toFixed(2)} mm</div>
-          </div>
-        </div>
-        <div style="text-align:center; margin:10px 0;">
-          <div class="tin-diff" style="background:${colorEstado}20; color:${colorEstado}; border:1px solid ${colorEstado}40; padding:5px 10px; border-radius:999px; display:inline-block;">
-            ${mensaje}
-          </div>
-        </div>
+        <div style="text-align:center; margin:10px 0;"><div style="background:${colorEstado}20; color:${colorEstado}; border:1px solid ${colorEstado}40; padding:5px 10px; border-radius:999px; display:inline-block; font-size:11px;">${mensaje}</div></div>
         <div style="font-size:11px; color:var(--t1); background:var(--bg4); padding:8px; border-radius:var(--r); margin-top:5px;">
-          <div><strong>📝 Observación:</strong> ${observacion}</div>
+          <div><strong>📝 Observación:</strong> ${reg.observaciones || 'Sin observaciones'}</div>
           <div style="margin-top:5px;"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div>
           <div style="margin-top:5px;"><strong>📐 Guía:</strong> ${tinData.guia}</div>
         </div>
-      </div>
-    `;
-    tinContainer.innerHTML = html;
+      </div>`;
   } else {
-    tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px;">⚠️ No se encontraron datos de Control de Estaño. Verifique la hoja "Laminador_KLB12".</div>`;
+    tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px;">⚠️ No se encontraron datos de Control de Estaño.</div>`;
   }
-  
-  // Columna de próximo rectificado (solo LM1210)
+
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
-  
-  // Gráfico de barras (sin cambios)
+
+  // Gráficos
   if(window.chartCamisa) window.chartCamisa.destroy();
   window.chartCamisa = new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
-  
-  // Gráfico acumulado (sin cambios)
   let acumL=0,acumR=0, acumLArr=[],acumRArr=[];
   rows.forEach(r=>{ acumL+=r.l; acumR+=r.r; acumLArr.push(acumL); acumRArr.push(acumR); });
   if(window.chartAcum) window.chartAcum.destroy();
   window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
-  
-  // Tabla (sin cambios)
   document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
@@ -1750,100 +999,45 @@ function buildLam(){
 function renderPesoBars(filtered){
   const container = document.getElementById('pesos-bars-container');
   if(!container) return;
-  if(!filtered.length){
-    container.innerHTML = '<div class="al alg">No hay moldes para mostrar</div>';
-    return;
-  }
+  if(!filtered.length){ container.innerHTML = '<div class="al alg">No hay moldes para mostrar</div>'; return; }
   let html = '<div style="display:flex;flex-direction:column;gap:14px;">';
   filtered.forEach(m => {
-    const nominal = m.nominal;
-    const real = m.prom;
+    const nominal = m.nominal; const real = m.prom;
     const tieneDatos = (real !== null && !isNaN(real) && nominal > 0);
-    let barWidthPercent = 0;
-    let barColor = '#6e7d96';
-    let valueText = '';
+    let barWidthPercent = 0, barColor = '#6e7d96', valueText = '';
     if(tieneDatos){
-      let rawPercent = (real / nominal) * 100;
-      barWidthPercent = Math.min(rawPercent, 200);
-      const diffKg = real - nominal;
-      const diffG = diffKg * 1000;
-      if(diffG < 0) barColor = '#3dd68c';
-      else if(diffG <= 300) barColor = '#f5a623';
-      else barColor = '#f05252';
+      barWidthPercent = Math.min((real/nominal)*100, 200);
+      const diffG = (real - nominal) * 1000;
+      if(diffG < 0) barColor = '#3dd68c'; else if(diffG <= 300) barColor = '#f5a623'; else barColor = '#f05252';
       valueText = `${real.toFixed(3)} / ${nominal.toFixed(1)} kg`;
-    } else {
-      barWidthPercent = 0;
-      barColor = '#6e7d96';
-      valueText = 'S/D';
-    }
-    const label = `${m.id} #${m.num}`;
-    html += `
-      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-        <div style="min-width: 90px; font-family:var(--fh); font-weight:600; font-size:13px; color:var(--t0);">${label}</div>
-        <div style="flex:1; min-width:200px;">
-          <div class="bar-wrapper" style="position:relative; width:100%; max-width:350px; height:24px; background:var(--bg4); border-radius:12px; overflow:visible; box-shadow:inset 0 1px 2px rgba(0,0,0,0.2);">
-            <div class="bar-real" style="position:absolute; left:0; top:0; height:100%; width:${barWidthPercent}%; background:${barColor}; border-radius:12px 0 0 12px; transition:width 0.2s ease; ${barWidthPercent >= 100 ? 'border-radius:12px;' : ''}"></div>
-            <div class="bar-nominal-line" style="position:absolute; left:100%; top:0; height:100%; width:2px; background:white; transform:translateX(-1px); box-shadow:0 0 3px rgba(0,0,0,0.5); z-index:2;"></div>
-          </div>
+    } else { valueText = 'S/D'; }
+    html += `<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div style="min-width: 90px; font-family:var(--fh); font-weight:600; font-size:13px; color:var(--t0);">${m.id} #${m.num}</div>
+      <div style="flex:1; min-width:200px;">
+        <div class="bar-wrapper" style="position:relative; width:100%; max-width:350px; height:24px; background:var(--bg4); border-radius:12px; overflow:visible;">
+          <div style="position:absolute; left:0; top:0; height:100%; width:${barWidthPercent}%; background:${barColor}; border-radius:12px; transition:width 0.2s ease;"></div>
+          <div style="position:absolute; left:100%; top:0; height:100%; width:2px; background:white; transform:translateX(-1px); box-shadow:0 0 3px rgba(0,0,0,0.5); z-index:2;"></div>
         </div>
-        <div style="min-width: 100px; text-align:right; font-family:var(--fm); font-size:11px; color:var(--t1);">${valueText}</div>
       </div>
-    `;
+      <div style="min-width: 100px; text-align:right; font-family:var(--fm); font-size:11px; color:var(--t1);">${valueText}</div>
+    </div>`;
   });
   html += '</div>';
   container.innerHTML = html;
 }
-
 function dibujarGraficoEstadoMoldes(){
   const data = STATE.data.MOLDES || [];
-  const filterType = STATE.filter;
-  let filtered = filterType === 'todos' ? data : data.filter(m => m.id === normID(filterType));
-  let operativo = 0, noOperativo = 0, enCalibracion = 0, enFabricacion = 0, irrecuperable = 0;
-  filtered.forEach(m => {
-    const estado = (m.estado || '').trim();
-    if(estado === 'Operativo') operativo++;
-    else if(estado === 'No operativo') noOperativo++;
-    else if(estado === 'En calibración' || estado === 'En laboratorio') enCalibracion++;
-    else if(estado === 'En fabricación') enFabricacion++;
-    else if(estado === 'Irrecuperable') irrecuperable++;
-  });
-  const canvas = document.getElementById('chart-estado-moldes');
-  if(!canvas) return;
+  const filtered = STATE.filter === 'todos' ? data : data.filter(m => m.id === normID(STATE.filter));
+  let operativo=0, noOperativo=0, enCalibracion=0, enFabricacion=0, irrecuperable=0;
+  filtered.forEach(m => { const e = (m.estado||'').trim(); if(e === 'Operativo') operativo++; else if(e === 'No operativo') noOperativo++; else if(e === 'En calibración' || e === 'En laboratorio') enCalibracion++; else if(e === 'En fabricación') enFabricacion++; else if(e === 'Irrecuperable') irrecuperable++; });
+  const canvas = document.getElementById('chart-estado-moldes'); if(!canvas) return;
   if(window.chartEstadoMoldes) window.chartEstadoMoldes.destroy();
   const total = operativo + noOperativo + enCalibracion + enFabricacion + irrecuperable;
-  if(total === 0){
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#6e7d96';
-    ctx.font = '12px monospace';
-    ctx.fillText('Sin datos', canvas.width/2-30, canvas.height/2);
-    return;
-  }
-  window.chartEstadoMoldes = new Chart(canvas, {
-    type: 'doughnut',
-    data: {
-      labels: ['Operativo', 'No Operativo', 'En Calibración', 'En Fabricación', 'Irrecuperable'],
-      datasets: [{
-        data: [operativo, noOperativo, enCalibracion, enFabricacion, irrecuperable],
-        backgroundColor: ['#3dd68c', '#f05252', '#f5a623', '#60a5fa', '#fb923c'],
-        borderWidth: 0,
-        borderRadius: 10,
-        cutout: '65%'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#b8c4d8' } }
-      }
-    }
-  });
+  if(total === 0){ const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#6e7d96'; ctx.font = '12px monospace'; ctx.fillText('Sin datos', canvas.width/2-30, canvas.height/2); return; }
+  window.chartEstadoMoldes = new Chart(canvas, { type: 'doughnut', data: { labels: ['Operativo', 'No Operativo', 'En Calibración', 'En Fabricación', 'Irrecuperable'], datasets: [{ data: [operativo, noOperativo, enCalibracion, enFabricacion, irrecuperable], backgroundColor: ['#3dd68c', '#f05252', '#f5a623', '#60a5fa', '#fb923c'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } } });
 }
-
 function buildMoldes(){
-  const F = STATE.filter;
-  const data = STATE.data.MOLDES || [];
+  const F = STATE.filter; const data = STATE.data.MOLDES || [];
   const filtered = F === 'todos' ? data : data.filter(m => m.id === F || m.id === normID(F));
   if(!document.getElementById('kpi-moldes')) return;
   const ops = data.filter(m => m.estado === 'Operativo').length;
@@ -1855,8 +1049,7 @@ function buildMoldes(){
     <div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div>
     <div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div>
     <div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div>
-    <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>
-  `;
+    <div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>`;
   renderPesoBars(filtered);
   let alHtml = '';
   filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
@@ -1871,114 +1064,61 @@ function buildMoldes(){
       const col = pesoColor(m.prom, m.nominal);
       const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
       const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
-      return `
-        <div class="mc">
-          <div class="mch">
-            <div>
-              <div class="mcn">${m.id}</div>
-              <div class="mcnum">N° ${m.num}</div>
-            </div>
-            ${estadoBadge(m.estado)}
-          </div>
-          <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
-          <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
-          ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
-          ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
-          ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : '<div class="mobs" style="color:var(--t3);font-size:9px">⚠️ Sin registros de vías</div>'}
-          <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
-          <div class="mobs">${m.obs || 'Sin observaciones'}</div>
-        </div>
-      `;
+      return `<div class="mc"><div class="mch"><div><div class="mcn">${m.id}</div><div class="mcnum">N° ${m.num}</div></div>${estadoBadge(m.estado)}</div>
+        <div class="mr"><span class="mrl">Peso nominal</span><span class="mrv">${m.nominal.toFixed(1)} kg</span></div>
+        <div class="mr"><span class="mrl">Promedio real</span><span class="mrv" style="color:${col}">${m.prom ? m.prom.toFixed(3) + ' kg' : 'S/D'}</span></div>
+        ${m.prom ? `<div class="mr"><span class="mrl">Diferencia</span><span class="mrv" style="color:${col};font-weight:600">${dif > 0 ? '+' : ''}${dif} g</span></div>` : ''}
+        ${m.prom ? `<div class="ptrack"><div class="pfill" style="width:${Math.min(barPct / 1.3, 100).toFixed(0)}%;background:${col}"></div></div>` : ''}
+        ${m.vias && m.vias.length > 0 ? `<div class="vpills">${m.vias.map((v, i) => `<span class="vp">V${i+1}: ${v.toFixed(3)} kg</span>`).join('')}</div>` : '<div class="mobs" style="color:var(--t3);font-size:9px">⚠️ Sin registros de vías</div>'}
+        <div class="mr" style="margin-top:5px"><span class="mrl">Cromado</span>${cromBadge(m.cromado)}</div>
+        <div class="mobs">${m.obs || 'Sin observaciones'}</div></div>`;
     }).join('');
   }
   const cromData = STATE.data.CROMADO || [];
   const filtCrom = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
   if(document.getElementById('tbody-cromado')){
     document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c => {
-      const pend = !c.recep;
-      const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
+      const pend = !c.recep; const dias = c.recep ? diasEntre(c.envio, c.recep) : null;
       const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
       return `<tr class="${pend ? 'crom-pend' : ''}"><td style="font-weight:600;color:var(--t0)">${c.molde || '—'}</td><td class="tg">${c.envio || '—'}</td><td class="tg" style="color:${pend ? 'var(--re)' : 'var(--t2)'}">${c.recep || '<span style="color:var(--re);font-weight:600">⏳ En proceso</span>'}</td><td class="tr">${diasBadge(dias)}</td>${provBadge}</td><td style="font-size:11px;color:var(--t2)">${c.tIda || '—'}</td><td style="font-size:11px;color:var(--t1);max-width:180px">${c.det || '—'}</td><td style="font-size:11px;color:var(--t2);max-width:180px">${c.obs || '—'}</td></tr>`;
     }).join('');
   }
-  dibujarGraficoCromado();
-  dibujarGraficoEstadoMoldes();
+  dibujarGraficoCromado(); dibujarGraficoEstadoMoldes();
 }
-
 function dibujarGraficoCromado(){
-  const data = STATE.data.MOLDES || [];
-  if(!data.length) return;
+  const data = STATE.data.MOLDES || []; if(!data.length) return;
   let cromadoSi = 0, cromadoNo = 0, cromadoProceso = 0;
-  data.forEach(molde => {
-    const cromado = (molde.cromado || '').toString().toLowerCase().trim();
-    if(cromado === 'sí' || cromado === 'si' || cromado === 's') cromadoSi++;
-    else if(cromado === 'en proceso' || cromado === 'proceso') cromadoProceso++;
-    else cromadoNo++;
-  });
-  const canvas = document.getElementById('chart-cromado-estado');
-  if(!canvas) return;
+  data.forEach(molde => { const cromado = (molde.cromado || '').toString().toLowerCase().trim(); if(cromado === 'sí' || cromado === 'si' || cromado === 's') cromadoSi++; else if(cromado === 'en proceso' || cromado === 'proceso') cromadoProceso++; else cromadoNo++; });
+  const canvas = document.getElementById('chart-cromado-estado'); if(!canvas) return;
   if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
-  window.chartCromadoEstado = new Chart(canvas, {
-    type: 'doughnut',
-    data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] },
-    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } }
-  });
+  window.chartCromadoEstado = new Chart(canvas, { type: 'doughnut', data: { labels: ['Cromado', 'Sin cromado', 'En proceso'], datasets: [{ data: [cromadoSi, cromadoNo, cromadoProceso], backgroundColor: ['#3dd68c', '#6e7d96', '#f5a623'], borderWidth: 0, borderRadius: 10, cutout: '65%' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#b8c4d8' } } } } });
 }
 
 // ========== BUILD STOCK ==========
 let STOCK_FILTERED = [];
 function stockCls(v){ if(v===0) return 'zero'; if(v===1) return 'low'; return 'ok-stock'; }
-function stockEstado(row){ 
-  const vals = [row.boquillas, row.aranas, row.dados, row.placaBase, row.frenos]; 
-  const zeros = vals.filter(v => v === 0).length; 
-  if(zeros === vals.length) return '<span class="badge-stock-sin">Sin stock</span>'; 
-  if(zeros > 0) return '<span class="badge-stock-parcial">Stock parcial</span>'; 
-  return '<span class="badge-stock-completo">Completo</span>'; 
-}
+function stockEstado(row){ const vals = [row.boquillas, row.aranas, row.dados, row.placaBase, row.frenos]; const zeros = vals.filter(v => v === 0).length; if(zeros === vals.length) return '<span class="badge-stock-sin">Sin stock</span>'; if(zeros > 0) return '<span class="badge-stock-parcial">Stock parcial</span>'; return '<span class="badge-stock-completo">Completo</span>'; }
 function buildStock(){
-  const F = STATE.filter;
-  const data = STATE.data.STOCK || [];
+  const F = STATE.filter; const data = STATE.data.STOCK || [];
   STOCK_FILTERED = F==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(F)));
   const total=data.length, sinStock=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, parcial=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].some(v=>v===0)&&![s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, completo=total-sinStock-parcial;
   document.getElementById('kpi-stock').innerHTML = `<div class="kpi ka"><div class="kl">Tipos</div><div class="kv">${total}</div></div><div class="kpi kg"><div class="kl">Completo</div><div class="kv">${completo}</div></div><div class="kpi ka"><div class="kl">Parcial</div><div class="kv">${parcial}</div></div><div class="kpi kr"><div class="kl">Sin stock</div><div class="kv">${sinStock}</div></div>`;
-  
-  const tbody = document.getElementById('tbody-stock');
-  if(!tbody) return;
+  const tbody = document.getElementById('tbody-stock'); if(!tbody) return;
   tbody.innerHTML = STOCK_FILTERED.map(s => {
     const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0);
-    return `<tr class="${crit ? 'crit-row' : ''}">
-      <td style="font-weight:700">${s.molde}</td>
-      <td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td>
-      <td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td>
-      <td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td>
-      <td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td>
-      <td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td>
-      <td class="tg">${s.rev || '—'}</td>
-      <td>${stockEstado(s)}</td>
-    </tr>`;
+    return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`;
   }).join('');
-  
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
 }
-function filterStock(){ 
-  const q = document.getElementById('stock-search').value.trim().toLowerCase(); 
-  const data = STATE.data.STOCK || []; 
-  const src = STATE.filter === 'todos' ? data : data.filter(s => normID(s.molde).includes(normID(STATE.filter))); 
-  STOCK_FILTERED = q ? src.filter(s => s.molde.toLowerCase().includes(q)) : src; 
-  const tbody = document.getElementById('tbody-stock');
-  if(!tbody) return;
+function filterStock(){
+  const q = document.getElementById('stock-search').value.trim().toLowerCase();
+  const data = STATE.data.STOCK || [];
+  const src = STATE.filter === 'todos' ? data : data.filter(s => normID(s.molde).includes(normID(STATE.filter)));
+  STOCK_FILTERED = q ? src.filter(s => s.molde.toLowerCase().includes(q)) : src;
+  const tbody = document.getElementById('tbody-stock'); if(!tbody) return;
   tbody.innerHTML = STOCK_FILTERED.map(s => {
     const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0);
-    return `<tr class="${crit ? 'crit-row' : ''}">
-      <td style="font-weight:700">${s.molde}</td>
-      <td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td>
-      <td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td>
-      <td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td>
-      <td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td>
-      <td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td>
-      <td class="tg">${s.rev || '—'}</td>
-      <td>${stockEstado(s)}</td>
-    </tr>`;
+    return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`;
   }).join('');
   const total = src.length;
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
@@ -1987,8 +1127,7 @@ function genFaltantes(){
   const data = STATE.data.STOCK || [];
   const cols = ['boquillas', 'aranas', 'dados', 'placaBase', 'frenos'];
   const labels = {'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
-  const falt = [];
-  data.forEach(s => { cols.forEach(c => { if(s[c] === 0) falt.push({molde: s.molde, rep: labels[c]}); }); });
+  const falt = []; data.forEach(s => { cols.forEach(c => { if(s[c] === 0) falt.push({molde: s.molde, rep: labels[c]}); }); });
   const mc = document.getElementById('modal-content');
   const now = new Date().toLocaleDateString('es-AR');
   if(!falt.length){ mc.innerHTML = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin faltantes</div><div class="ad">Todos los repuestos tienen al menos una unidad en stock.</div></div></div>`; }
@@ -1996,9 +1135,7 @@ function genFaltantes(){
   document.getElementById('modal-falt').classList.add('open');
 }
 function copyFalt(){
-  const data = STATE.data.STOCK || [];
-  const cols=['boquillas','aranas','dados','placaBase','frenos'];
-  const labels={'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
+  const data = STATE.data.STOCK || []; const cols=['boquillas','aranas','dados','placaBase','frenos']; const labels={'boquillas':'Boquillas','aranas':'Arañas','dados':'Dados','placaBase':'Placa Base','frenos':'Frenos'};
   const falt=[]; data.forEach(s=>{ cols.forEach(c=>{ if(s[c]===0) falt.push(`• ${s.molde} — ${labels[c]}: Stock 0`); }); });
   const txt = `LISTA DE FALTANTES — CEVIL\n${new Date().toLocaleDateString('es-AR')}\n\n${falt.length?falt.join('\n'):'Sin faltantes'}`;
   navigator.clipboard.writeText(txt).then(()=>alert('Lista copiada'));
@@ -2016,71 +1153,20 @@ function buildMantenimiento(){
   const containerTabla = document.getElementById('tbody-mantenimiento');
   const containerTipo = document.getElementById('chart-tareas-tipo');
   const containerResp = document.getElementById('chart-tareas-responsable');
-  if(!data.length){
-    if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros de mantenimiento</td></tr>';
-    if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
-    if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>';
-    return;
-  }
-  if(containerTabla){
-    containerTabla.innerHTML = data.map(r => `
-      <tr style="border-bottom:1px solid var(--b0)">
-        <td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td>
-        <td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td>
-        <td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td>
-        <td>${getTareaBadge(r.tipoTarea || 'Otros')}</td>
-        <td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td>
-      </tr>
-    `).join('');
-  }
+  if(!data.length){ if(containerTabla) containerTabla.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--t2)">No hay registros</td></tr>'; if(containerTipo) containerTipo.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>'; if(containerResp) containerResp.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t2)">⚠️ Sin datos</div>'; return; }
+  if(containerTabla){ containerTabla.innerHTML = data.map(r => `<tr style="border-bottom:1px solid var(--b0)"><td class="tg" style="white-space:nowrap">${r.fecha || '—'}</td><td style="font-family:var(--fm);font-size:11px;color:var(--t1)">${r.responsable || '—'}</td><td style="font-weight:500;color:var(--t0)">${r.moldeEquipo || '—'}</td><td>${getTareaBadge(r.tipoTarea || 'Otros')}</td><td style="color:var(--t2);max-width:350px">${r.descripcion || '—'}</td></tr>`).join(''); }
   if(containerTipo){
-    const tipos = {};
-    data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
+    const tipos = {}; data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
     const maxTareas = Math.max(...Object.values(tipos));
     const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
-    containerTipo.innerHTML = `
-      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 CANTIDAD DE TAREAS POR TIPO</div>
-      ${Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => {
-        const porcentaje = (cantidad / maxTareas) * 100;
-        const color = colores[idx % colores.length];
-        return `
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span>
-              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
-            </div>
-            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)"></div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
+    containerTipo.innerHTML = `<div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => { const porcentaje = (cantidad / maxTareas) * 100; const color = colores[idx % colores.length]; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span><span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span></div><div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden"><div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div></div></div>`; }).join('');
   }
   if(containerResp){
-    const responsables = {};
-    data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
+    const responsables = {}; data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
     const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
     const maxResp = topResp[0]?.[1] || 1;
     const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
-    containerResp.innerHTML = `
-      <div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES POR CANTIDAD DE TAREAS</div>
-      ${topResp.map(([responsable, cantidad], idx) => {
-        const porcentaje = (cantidad / maxResp) * 100;
-        const color = coloresResp[idx % coloresResp.length];
-        return `
-          <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span>
-              <span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span>
-            </div>
-            <div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden">
-              <div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--bg0)"></div>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
+    containerResp.innerHTML = `<div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES</div>` + topResp.map(([responsable, cantidad], idx) => { const porcentaje = (cantidad / maxResp) * 100; const color = coloresResp[idx % coloresResp.length]; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span><span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span></div><div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden"><div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div></div></div>`; }).join('');
   }
 }
 
@@ -2089,68 +1175,34 @@ function buildVidaUtil(){
   const data = STATE.data.VIDA_UTIL || [];
   const LIMITE_BASE = 12000;
   const container = document.getElementById('gauges-container');
-  if(!data.length){
-    document.getElementById('tn5').textContent = 0;
-    container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>';
-    return;
-  }
-
+  if(!data.length){ document.getElementById('tn5').textContent = 0; container.innerHTML = '<div class="al alg">Sin datos de vida útil</div>'; return; }
   const grupos = {};
-  data.forEach((row, idx) => {
-    const key = `${(row.molde||'').trim()}__${(row.numero||'1').trim()}`;
-    if(!grupos[key]) grupos[key] = [];
-    grupos[key].push({ ...row, _ordenOriginal: idx });
-  });
-
+  data.forEach((row, idx) => { const key = `${(row.molde||'').trim()}__${(row.numero||'1').trim()}`; if(!grupos[key]) grupos[key] = []; grupos[key].push({ ...row, _ordenOriginal: idx }); });
   const ciclosVigentes = [];
   Object.values(grupos).forEach(filas => {
-    const ordenadas = [...filas].sort((a,b) => {
-      const fa = fechaToNum(a.inicio);
-      const fb = fechaToNum(b.inicio);
-      if(fb !== fa) return fb - fa;
-      return b._ordenOriginal - a._ordenOriginal;
-    });
+    const ordenadas = [...filas].sort((a,b) => { const fa = fechaToNum(a.inicio); const fb = fechaToNum(b.inicio); if(fb !== fa) return fb - fa; return b._ordenOriginal - a._ordenOriginal; });
     const vigente = ordenadas[0];
     const anteriores = ordenadas.slice(1);
     const tnAnterior = anteriores.reduce((s, r) => s + (parseFloat(r.tnProducidas) || 0), 0);
-    ciclosVigentes.push({
-      ...vigente,
-      _numCiclo: filas.length,
-      _tnAnterior: tnAnterior,
-      _tnHistorico: tnAnterior + (parseFloat(vigente.tnProducidas) || 0)
-    });
+    ciclosVigentes.push({ ...vigente, _numCiclo: filas.length, _tnAnterior: tnAnterior, _tnHistorico: tnAnterior + (parseFloat(vigente.tnProducidas) || 0) });
   });
-
   document.getElementById('tn5').textContent = ciclosVigentes.length;
-
   container.innerHTML = '';
   ciclosVigentes.forEach(molde => {
     const tn = molde.tnProducidas;
     const esInfinito = (molde.numero === '3');
     let porcentajeReal = (tn / LIMITE_BASE) * 100;
     let status = '', statusText = '', color = '';
-    if(esInfinito){
-      if(porcentajeReal >= 100){ status='warning'; statusText='∞ Sin límite definido (supera 100%)'; color='#f5a623'; }
-      else { status='ok'; statusText='∞ Sin límite definido'; color='#3dd68c'; }
-    } else {
-      if(porcentajeReal > 125){ status='critical'; statusText=`⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`; color='#f05252'; }
-      else if(porcentajeReal > 100){ status='warning'; statusText=`⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`; color='#f5a623'; }
-      else { status='ok'; statusText='✓ DENTRO DE VIDA ÚTIL'; color='#3dd68c'; }
-    }
+    if(esInfinito){ if(porcentajeReal >= 100){ status='warning'; statusText='∞ Sin límite definido (supera 100%)'; color='#f5a623'; } else { status='ok'; statusText='∞ Sin límite definido'; color='#3dd68c'; } }
+    else { if(porcentajeReal > 125){ status='critical'; statusText=`⚠⚠ EXTRAS EXCEDIDOS (${Math.round(porcentajeReal)}%)`; color='#f05252'; } else if(porcentajeReal > 100){ status='warning'; statusText=`⚠ TOLERANCIA (supera 100%: ${Math.round(porcentajeReal)}%)`; color='#f5a623'; } else { status='ok'; statusText='✓ DENTRO DE VIDA ÚTIL'; color='#3dd68c'; } }
     let displayPercent = Math.min(porcentajeReal, 200);
     const canvasId = `doughnut-${molde.molde.replace(/\s/g,'')}-${molde.numero || '1'}`;
     const inicio = molde.inicio && molde.inicio !== '' ? molde.inicio : '—';
     const fin    = molde.fin && molde.fin !== '' ? molde.fin : '—';
-
     const mostrarCiclo = molde._numCiclo >= 2;
     const tnAntFmt  = molde._tnAnterior.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const tnHistFmt = molde._tnHistorico.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    const badgeHtml = mostrarCiclo ? `
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0" title="Ciclo anterior: ${tnAntFmt} t · Total histórico: ${tnHistFmt} t">
-        <span style="background:var(--bld);color:var(--bl);border:1px solid var(--blb);border-radius:999px;padding:2px 8px;font-family:var(--fm);font-size:10px;font-weight:600;white-space:nowrap">Ciclo ${molde._numCiclo}</span>
-        <span style="font-family:var(--fm);font-size:10px;color:var(--t2);white-space:nowrap">Ant: ${tnAntFmt} t</span>
-      </div>` : '';
-
+    const badgeHtml = mostrarCiclo ? `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0" title="Ciclo anterior: ${tnAntFmt} t · Total histórico: ${tnHistFmt} t"><span style="background:var(--bld);color:var(--bl);border:1px solid var(--blb);border-radius:999px;padding:2px 8px;font-family:var(--fm);font-size:10px;font-weight:600;white-space:nowrap">Ciclo ${molde._numCiclo}</span><span style="font-family:var(--fm);font-size:10px;color:var(--t2);white-space:nowrap">Ant: ${tnAntFmt} t</span></div>` : '';
     const card = document.createElement('div');
     card.className = 'gauge-container';
     card.style.background = `color-mix(in srgb, ${color} 10%, transparent)`;
@@ -2159,113 +1211,57 @@ function buildVidaUtil(){
         <div style="text-align:left;min-width:0">
           <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);line-height:1.1">${molde.molde} ${molde.numero ? `#${molde.numero}` : ''}</div>
           <div style="font-size:11px;color:var(--t2);margin-top:3px">${molde.clave || ''}</div>
-        </div>
-        ${badgeHtml}
+        </div>${badgeHtml}
       </div>
       <canvas id="${canvasId}" width="240" height="240" class="gauge-canvas"></canvas>
       <div class="gauge-value" style="color:${color}">${tn.toLocaleString()} <span style="font-size:12px">toneladas</span></div>
       <div style="font-size:10px; color:var(--t2); margin-top:4px; text-align:center">Inicio: ${inicio} · Fin: ${fin}</div>
       <div class="gauge-label">100% = ${LIMITE_BASE.toLocaleString()} t · círculo completo = 200% (${(LIMITE_BASE*2).toLocaleString()} t)</div>
-      <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>
-    `;
+      <div class="gauge-status status-${status}" style="margin-top:12px">${statusText}</div>`;
     container.appendChild(card);
     setTimeout(() => drawDoughnut(canvasId, displayPercent, porcentajeReal, color, esInfinito), 10);
   });
 }
-
 function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito = false){
-  const canvas = document.getElementById(canvasId);
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width = 240;
-  const h = canvas.height = 240;
+  const canvas = document.getElementById(canvasId); if(!canvas) return;
+  const ctx = canvas.getContext('2d'); const w = canvas.width = 240; const h = canvas.height = 240;
   ctx.clearRect(0, 0, w, h);
-  const centerX = w/2;
-  const centerY = h/2;
-  const radius = 90;
-  const innerRadius = 55;
+  const centerX = w/2; const centerY = h/2; const radius = 90; const innerRadius = 55;
   const startAngle = -Math.PI / 2;
   const endAngle = startAngle + (displayPercent / 200) * 2 * Math.PI;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.fillStyle = '#2d3a50';
-  ctx.fill();
-  if(displayPercent > 0){
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-    ctx.lineWidth = radius - innerRadius;
-    ctx.strokeStyle = color;
-    ctx.stroke();
-  }
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
-  ctx.fillStyle = 'var(--bg3)';
-  ctx.fill();
-  ctx.font = 'bold 32px "IBM Plex Mono", monospace';
-  ctx.fillStyle = '#f0f4ff';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  let percentText = `${Math.round(realPercent)}%`;
-  ctx.fillText(percentText, centerX, centerY - 5);
-  if(esInfinito){
-    ctx.font = 'bold 26px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#f5a623';
-    ctx.fillText('∞', centerX + 50, centerY - 10);
-  }
-  ctx.font = '12px "IBM Plex Mono", monospace';
-  ctx.fillStyle = '#6e7d96';
-  ctx.fillText('vida útil', centerX, centerY + 25);
-  if(realPercent > 200 && !esInfinito){
-    ctx.font = 'bold 11px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#f05252';
-    ctx.fillText('>200%', centerX, centerY + 48);
-  }
+  ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI); ctx.fillStyle = '#2d3a50'; ctx.fill();
+  if(displayPercent > 0){ ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, endAngle); ctx.lineWidth = radius - innerRadius; ctx.strokeStyle = color; ctx.stroke(); }
+  ctx.beginPath(); ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI); ctx.fillStyle = 'var(--bg3)'; ctx.fill();
+  ctx.font = 'bold 32px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f0f4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${Math.round(realPercent)}%`, centerX, centerY - 5);
+  if(esInfinito){ ctx.font = 'bold 26px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f5a623'; ctx.fillText('∞', centerX + 50, centerY - 10); }
+  ctx.font = '12px "IBM Plex Mono", monospace'; ctx.fillStyle = '#6e7d96'; ctx.fillText('vida útil', centerX, centerY + 25);
+  if(realPercent > 200 && !esInfinito){ ctx.font = 'bold 11px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f05252'; ctx.fillText('>200%', centerX, centerY + 48); }
 }
 
 // ========== BUILD PLANOS ==========
 function buildPlanos(){
   const tiposLadrillos = [
-    { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' },
-    { id: 'H12', nombre: 'H12', img: 'img/ladrillos/H12.png' },
-    { id: 'H18', nombre: 'H18', img: 'img/ladrillos/H18.png' },
-    { id: 'P12', nombre: 'P12', img: 'img/ladrillos/P12.png' },
-    { id: 'P18', nombre: 'P18', img: 'img/ladrillos/P18.png' },
-    { id: 'L12', nombre: 'L12', img: 'img/ladrillos/L12.png' },
-    { id: 'L16', nombre: 'L16', img: 'img/ladrillos/L16.png' },
-    { id: 'DM20', nombre: 'DM20', img: 'img/ladrillos/DM20.png' },
-    { id: 'DM27', nombre: 'DM27', img: 'img/ladrillos/DM27.png' },
-    { id: 'KB', nombre: 'KB', img: 'img/ladrillos/KB.png' }
+    { id: 'H8', nombre: 'H8', img: 'img/ladrillos/H8.png' }, { id: 'H12', nombre: 'H12', img: 'img/ladrillos/H12.png' },
+    { id: 'H18', nombre: 'H18', img: 'img/ladrillos/H18.png' }, { id: 'P12', nombre: 'P12', img: 'img/ladrillos/P12.png' },
+    { id: 'P18', nombre: 'P18', img: 'img/ladrillos/P18.png' }, { id: 'L12', nombre: 'L12', img: 'img/ladrillos/L12.png' },
+    { id: 'L16', nombre: 'L16', img: 'img/ladrillos/L16.png' }, { id: 'DM20', nombre: 'DM20', img: 'img/ladrillos/DM20.png' },
+    { id: 'DM27', nombre: 'DM27', img: 'img/ladrillos/DM27.png' }, { id: 'KB', nombre: 'KB', img: 'img/ladrillos/KB.png' }
   ];
   const planosMoldes = tiposLadrillos.map(t => ({ id: t.id, nombre: t.nombre, img: `img/planos/molde-${t.id}.jpg` }));
   const planosCMP = [
-    { nombre: 'Araña modificada H12', img: 'img/planos/Araña-modificada-H12.jpg' },
-    { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/Medida-Boquilla-H12.jpg' },
-    { nombre: 'Boquilla H12', img: 'img/planos/Boquilla-H12.jpg' },
-    { nombre: 'Boquilla H18', img: 'img/planos/Boquilla-H18.jpg' },
-    { nombre: 'Boquilla P18', img: 'img/planos/Boquilla-P18.jpg' },
-    { nombre: 'Dados H12', img: 'img/planos/Dados-H12.jpg' },
-    { nombre: 'Dados H18', img: 'img/planos/Dados-H18.jpg' },
-    { nombre: 'Plano H18', img: 'img/planos/Plano-H18.jpg' },
-    { nombre: 'Modificaciones H12 BR', img: 'img/planos/Modificaciones-H12-BR.jpg' },
-    { nombre: 'Piezas araña H12', img: 'img/planos/Piezas-Araña-H12.jpg' }
+    { nombre: 'Araña modificada H12', img: 'img/planos/Araña-modificada-H12.jpg' }, { nombre: 'Medida y grados Boquilla H12', img: 'img/planos/Medida-Boquilla-H12.jpg' },
+    { nombre: 'Boquilla H12', img: 'img/planos/Boquilla-H12.jpg' }, { nombre: 'Boquilla H18', img: 'img/planos/Boquilla-H18.jpg' },
+    { nombre: 'Boquilla P18', img: 'img/planos/Boquilla-P18.jpg' }, { nombre: 'Dados H12', img: 'img/planos/Dados-H12.jpg' },
+    { nombre: 'Dados H18', img: 'img/planos/Dados-H18.jpg' }, { nombre: 'Plano H18', img: 'img/planos/Plano-H18.jpg' },
+    { nombre: 'Modificaciones H12 BR', img: 'img/planos/Modificaciones-H12-BR.jpg' }, { nombre: 'Piezas araña H12', img: 'img/planos/Piezas-Araña-H12.jpg' }
   ];
-  const galeriaLadrillos = tiposLadrillos.map(t => `<div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${t.img}" alt="${t.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${t.id}%3C/text%3E%3C/svg%3E'"><div><div class="mcn">${t.nombre}</div><div class="mcnum">Referencia visual</div></div></div></div>`).join('');
-  document.getElementById('ladrillos-gallery').innerHTML = galeriaLadrillos;
-  const galeriaPlanosMoldes = planosMoldes.map(p => `<div class="mc" onclick="verPlano('${p.img}', 'Plano - ${p.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${p.img}" alt="Plano ${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${p.nombre}%3C/text%3E%3C/svg%3E'"><div><div class="mcn">${p.nombre}</div><div class="mcnum">Plano técnico - click para ampliar</div></div></div></div>`).join('');
-  document.getElementById('planos-moldes-gallery').innerHTML = galeriaPlanosMoldes;
-  const galeriaPlanosCMP = planosCMP.map(p => `<div class="mc" onclick="verPlano('${p.img}', '${p.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${p.img}" alt="${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${p.nombre}%3C/text%3E%3C/svg%3E'"><div><div class="mcn">${p.nombre}</div><div class="mcnum">Plano CMP - click para ampliar</div></div></div></div>`).join('');
+  document.getElementById('ladrillos-gallery').innerHTML = tiposLadrillos.map(t => `<div class="mc" onclick="verPlano('${t.img}', '${t.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${t.img}" alt="${t.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:contain" onerror="this.style.opacity=.3"><div><div class="mcn">${t.nombre}</div><div class="mcnum">Referencia visual</div></div></div></div>`).join('');
+  document.getElementById('planos-moldes-gallery').innerHTML = planosMoldes.map(p => `<div class="mc" onclick="verPlano('${p.img}', 'Plano - ${p.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${p.img}" alt="Plano ${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.style.opacity=.3"><div><div class="mcn">${p.nombre}</div><div class="mcnum">Plano técnico - click para ampliar</div></div></div></div>`).join('');
   let cmpContainer = document.getElementById('planos-cmp-gallery');
-  if(!cmpContainer){
-    const parent = document.getElementById('tab-planos');
-    const newCard = document.createElement('div');
-    newCard.className = 'card';
-    newCard.innerHTML = `<div class="ct"><div class="ctd" style="background:var(--am)"></div>Planos CMP · Documentación técnica</div><div class="mg" id="planos-cmp-gallery"></div>`;
-    parent.appendChild(newCard);
-    cmpContainer = document.getElementById('planos-cmp-gallery');
-  }
-  cmpContainer.innerHTML = galeriaPlanosCMP;
-  const totalPlanos = tiposLadrillos.length + planosMoldes.length + planosCMP.length;
-  document.getElementById('tn6').textContent = totalPlanos;
+  if(!cmpContainer){ const parent = document.getElementById('tab-planos'); const newCard = document.createElement('div'); newCard.className = 'card'; newCard.innerHTML = `<div class="ct"><div class="ctd" style="background:var(--am)"></div>Planos CMP · Documentación técnica</div><div class="mg" id="planos-cmp-gallery"></div>`; parent.appendChild(newCard); cmpContainer = document.getElementById('planos-cmp-gallery'); }
+  cmpContainer.innerHTML = planosCMP.map(p => `<div class="mc" onclick="verPlano('${p.img}', '${p.nombre}')" style="cursor:pointer"><div style="display:flex;align-items:center;gap:12px"><img src="${p.img}" alt="${p.nombre}" style="width:60px;height:60px;border-radius:var(--r);background:var(--bg4);object-fit:cover" onerror="this.style.opacity=.3"><div><div class="mcn">${p.nombre}</div><div class="mcnum">Plano CMP - click para ampliar</div></div></div></div>`).join('');
+  document.getElementById('tn6').textContent = tiposLadrillos.length + planosMoldes.length + planosCMP.length;
 }
 function verPlano(imgUrl, titulo){
   document.getElementById('plano-title').textContent = titulo;
@@ -2277,125 +1273,40 @@ function verPlano(imgUrl, titulo){
 
 // ========== BUILD ESTADO PIEZAS ==========
 let ESTADO_FILTER_TEXT = '';
-
-function filterEstadoPiezas(){
-  const input = document.getElementById('search-estado');
-  if(input) ESTADO_FILTER_TEXT = input.value.trim().toLowerCase();
-  buildEstadoPiezas();
-}
-
-function esEstadoIdeal(estado){
-  const e = (estado || '').trim().toLowerCase();
-  return e.includes('buen') || e.includes('reacondicionado') || e.includes('cromado');
-}
-
+function filterEstadoPiezas(){ const input = document.getElementById('search-estado'); if(input) ESTADO_FILTER_TEXT = input.value.trim().toLowerCase(); buildEstadoPiezas(); }
+function esEstadoIdeal(estado){ const e = (estado || '').trim().toLowerCase(); return e.includes('buen') || e.includes('reacondicionado') || e.includes('cromado'); }
 function abrirModalOperatividad(g){
   const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
   document.getElementById('op-modal-title').textContent = `${g.molde} #${g.numero} — Detalle de piezas`;
-  const html = `
+  document.getElementById('op-modal-content').innerHTML = `
     <div class="op-modal-resumen">
-      <div class="op-modal-resumen-item">
-        <div class="op-num" style="color:var(--gr);">${g.optimas}</div>
-        <div class="op-lbl">Óptimas</div>
-      </div>
-      <div class="op-modal-resumen-item">
-        <div class="op-num" style="color:var(--re);">${g.deficientes}</div>
-        <div class="op-lbl">Deficientes</div>
-      </div>
-      <div class="op-modal-resumen-item">
-        <div class="op-num" style="color:var(--t0);">${g.total}</div>
-        <div class="op-lbl">Total piezas</div>
-      </div>
+      <div class="op-modal-resumen-item"><div class="op-num" style="color:var(--gr);">${g.optimas}</div><div class="op-lbl">Óptimas</div></div>
+      <div class="op-modal-resumen-item"><div class="op-num" style="color:var(--re);">${g.deficientes}</div><div class="op-lbl">Deficientes</div></div>
+      <div class="op-modal-resumen-item"><div class="op-num" style="color:var(--t0);">${g.total}</div><div class="op-lbl">Total piezas</div></div>
     </div>
-    <div class="op-modal-piezas">
-      ${g.piezas.map(p => {
-        const ideal = esEstadoIdeal(p.estado);
-        const ico = ideal ? '✓' : '✗';
-        const col = ideal ? 'var(--gr)' : 'var(--re)';
-        return `
-          <div class="op-modal-pieza" style="border-left-color:${col};">
-            <span class="op-ico" style="color:${col};">${ico}</span>
-            <span class="op-comp">${p.componente || 'Pieza'}</span>
-            <span class="op-est" style="color:${col};">${p.estado || 'Sin especificar'}</span>
-          </div>
-        `;
-      }).join('')}
-    </div>
-    <div class="op-modal-pct-final">
-      <div class="op-modal-pct-final-label">Porcentaje de Operatividad</div>
-      <div class="op-modal-pct-final-val" style="color:${color};">${g.pct}%</div>
-    </div>
-  `;
-  document.getElementById('op-modal-content').innerHTML = html;
+    <div class="op-modal-piezas">${g.piezas.map(p => { const ideal = esEstadoIdeal(p.estado); const ico = ideal ? '✓' : '✗'; const col = ideal ? 'var(--gr)' : 'var(--re)'; return `<div class="op-modal-pieza" style="border-left-color:${col};"><span class="op-ico" style="color:${col};">${ico}</span><span class="op-comp">${p.componente || 'Pieza'}</span><span class="op-est" style="color:${col};">${p.estado || 'Sin especificar'}</span></div>`; }).join('')}</div>
+    <div class="op-modal-pct-final"><div class="op-modal-pct-final-label">Porcentaje de Operatividad</div><div class="op-modal-pct-final-val" style="color:${color};">${g.pct}%</div></div>`;
   document.getElementById('modal-operatividad').classList.add('open');
 }
-
-function cerrarModalOperatividad(){
-  document.getElementById('modal-operatividad').classList.remove('open');
-}
-
-document.addEventListener('click', (e) => {
-  const modal = document.getElementById('modal-operatividad');
-  if(modal && modal.classList.contains('open') && e.target === modal){
-    cerrarModalOperatividad();
-  }
-});
+function cerrarModalOperatividad(){ document.getElementById('modal-operatividad').classList.remove('open'); }
+document.addEventListener('click', (e) => { const modal = document.getElementById('modal-operatividad'); if(modal && modal.classList.contains('open') && e.target === modal) cerrarModalOperatividad(); });
 
 function renderOperatividad(filtered){
-  const container = document.getElementById('operatividad-container');
-  if(!container) return;
-
+  const container = document.getElementById('operatividad-container'); if(!container) return;
   const grupos = {};
-  filtered.forEach(p => {
-    const key = `${p.molde}__${p.numero}`;
-    if(!grupos[key]) grupos[key] = { molde: p.molde, numero: p.numero, piezas: [] };
-    grupos[key].piezas.push(p);
-  });
-
-  const ordenados = Object.values(grupos).sort((a,b) => {
-    const cmp = String(a.molde).localeCompare(String(b.molde));
-    if(cmp !== 0) return cmp;
-    return String(a.numero).localeCompare(String(b.numero), undefined, { numeric: true });
-  });
-
-  if(ordenados.length === 0){
-    container.innerHTML = '<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin piezas para los filtros seleccionados</div><div class="ad">Probá cambiar el filtro o el buscador.</div></div></div>';
-    return;
-  }
-
-  ordenados.forEach(g => {
-    g.total = g.piezas.length;
-    g.optimas = g.piezas.filter(p => esEstadoIdeal(p.estado)).length;
-    g.deficientes = g.total - g.optimas;
-    g.pct = g.total > 0 ? Math.round((g.optimas / g.total) * 100) : 0;
-  });
-
+  filtered.forEach(p => { const key = `${p.molde}__${p.numero}`; if(!grupos[key]) grupos[key] = { molde: p.molde, numero: p.numero, piezas: [] }; grupos[key].piezas.push(p); });
+  const ordenados = Object.values(grupos).sort((a,b) => { const cmp = String(a.molde).localeCompare(String(b.molde)); if(cmp !== 0) return cmp; return String(a.numero).localeCompare(String(b.numero), undefined, { numeric: true }); });
+  if(ordenados.length === 0){ container.innerHTML = '<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin piezas</div><div class="ad">Probá cambiar el filtro.</div></div></div>'; return; }
+  ordenados.forEach(g => { g.total = g.piezas.length; g.optimas = g.piezas.filter(p => esEstadoIdeal(p.estado)).length; g.deficientes = g.total - g.optimas; g.pct = g.total > 0 ? Math.round((g.optimas / g.total) * 100) : 0; });
   let html = '<div class="op-grid">';
   ordenados.forEach(g => {
     const color = g.pct >= 80 ? 'var(--gr)' : g.pct >= 50 ? 'var(--am)' : 'var(--re)';
     const imgSrc = getImagenLadrillo(g.molde);
-    const imgFallback = `this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236e7d96%22 stroke-width=%221%22%3E%3Crect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/%3E%3Ctext x=%2212%22 y=%2216%22 text-anchor=%22middle%22 fill=%22%236e7d96%22 font-size=%228%22%3E${g.molde}%3C/text%3E%3C/svg%3E'`;
-    html += `
-      <div class="op-card" data-key="${g.molde}__${g.numero}" title="Ver detalle de ${g.molde} #${g.numero}">
-        <img src="${imgSrc}" alt="${g.molde}" onerror="${imgFallback}">
-        <div class="op-nombre">${g.molde} #${g.numero}</div>
-        <div class="op-pct" style="color:${color}">${g.pct}%</div>
-        <div class="op-barra"><div class="op-barra-fill" style="width:${g.pct}%;background:${color};"></div></div>
-        <div class="op-sub">${g.optimas}/${g.total} óptimas</div>
-      </div>
-    `;
+    html += `<div class="op-card" data-key="${g.molde}__${g.numero}" title="Ver detalle de ${g.molde} #${g.numero}"><img src="${imgSrc}" alt="${g.molde}" onerror="this.style.opacity=.3"><div class="op-nombre">${g.molde} #${g.numero}</div><div class="op-pct" style="color:${color}">${g.pct}%</div><div class="op-barra"><div class="op-barra-fill" style="width:${g.pct}%;background:${color};"></div></div><div class="op-sub">${g.optimas}/${g.total} óptimas</div></div>`;
   });
   html += '</div>';
-
   container.innerHTML = html;
-
-  container.querySelectorAll('.op-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const key = card.getAttribute('data-key');
-      const g = ordenados.find(x => `${x.molde}__${x.numero}` === key);
-      if(g) abrirModalOperatividad(g);
-    });
-  });
+  container.querySelectorAll('.op-card').forEach(card => { card.addEventListener('click', () => { const key = card.getAttribute('data-key'); const g = ordenados.find(x => `${x.molde}__${x.numero}` === key); if(g) abrirModalOperatividad(g); }); });
 }
 
 function renderDistribucionEstados(estadosCount, totalPiezas){
@@ -2403,145 +1314,30 @@ function renderDistribucionEstados(estadosCount, totalPiezas){
   const legendEl = document.getElementById('dist-legend');
   const centerNum = document.getElementById('dist-center-num');
   const centerLbl = document.getElementById('dist-center-lbl');
-  
   if(!chartCanvas) return;
   if(window.chartEstadoPiezas) window.chartEstadoPiezas.destroy();
-  
   const labelsDist = Object.keys(estadosCount);
   const valuesDist = Object.values(estadosCount);
   const coloresDist = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'];
   const totalDist = valuesDist.reduce((a,b) => a + b, 0);
-  
   function updateCenter(idx){
-    if(idx === null || idx === undefined){
-      centerNum.textContent = totalDist.toLocaleString();
-      centerNum.style.color = 'var(--t0)';
-      centerLbl.textContent = 'piezas';
-    } else {
-      const pct = totalDist > 0 ? Math.round((valuesDist[idx] / totalDist) * 100) : 0;
-      centerNum.textContent = pct + '%';
-      centerNum.style.color = coloresDist[idx];
-      centerLbl.textContent = labelsDist[idx].toUpperCase();
-    }
+    if(idx === null || idx === undefined){ centerNum.textContent = totalDist.toLocaleString(); centerNum.style.color = 'var(--t0)'; centerLbl.textContent = 'piezas'; }
+    else { const pct = totalDist > 0 ? Math.round((valuesDist[idx] / totalDist) * 100) : 0; centerNum.textContent = pct + '%'; centerNum.style.color = coloresDist[idx]; centerLbl.textContent = labelsDist[idx].toUpperCase(); }
   }
-  
-  if(legendEl){
-    legendEl.innerHTML = labelsDist.map((lbl, i) => {
-      const pct = totalDist > 0 ? Math.round((valuesDist[i]/totalDist)*100) : 0;
-      return `<div class="dist-legend-item" data-idx="${i}">
-        <span class="dist-legend-dot" style="background:${coloresDist[i]}"></span>
-        <span class="dist-legend-name">${lbl}</span>
-        <span class="dist-legend-count">${valuesDist[i]} · ${pct}%</span>
-      </div>`;
-    }).join('');
-  }
-  
+  if(legendEl){ legendEl.innerHTML = labelsDist.map((lbl, i) => { const pct = totalDist > 0 ? Math.round((valuesDist[i]/totalDist)*100) : 0; return `<div class="dist-legend-item" data-idx="${i}"><span class="dist-legend-dot" style="background:${coloresDist[i]}"></span><span class="dist-legend-name">${lbl}</span><span class="dist-legend-count">${valuesDist[i]} · ${pct}%</span></div>`; }).join(''); }
   if(totalPiezas > 0){
-    window.chartEstadoPiezas = new Chart(chartCanvas, {
-      type: 'doughnut',
-      data: {
-        labels: labelsDist,
-        datasets: [{
-          data: valuesDist,
-          backgroundColor: coloresDist,
-          borderColor: '#131720',
-          borderWidth: 3,
-          borderRadius: 8,
-          hoverOffset: 14,
-          hoverBorderColor: '#131720'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '72%',
-        animation: {
-          animateRotate: true,
-          animateScale: false,
-          duration: 900,
-          easing: 'easeOutQuart'
-        },
-        layout: { padding: 8 },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(13,16,23,0.96)',
-            borderColor: 'rgba(255,255,255,0.16)',
-            borderWidth: 1,
-            titleColor: '#f0f4ff',
-            bodyColor: '#b8c4d8',
-            padding: 12,
-            cornerRadius: 8,
-            displayColors: true,
-            titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' },
-            bodyFont: { family: 'IBM Plex Mono', size: 11 },
-            callbacks: {
-              label: function(ctx){
-                const val = ctx.parsed;
-                const pct = totalDist > 0 ? Math.round((val/totalDist)*100) : 0;
-                return ` ${val} piezas · ${pct}%`;
-              }
-            }
-          }
-        },
-        onHover: (evt, activeEls) => {
-          if(activeEls.length > 0){
-            updateCenter(activeEls[0].index);
-            if(legendEl){
-              legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => {
-                it.classList.toggle('dim', i !== activeEls[0].index);
-              });
-            }
-          } else {
-            updateCenter(null);
-            if(legendEl){
-              legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim'));
-            }
-          }
-        }
-      }
-    });
-    
+    window.chartEstadoPiezas = new Chart(chartCanvas, { type: 'doughnut', data: { labels: labelsDist, datasets: [{ data: valuesDist, backgroundColor: coloresDist, borderColor: '#131720', borderWidth: 3, borderRadius: 8, hoverOffset: 14, hoverBorderColor: '#131720' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '72%', animation: { animateRotate: true, animateScale: false, duration: 900, easing: 'easeOutQuart' }, layout: { padding: 8 }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,0.96)', borderColor: 'rgba(255,255,255,0.16)', borderWidth: 1, titleColor: '#f0f4ff', bodyColor: '#b8c4d8', padding: 12, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: function(ctx){ const val = ctx.parsed; const pct = totalDist > 0 ? Math.round((val/totalDist)*100) : 0; return ` ${val} piezas · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(activeEls.length > 0){ updateCenter(activeEls[0].index); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => { it.classList.toggle('dim', i !== activeEls[0].index); }); } } else { updateCenter(null); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim')); } } } } });
     updateCenter(null);
-    
     if(legendEl){
       legendEl.querySelectorAll('.dist-legend-item').forEach(item => {
         const idx = parseInt(item.getAttribute('data-idx'));
-        item.addEventListener('mouseenter', () => {
-          updateCenter(idx);
-          const chart = window.chartEstadoPiezas;
-          if(chart){
-            const meta = chart.getDatasetMeta(0);
-            meta.data.forEach((arc, i) => {
-              arc.options.hoverOffset = (i === idx) ? 14 : 0;
-            });
-            chart.update('none');
-            legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => {
-              if(i !== idx) it.classList.add('dim');
-            });
-          }
-        });
-        item.addEventListener('mouseleave', () => {
-          updateCenter(null);
-          const chart = window.chartEstadoPiezas;
-          if(chart){
-            const meta = chart.getDatasetMeta(0);
-            meta.data.forEach(arc => { arc.options.hoverOffset = 14; });
-            chart.update('none');
-          }
-          legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim'));
-        });
+        item.addEventListener('mouseenter', () => { updateCenter(idx); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => { if(i !== idx) it.classList.add('dim'); }); } });
+        item.addEventListener('mouseleave', () => { updateCenter(null); if(legendEl){ legendEl.querySelectorAll('.dist-legend-item').forEach(it => it.classList.remove('dim')); } });
       });
     }
   } else {
-    const ctx = chartCanvas.getContext('2d');
-    ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
-    ctx.fillStyle = '#6e7d96';
-    ctx.font = '12px monospace';
-    ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
-    if(legendEl) legendEl.innerHTML = '';
-    if(centerNum) centerNum.textContent = '0';
-    if(centerLbl) centerLbl.textContent = 'piezas';
+    const ctx = chartCanvas.getContext('2d'); ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height); ctx.fillStyle = '#6e7d96'; ctx.font = '12px monospace'; ctx.fillText('Sin datos', chartCanvas.width/2-30, chartCanvas.height/2);
+    if(legendEl) legendEl.innerHTML = ''; if(centerNum) centerNum.textContent = '0'; if(centerLbl) centerLbl.textContent = 'piezas';
   }
 }
 
@@ -2549,9 +1345,7 @@ function buildEstadoPiezas(){
   const data = STATE.data.ESTADO_PIEZAS || [];
   const filterType = STATE.filter;
   let filtered = filterType === 'todos' ? data : data.filter(p => normID(p.molde) === normID(filterType));
-  if(ESTADO_FILTER_TEXT){
-    filtered = filtered.filter(p => `${p.molde} ${p.numero}`.toLowerCase().includes(ESTADO_FILTER_TEXT));
-  }
+  if(ESTADO_FILTER_TEXT){ filtered = filtered.filter(p => `${p.molde} ${p.numero}`.toLowerCase().includes(ESTADO_FILTER_TEXT)); }
   document.getElementById('tn7').textContent = filtered.length;
   const totalPiezas = filtered.length;
   const buenEstado = filtered.filter(p => p.estado.toLowerCase().includes('buen')).length;
@@ -2563,38 +1357,16 @@ function buildEstadoPiezas(){
     <div class="kpi kb"><div class="kl">Buen estado</div><div class="kv" style="color:var(--gr)">${buenEstado}</div><div class="km">piezas</div></div>
     <div class="kpi ka"><div class="kl">Con acción requerida</div><div class="kv" style="color:var(--am)">${conAccion}</div><div class="km">pendientes</div></div>
     <div class="kpi kr"><div class="kl">Cromado / Reacond.</div><div class="kv" style="color:var(--or)">${cromadoReacond}</div><div class="km">necesitan atención</div></div>
-    <div class="kpi ${moldesUnicos>0?'kg':'bgr'}"><div class="kl">Moldes distintos</div><div class="kv">${moldesUnicos}</div><div class="km">con piezas</div></div>
-  `;
+    <div class="kpi ${moldesUnicos>0?'kg':'bgr'}"><div class="kl">Moldes distintos</div><div class="kv">${moldesUnicos}</div><div class="km">con piezas</div></div>`;
   const estadosCount = { 'Buen estado':0, 'Cromado':0, 'Reacondicionado':0, 'Otro':0 };
-  filtered.forEach(p => {
-    const e = p.estado.toLowerCase();
-    if(e.includes('buen')) estadosCount['Buen estado']++;
-    else if(e.includes('cromado')) estadosCount['Cromado']++;
-    else if(e.includes('reacondicionado')) estadosCount['Reacondicionado']++;
-    else estadosCount['Otro']++;
-  });
-
+  filtered.forEach(p => { const e = p.estado.toLowerCase(); if(e.includes('buen')) estadosCount['Buen estado']++; else if(e.includes('cromado')) estadosCount['Cromado']++; else if(e.includes('reacondicionado')) estadosCount['Reacondicionado']++; else estadosCount['Otro']++; });
   renderDistribucionEstados(estadosCount, totalPiezas);
   renderOperatividad(filtered);
-
   const grouped = {};
   filtered.forEach(p => { const key = `${p.molde} #${p.numero}`; if(!grouped[key]) grouped[key] = []; grouped[key].push(p); });
   let cardsHtml = '';
-  if(Object.keys(grouped).length === 0){
-    cardsHtml = '<div class="al alg">No hay piezas para los filtros seleccionados.</div>';
-  } else {
-    for(const [moldeKey, piezas] of Object.entries(grouped)){
-      cardsHtml += `<div class="mc"><div class="mch"><div><div class="mcn">${moldeKey}</div><div class="mcnum">${piezas.length} pieza(s)</div></div><span class="badge bb">${piezas[0].molde}</span></div><div style="margin-top:8px;">`;
-      piezas.forEach(p => {
-        let badgeClass = 'estado-badge-otro';
-        if(p.estado.toLowerCase().includes('buen')) badgeClass = 'estado-badge-bueno';
-        else if(p.estado.toLowerCase().includes('cromado')) badgeClass = 'estado-badge-cromado';
-        else if(p.estado.toLowerCase().includes('reacondicionado')) badgeClass = 'estado-badge-reacondicionado';
-        cardsHtml += `<div class="pieza-item"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:600;">${p.componente}</span><span class="badge ${badgeClass}">${p.estado}</span></div>${p.accion ? `<div style="font-size:11px; color:var(--am);">🔧 ${p.accion}</div>` : ''}${p.observacion ? `<div style="font-size:10px; color:var(--t2);">📝 ${p.observacion}</div>` : ''}${p.fecha ? `<div style="font-size:9px; color:var(--t3);">📅 ${p.fecha}</div>` : ''}</div>`;
-      });
-      cardsHtml += `</div></div>`;
-    }
-  }
+  if(Object.keys(grouped).length === 0){ cardsHtml = '<div class="al alg">No hay piezas.</div>'; }
+  else { for(const [moldeKey, piezas] of Object.entries(grouped)){ cardsHtml += `<div class="mc"><div class="mch"><div><div class="mcn">${moldeKey}</div><div class="mcnum">${piezas.length} pieza(s)</div></div><span class="badge bb">${piezas[0].molde}</span></div><div style="margin-top:8px;">`; piezas.forEach(p => { let badgeClass = 'estado-badge-otro'; if(p.estado.toLowerCase().includes('buen')) badgeClass = 'estado-badge-bueno'; else if(p.estado.toLowerCase().includes('cromado')) badgeClass = 'estado-badge-cromado'; else if(p.estado.toLowerCase().includes('reacondicionado')) badgeClass = 'estado-badge-reacondicionado'; cardsHtml += `<div class="pieza-item"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-weight:600;">${p.componente}</span><span class="badge ${badgeClass}">${p.estado}</span></div>${p.accion ? `<div style="font-size:11px; color:var(--am);">🔧 ${p.accion}</div>` : ''}${p.observacion ? `<div style="font-size:10px; color:var(--t2);">📝 ${p.observacion}</div>` : ''}${p.fecha ? `<div style="font-size:9px; color:var(--t3);">📅 ${p.fecha}</div>` : ''}</div>`; }); cardsHtml += `</div></div>`; } }
   document.getElementById('estado-cards-container').innerHTML = cardsHtml;
 }
 
