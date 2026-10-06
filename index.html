@@ -146,7 +146,7 @@ tbody tr:hover td{background:var(--bg3)}
 .crit-row{background:rgba(240,82,82,.04)!important}
 
 .dbar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.db-lbl{font-family:var(--fm);font-size:11px;color:var(--t2);width:68px;flex-shrink:0;line-height:1.3}
+.db-lbl{font-family:var(--fm);font-size:11px;color:var(--t2);width:90px;flex-shrink:0;line-height:1.3}
 .db-trk{flex:1;background:var(--bg4);border-radius:3px;height:10px;overflow:hidden}
 .db-fill{height:10px;border-radius:3px}
 .db-val{font-family:var(--fm);font-size:11px;color:var(--t1);width:80px;text-align:right;flex-shrink:0}
@@ -977,6 +977,16 @@ tbody tr:hover td{background:var(--bg3)}
 <script>
 'use strict';
 
+// ══════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN ESPECIAL KLB12 (para el cálculo de vida útil de camisas)
+// ══════════════════════════════════════════════════════════════════════════
+const KLB12_CONFIG = {
+  originalFabrica: 175,        // Medida original de fábrica de la camisa
+  inicioControlLento: 153,     // Diámetro al que se empezó a medir (lento)
+  inicioControlRapido: 106.9,  // Diámetro al que se empezó a medir (rápido)
+  finVida: 20                  // Medida a la que se considera fin de vida útil
+};
+
 const SHEET_ID_LAM = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0';
 const SHEET_ID_SEG = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0';
 
@@ -1006,7 +1016,6 @@ const URLS_GITHUB = {
   ESTAÑO: GITHUB_BASE + 'estano.csv'
 };
 
-// Mapa de imágenes especiales
 const IMAGENES_ESPECIALES = {
   'H12 BR 9T': 'img/ladrillos/H12-9T.png'
 };
@@ -1516,6 +1525,8 @@ function pesoColor(prom, nominal){
 }
 
 // ========== BUILD LAMINADORAS ==========
+// Modificado: maneja lógica especial para KLB12 (con Fin de vida = 20mm)
+// y mantiene la lógica original para LM1210.
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
   if(!D) return;
@@ -1523,36 +1534,129 @@ function buildLam(){
   const totalRects = rows.length;
   const totalL = rows.reduce((s,r)=>s+r.l,0);
   const totalR = rows.reduce((s,r)=>s+r.r,0);
-  const desgL = D.ini.lento - D.act.lento;
-  const desgR = D.ini.rapido - D.act.rapido;
   const maxEvL = Math.max(...rows.map(r=>r.l));
   const maxEvR = Math.max(...rows.map(r=>r.r));
-  const pctL = Math.min(desgL/D.ini.lento*100,100);
-  const pctR = Math.min(desgR/D.ini.rapido*100,100);
-  document.getElementById('kpi-lam').innerHTML = `
-    <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
-    <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
-    <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
-    <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>
-  `;
-  const barL = Math.min(pctL,100), barR = Math.min(pctR,100);
-  const cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
-  const cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
-  document.getElementById('dsgaste-bars').innerHTML = `
-    <div><div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
-    <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span>${D.ini.lento} mm</span></div>
-    <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.lento/D.ini.lento*100).toFixed(0)}%;background:${cL}"></div></div><span>${D.act.lento} mm</span></div>
-    <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barL}%;background:${cL};opacity:.6"></div></div><span>${desgL.toFixed(1)} mm (${barL.toFixed(1)}%)</span></div></div>
-    <div><div style="font-size:10px;margin-bottom:10px">Cilindro Rápido</div>
-    <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span>${D.ini.rapido} mm</span></div>
-    <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.rapido/D.ini.rapido*100).toFixed(0)}%;background:${cR}"></div></div><span>${D.act.rapido} mm</span></div>
-    <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span>${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>
-  `;
+  
+  let desgL, desgR, pctL, pctR, cL, cR, barL, barR;
+  
+  if(STATE.activeLam === 'KLB12'){
+    // ══════════════════════════════════════════════════════════════════
+    // LÓGICA ESPECIAL KLB12 — Inicio control 153/106.9 · Fin vida 20 mm
+    // El "Actual" se lee del Sheet (el usuario lo actualiza manualmente).
+    // ══════════════════════════════════════════════════════════════════
+    const ini = KLB12_CONFIG.inicioControlLento;      // 153
+    const iniR = KLB12_CONFIG.inicioControlRapido;    // 106.9
+    const orig = KLB12_CONFIG.originalFabrica;        // 175
+    const fin = KLB12_CONFIG.finVida;                 // 20
+    
+    const actualLento = D.act.lento;   // viene del Sheet (120)
+    const actualRapido = D.act.rapido; // viene del Sheet (89)
+    
+    // Consumido desde inicio control
+    const consumidoLento = ini - actualLento;
+    const consumidoRapido = iniR - actualRapido;
+    
+    // Rango útil (desde inicio control hasta fin de vida)
+    const rangoUtilLento = ini - fin;
+    const rangoUtilRapido = iniR - fin;
+    
+    // Porcentaje consumido
+    pctL = Math.min((consumidoLento / rangoUtilLento) * 100, 100);
+    pctR = Math.min((consumidoRapido / rangoUtilRapido) * 100, 100);
+    
+    // Guardamos desgaste como mm consumidos desde inicio control
+    desgL = consumidoLento;
+    desgR = consumidoRapido;
+    
+    barL = pctL;
+    barR = pctR;
+    
+    cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
+    cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
+    
+    // CÁLCULO INTERNO (no se ve en la card):
+    // Desgaste por uso = (Desgaste total desde inicio control) / N° intervenciones
+    const nEventos = rows.length;
+    const desgasteUsoPorEventoLento = nEventos > 0 ? consumidoLento / nEventos : 0;
+    const desgasteUsoPorEventoRapido = nEventos > 0 ? consumidoRapido / nEventos : 0;
+    
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('📊 KLB12 — Cálculo de desgaste por uso natural');
+    console.log('───────────────────────────────────────────────────────────');
+    console.log(`Intervenciones registradas: ${nEventos}`);
+    console.log(`LENTO  — Inicio control: ${ini} mm · Actual: ${actualLento} mm`);
+    console.log(`         Desgaste total: ${consumidoLento.toFixed(1)} mm`);
+    console.log(`         Desgaste por uso por evento: ${desgasteUsoPorEventoLento.toFixed(3)} mm`);
+    console.log(`RÁPIDO — Inicio control: ${iniR} mm · Actual: ${actualRapido} mm`);
+    console.log(`         Desgaste total: ${consumidoRapido.toFixed(1)} mm`);
+    console.log(`         Desgaste por uso por evento: ${desgasteUsoPorEventoRapido.toFixed(3)} mm`);
+    console.log('═══════════════════════════════════════════════════════════');
+    
+    // KPIs para KLB12
+    document.getElementById('kpi-lam').innerHTML = `
+      <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
+      <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
+      <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>
+    `;
+    
+    // Card de desgaste con las 4 filas
+    document.getElementById('dsgaste-bars').innerHTML = `
+      <div>
+        <div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
+        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk"><div class="db-fill" style="width:100%;background:var(--bg5)"></div></div><span class="db-val">${orig} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${(ini/orig*100).toFixed(0)}%"></div></div><span class="db-val">${ini} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(actualLento/orig*100).toFixed(0)}%;background:${cL}"></div></div><span class="db-val">${actualLento} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk"><div class="db-fill" style="width:${(fin/orig*100).toFixed(0)}%;background:var(--re);opacity:.6"></div></div><span class="db-val">${fin} mm</span></div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="font-size:10px;margin-bottom:10px">Cilindro Rápido</div>
+        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk"><div class="db-fill" style="width:100%;background:var(--bg5)"></div></div><span class="db-val">${orig} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${(iniR/orig*100).toFixed(0)}%"></div></div><span class="db-val">${iniR} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(actualRapido/orig*100).toFixed(0)}%;background:${cR}"></div></div><span class="db-val">${actualRapido} mm</span></div>
+        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk"><div class="db-fill" style="width:${(fin/orig*100).toFixed(0)}%;background:var(--re);opacity:.6"></div></div><span class="db-val">${fin} mm</span></div>
+      </div>
+    `;
+  } else {
+    // ══════════════════════════════════════════════════════════════════
+    // LÓGICA ORIGINAL (LM1210) — Sin cambios
+    // ══════════════════════════════════════════════════════════════════
+    desgL = D.ini.lento - D.act.lento;
+    desgR = D.ini.rapido - D.act.rapido;
+    pctL = Math.min(desgL/D.ini.lento*100,100);
+    pctR = Math.min(desgR/D.ini.rapido*100,100);
+    barL = Math.min(pctL,100);
+    barR = Math.min(pctR,100);
+    cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
+    cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
+    
+    document.getElementById('kpi-lam').innerHTML = `
+      <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
+      <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
+      <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>
+    `;
+    
+    document.getElementById('dsgaste-bars').innerHTML = `
+      <div><div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
+      <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span class="db-val">${D.ini.lento} mm</span></div>
+      <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.lento/D.ini.lento*100).toFixed(0)}%;background:${cL}"></div></div><span class="db-val">${D.act.lento} mm</span></div>
+      <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barL}%;background:${cL};opacity:.6"></div></div><span class="db-val">${desgL.toFixed(1)} mm (${barL.toFixed(1)}%)</span></div></div>
+      <div><div style="font-size:10px;margin-bottom:10px">Cilindro Rápido</div>
+      <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span class="db-val">${D.ini.rapido} mm</span></div>
+      <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.rapido/D.ini.rapido*100).toFixed(0)}%;background:${cR}"></div></div><span class="db-val">${D.act.rapido} mm</span></div>
+      <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span class="db-val">${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>
+    `;
+  }
+  
+  // Alertas (comunes a ambas máquinas)
   let alHtml = '';
   if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm (${pctL.toFixed(1)}%)</div></div></div>`;
   if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm (${pctR.toFixed(1)}%)</div></div></div>`;
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
+  
+  // Estaño (sin cambios)
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
@@ -1623,14 +1727,22 @@ function buildLam(){
   } else {
     tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px;">⚠️ No se encontraron datos de Control de Estaño. Verifique la hoja "Laminador_KLB12".</div>`;
   }
+  
+  // Columna de próximo rectificado (solo LM1210)
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
+  
+  // Gráfico de barras (sin cambios)
   if(window.chartCamisa) window.chartCamisa.destroy();
   window.chartCamisa = new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
+  
+  // Gráfico acumulado (sin cambios)
   let acumL=0,acumR=0, acumLArr=[],acumRArr=[];
   rows.forEach(r=>{ acumL+=r.l; acumR+=r.r; acumLArr.push(acumL); acumRArr.push(acumR); });
   if(window.chartAcum) window.chartAcum.destroy();
   window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
+  
+  // Tabla (sin cambios)
   document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
 }
 
@@ -2286,7 +2398,6 @@ function renderOperatividad(filtered){
   });
 }
 
-// Render del gráfico de Distribución de Estados (REDISEÑADO)
 function renderDistribucionEstados(estadosCount, totalPiezas){
   const chartCanvas = document.getElementById('chart-estado-piezas');
   const legendEl = document.getElementById('dist-legend');
@@ -2298,7 +2409,7 @@ function renderDistribucionEstados(estadosCount, totalPiezas){
   
   const labelsDist = Object.keys(estadosCount);
   const valuesDist = Object.values(estadosCount);
-  const coloresDist = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444']; // Verde, Azul, Dorado, Rojo
+  const coloresDist = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'];
   const totalDist = valuesDist.reduce((a,b) => a + b, 0);
   
   function updateCenter(idx){
@@ -2314,7 +2425,6 @@ function renderDistribucionEstados(estadosCount, totalPiezas){
     }
   }
   
-  // Render leyenda custom
   if(legendEl){
     legendEl.innerHTML = labelsDist.map((lbl, i) => {
       const pct = totalDist > 0 ? Math.round((valuesDist[i]/totalDist)*100) : 0;
@@ -2394,7 +2504,6 @@ function renderDistribucionEstados(estadosCount, totalPiezas){
     
     updateCenter(null);
     
-    // Interacciones de leyenda
     if(legendEl){
       legendEl.querySelectorAll('.dist-legend-item').forEach(item => {
         const idx = parseInt(item.getAttribute('data-idx'));
@@ -2407,7 +2516,6 @@ function renderDistribucionEstados(estadosCount, totalPiezas){
               arc.options.hoverOffset = (i === idx) ? 14 : 0;
             });
             chart.update('none');
-            // Atenuamos las otras
             legendEl.querySelectorAll('.dist-legend-item').forEach((it, i) => {
               if(i !== idx) it.classList.add('dim');
             });
@@ -2466,9 +2574,7 @@ function buildEstadoPiezas(){
     else estadosCount['Otro']++;
   });
 
-  // Render del gráfico rediseñado
   renderDistribucionEstados(estadosCount, totalPiezas);
-
   renderOperatividad(filtered);
 
   const grouped = {};
