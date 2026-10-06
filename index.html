@@ -366,9 +366,6 @@ tbody tr:hover td{background:var(--bg3)}
 
 // ══════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN KLB12
-// - actualBaseLento/Rapido = la medida que medisteis manualmente
-// - intervencionesBaseLento/Rapido = cuántas filas había en el Sheet
-//   cuando medisteis. A partir de ahí, cada fila NUEVA resta al Actual.
 // ══════════════════════════════════════════════════════════════════════════
 const KLB12_CONFIG = {
   originalFabrica: 175,
@@ -380,6 +377,34 @@ const KLB12_CONFIG = {
   intervencionesBaseLento: 18,
   intervencionesBaseRapido: 20
 };
+
+// ══════════════════════════════════════════════════════════════════════════
+// COLOR GRADUAL SEGÚN VIDA RESTANTE
+//   100% → verde · 70% → ámbar · 20% → rojo · <20% → rojo
+// ══════════════════════════════════════════════════════════════════════════
+function interpColor(c1, c2, t){
+  return [
+    Math.round(c1[0] + (c2[0]-c1[0])*t),
+    Math.round(c1[1] + (c2[1]-c1[1])*t),
+    Math.round(c1[2] + (c2[2]-c1[2])*t)
+  ];
+}
+function colorPorVidaRestante(pct){
+  const verde = [61, 214, 140];
+  const ambar = [245, 166, 35];
+  const rojo  = [240, 82, 82];
+  let rgb;
+  if(pct >= 70){
+    const t = Math.min(1, (pct - 70) / 30);
+    rgb = interpColor(ambar, verde, t);
+  } else if(pct >= 20){
+    const t = (pct - 20) / 50;
+    rgb = interpColor(rojo, ambar, t);
+  } else {
+    rgb = rojo;
+  }
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
 
 const SHEET_ID_LAM = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0';
 const SHEET_ID_SEG = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0';
@@ -566,8 +591,6 @@ function pesoColor(prom, nominal){ if(prom === null || prom === undefined) retur
 
 // ══════════════════════════════════════════════════════════════════════════
 // BUILD LAMINADORAS
-// KLB12: "Actual" dinámico = base − mm rectificados en filas nuevas del Sheet
-// LM1210: sin cambios
 // ══════════════════════════════════════════════════════════════════════════
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
@@ -586,10 +609,6 @@ function buildLam(){
     const orig = KLB12_CONFIG.originalFabrica;
     const fin = KLB12_CONFIG.finVida;
 
-    // ⬇️ CÁLCULO DINÁMICO DEL "ACTUAL"
-    // Base = 120 (lento) / 89 (rápido) medida manualmente
-    // A la base se le resta SOLO lo que se agregue al Sheet DESPUÉS de la base
-    // (después de las 18 filas / 20 filas que había al momento de medir)
     const nuevaRectLento = rows.length > KLB12_CONFIG.intervencionesBaseLento
       ? rows.slice(KLB12_CONFIG.intervencionesBaseLento).reduce((s,r)=>s + (r.l || 0), 0)
       : 0;
@@ -603,7 +622,6 @@ function buildLam(){
     console.log('📊 KLB12 — Actual dinámico');
     console.log(`LENTO:  Base ${KLB12_CONFIG.actualBaseLento} mm − nuevas rect ${nuevaRectLento.toFixed(2)} mm = ${actualLento} mm`);
     console.log(`RÁPIDO: Base ${KLB12_CONFIG.actualBaseRapido} mm − nuevas rect ${nuevaRectRapido.toFixed(2)} mm = ${actualRapido} mm`);
-    console.log(`Filas en Sheet: ${rows.length} | Base lento: ${KLB12_CONFIG.intervencionesBaseLento} | Base rápido: ${KLB12_CONFIG.intervencionesBaseRapido}`);
     console.log('═══════════════════════════════════════════════════════════');
 
     const rangoUtilLento = ini - fin;
@@ -612,10 +630,12 @@ function buildLam(){
     const pctVidaRestanteRapido = Math.max(0, Math.min(100, ((actualRapido - fin) / rangoUtilRapido) * 100));
     const pctDesgasteLento = 100 - pctVidaRestanteLento;
     const pctDesgasteRapido = 100 - pctVidaRestanteRapido;
-    const colorVidaLento = pctVidaRestanteLento > 55 ? 'var(--gr)' : pctVidaRestanteLento > 30 ? 'var(--am)' : 'var(--re)';
-    const colorVidaRapido = pctVidaRestanteRapido > 55 ? 'var(--gr)' : pctVidaRestanteRapido > 30 ? 'var(--am)' : 'var(--re)';
-    const colorDesgasteLento = pctDesgasteLento > 70 ? 'var(--re)' : pctDesgasteLento > 45 ? 'var(--am)' : 'var(--gr)';
-    const colorDesgasteRapido = pctDesgasteRapido > 70 ? 'var(--re)' : pctDesgasteRapido > 45 ? 'var(--am)' : 'var(--gr)';
+
+    // ⬇️ Color gradual según vida restante
+    const colorVidaLento = colorPorVidaRestante(pctVidaRestanteLento);
+    const colorVidaRapido = colorPorVidaRestante(pctVidaRestanteRapido);
+    const colorDesgasteLento = colorPorVidaRestante(pctVidaRestanteLento);
+    const colorDesgasteRapido = colorPorVidaRestante(pctVidaRestanteRapido);
 
     pctL = pctDesgasteLento; pctR = pctDesgasteRapido;
     desgL = ini - actualLento; desgR = iniR - actualRapido;
