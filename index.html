@@ -379,15 +379,25 @@ const KLB12_CONFIG = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN LM1210 — valores fijos para el eje
+// ══════════════════════════════════════════════════════════════════════════
+const LM1210_CONFIG = {
+  originalFabrica: 175,
+  inicioControlLento: 153,
+  inicioControlRapido: 143,
+  finVida: 20
+};
+
+// ══════════════════════════════════════════════════════════════════════════
 // COLOR SEGÚN VIDA RESTANTE (3 zonas discretas)
 //   ≥ 50%  → Verde
 //   ≥ 20%  → Ámbar
 //   < 20%  → Rojo
 // ══════════════════════════════════════════════════════════════════════════
 function colorPorVidaRestante(pct){
-  if(pct >= 50) return '#3dd68c';   // verde
-  if(pct >= 20) return '#f5a623';   // ámbar
-  return '#f05252';                 // rojo
+  if(pct >= 50) return '#3dd68c';
+  if(pct >= 20) return '#f5a623';
+  return '#f05252';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -397,7 +407,7 @@ function renderEjeCamisa(nombre, valores, colorVida){
   const { fin, actual, inicioControl, inicioFabrica } = valores;
   const rango = inicioFabrica - fin;
   const pctFin = 0;
-  const pctActual = ((actual - fin) / rango) * 100;
+  const pctActual = Math.max(0, Math.min(100, ((actual - fin) / rango) * 100));
   const pctInicioControl = ((inicioControl - fin) / rango) * 100;
   const pctInicioFabrica = 100;
 
@@ -466,7 +476,7 @@ function getImagenLadrillo(molde){ return IMAGENES_ESPECIALES[molde] || `img/lad
 
 const FB = {
   KLB12: { maq:'KLB12', ini:{lento:153,rapido:143}, act:{lento:120,rapido:89}, rows:[] },
-  LM1210: { maq:'LM1210', ini:{lento:153,rapido:143}, act:{lento:137.7,rapido:128.8}, rows:[] },
+  LM1210: { maq:'LM1210', ini:{lento:153,rapido:143}, act:{lento:134.9,rapido:126.8}, rows:[] },
   MOLDES: [], CROMADO: [],
   STOCK: [
     { molde:'H8', boquillas:0, aranas:0, dados:0, placaBase:0, frenos:0, rev:'21/11/2025' }, { molde:'H12', boquillas:0, aranas:0, dados:1, placaBase:0, frenos:0, rev:'10/03/2026' },
@@ -634,7 +644,8 @@ function pesoColor(prom, nominal){ if(prom === null || prom === undefined) retur
 
 // ══════════════════════════════════════════════════════════════════════════
 // BUILD LAMINADORAS
-// CAMBIO: los colores ahora usan la misma referencia que la etiqueta (175 → 20)
+// KLB12: base fija + descuento por filas nuevas
+// LM1210: Actual leído directo del Sheet · inicio control 153/143 fijos
 // ══════════════════════════════════════════════════════════════════════════
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
@@ -645,9 +656,12 @@ function buildLam(){
   const totalR = rows.reduce((s,r)=>s+r.r,0);
   const maxEvL = Math.max(...rows.map(r=>r.l));
   const maxEvR = Math.max(...rows.map(r=>r.r));
-  let desgL, desgR, pctL, pctR, cL, cR, barL, barR;
+  let desgL, desgR, pctL, pctR, cL, cR;
 
   if(STATE.activeLam === 'KLB12'){
+    // ══════════════════════════════════════════════════════════════════
+    // KLB12 — Actual calculado (base − mm de filas nuevas del Sheet)
+    // ══════════════════════════════════════════════════════════════════
     const ini = KLB12_CONFIG.inicioControlLento;
     const iniR = KLB12_CONFIG.inicioControlRapido;
     const orig = KLB12_CONFIG.originalFabrica;
@@ -672,21 +686,16 @@ function buildLam(){
     const rangoUtilRapido = iniR - fin;
     const pctVidaRestanteLento = Math.max(0, Math.min(100, ((actualLento - fin) / rangoUtilLento) * 100));
     const pctVidaRestanteRapido = Math.max(0, Math.min(100, ((actualRapido - fin) / rangoUtilRapido) * 100));
-    const pctDesgasteLento = 100 - pctVidaRestanteLento;
-    const pctDesgasteRapido = 100 - pctVidaRestanteRapido;
 
-    // ⬇️ CAMBIO: el color se calcula con la MISMA referencia que la etiqueta (175 → 20)
     const rangoEje = orig - fin;
     const pctEjeLento = ((actualLento - fin) / rangoEje) * 100;
     const pctEjeRapido = ((actualRapido - fin) / rangoEje) * 100;
     const colorVidaLento = colorPorVidaRestante(pctEjeLento);
     const colorVidaRapido = colorPorVidaRestante(pctEjeRapido);
-    const colorDesgasteLento = colorPorVidaRestante(pctEjeLento);
-    const colorDesgasteRapido = colorPorVidaRestante(pctEjeRapido);
 
-    pctL = pctDesgasteLento; pctR = pctDesgasteRapido;
+    pctL = 100 - pctVidaRestanteLento; pctR = 100 - pctVidaRestanteRapido;
     desgL = ini - actualLento; desgR = iniR - actualRapido;
-    cL = colorDesgasteLento; cR = colorDesgasteRapido;
+    cL = colorVidaLento; cR = colorVidaRapido;
 
     document.getElementById('kpi-lam').innerHTML = `
       <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
@@ -695,42 +704,52 @@ function buildLam(){
       <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
 
     document.getElementById('dsgaste-bars').innerHTML =
-      renderEjeCamisa('Lento', {
-        fin: fin,
-        actual: actualLento,
-        inicioControl: ini,
-        inicioFabrica: orig
-      }, colorVidaLento) +
-      renderEjeCamisa('Rápido', {
-        fin: fin,
-        actual: actualRapido,
-        inicioControl: iniR,
-        inicioFabrica: orig
-      }, colorVidaRapido);
+      renderEjeCamisa('Lento', { fin, actual: actualLento, inicioControl: ini, inicioFabrica: orig }, colorVidaLento) +
+      renderEjeCamisa('Rápido', { fin, actual: actualRapido, inicioControl: iniR, inicioFabrica: orig }, colorVidaRapido);
   } else {
-    desgL = D.ini.lento - D.act.lento;
-    desgR = D.ini.rapido - D.act.rapido;
-    pctL = Math.min(desgL/D.ini.lento*100,100);
-    pctR = Math.min(desgR/D.ini.rapido*100,100);
-    barL = Math.min(pctL,100); barR = Math.min(pctR,100);
-    cL = pctL>70?'var(--re)':pctL>45?'var(--am)':'var(--gr)';
-    cR = pctR>70?'var(--re)':pctR>45?'var(--am)':'var(--gr)';
+    // ══════════════════════════════════════════════════════════════════
+    // LM1210 — Actual leído DIRECTO del Sheet
+    // Inicio control 153/143 fijos · Fábrica 175 · Fin 20
+    // ══════════════════════════════════════════════════════════════════
+    const orig = LM1210_CONFIG.originalFabrica;
+    const fin = LM1210_CONFIG.finVida;
+    const ini = LM1210_CONFIG.inicioControlLento;
+    const iniR = LM1210_CONFIG.inicioControlRapido;
+
+    const actualLento = D.act.lento;   // del Sheet
+    const actualRapido = D.act.rapido; // del Sheet
+
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('📊 LM1210 — Actual desde Sheet');
+    console.log(`LENTO:  ${actualLento} mm · RÁPIDO: ${actualRapido} mm`);
+    console.log('═══════════════════════════════════════════════════════════');
+
+    // Desgaste para KPIs/alertas (referencia = inicio control 153/143)
+    const rangoUtilLento = ini - fin;
+    const rangoUtilRapido = iniR - fin;
+    const pctVidaRestanteLento = Math.max(0, Math.min(100, ((actualLento - fin) / rangoUtilLento) * 100));
+    const pctVidaRestanteRapido = Math.max(0, Math.min(100, ((actualRapido - fin) / rangoUtilRapido) * 100));
+
+    // Color y posición sobre el eje completo (175 → 20)
+    const rangoEje = orig - fin;
+    const pctEjeLento = ((actualLento - fin) / rangoEje) * 100;
+    const pctEjeRapido = ((actualRapido - fin) / rangoEje) * 100;
+    const colorVidaLento = colorPorVidaRestante(pctEjeLento);
+    const colorVidaRapido = colorPorVidaRestante(pctEjeRapido);
+
+    pctL = 100 - pctVidaRestanteLento; pctR = 100 - pctVidaRestanteRapido;
+    desgL = ini - actualLento; desgR = iniR - actualRapido;
+    cL = colorVidaLento; cR = colorVidaRapido;
 
     document.getElementById('kpi-lam').innerHTML = `
       <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
       <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
-      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Desgaste mayor</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del diámetro inicial</div></div>`;
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
 
-    document.getElementById('dsgaste-bars').innerHTML = `
-      <div><div style="font-size:10px;margin-bottom:10px">Cilindro Lento</div>
-      <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span class="db-val">${D.ini.lento} mm</span></div>
-      <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.lento/D.ini.lento*100).toFixed(0)}%;background:${cL}"></div></div><span class="db-val">${D.act.lento} mm</span></div>
-      <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barL}%;background:${cL};opacity:.6"></div></div><span class="db-val">${desgL.toFixed(1)} mm (${barL.toFixed(1)}%)</span></div></div>
-      <div><div style="font-size:10px;margin-bottom:10px">Cilindro Rápido</div>
-      <div class="dbar"><span class="db-lbl">Inicial</span><div class="db-trk"><div class="db-fill" style="width:100%"></div></div><span class="db-val">${D.ini.rapido} mm</span></div>
-      <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${(D.act.rapido/D.ini.rapido*100).toFixed(0)}%;background:${cR}"></div></div><span class="db-val">${D.act.rapido} mm</span></div>
-      <div class="dbar"><span class="db-lbl">Retirado</span><div class="db-trk"><div class="db-fill" style="width:${barR}%;background:${cR};opacity:.6"></div></div><span class="db-val">${desgR.toFixed(1)} mm (${barR.toFixed(1)}%)</span></div></div>`;
+    document.getElementById('dsgaste-bars').innerHTML =
+      renderEjeCamisa('Lento', { fin, actual: actualLento, inicioControl: ini, inicioFabrica: orig }, colorVidaLento) +
+      renderEjeCamisa('Rápido', { fin, actual: actualRapido, inicioControl: iniR, inicioFabrica: orig }, colorVidaRapido);
   }
 
   let alHtml = '';
