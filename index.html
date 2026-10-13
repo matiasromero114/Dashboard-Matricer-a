@@ -29,6 +29,7 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .alerta-slide { animation: slideInRight .35s ease both; }
 .icono-pulso { animation: iconoPulso 1.6s ease-in-out infinite; }
 .bullet-pulso { animation: bulletPulso 2s ease-in-out infinite; }
+.marker-pulso { animation: pulsoMarker 2.4s ease-in-out infinite; }
 .barra-shimmer-m { position:absolute; top:0; left:0; height:100%; width:40%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent); animation:shimmer 4s ease-in-out infinite; pointer-events:none; }
 .linea-nominal { animation: lineaNominalPulso 2.5s ease-in-out infinite; }
 .badge-pulso { animation: badgePulso 2s ease-in-out infinite; }
@@ -250,7 +251,6 @@ tbody tr.fila-hover:hover td{background: rgba(245,166,35,.05); box-shadow: inset
 .dist-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.06)}
 .dist-legend-name{font-family:var(--fm);font-size:11px;color:var(--t1);white-space:nowrap}
 .dist-legend-count{font-family:var(--fm);font-size:11px;color:var(--t2);white-space:nowrap}
-/* Leyenda compacta para doughnuts de Moldes */
 .donut-leyenda { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 6px; margin-top:8px; width:100% }
 .donut-leyenda-item { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:999px; background:transparent; border:1px solid transparent; cursor:pointer; transition:all .15s; user-select:none; font-size:10px }
 .donut-leyenda-item:hover { background: var(--bg3); border-color: var(--b1) }
@@ -258,7 +258,6 @@ tbody tr.fila-hover:hover td{background: rgba(245,166,35,.05); box-shadow: inset
 .donut-leyenda-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
 .donut-leyenda-name { font-family:var(--fm); font-size:10px; color:var(--t1); white-space:nowrap }
 .donut-leyenda-count { font-family:var(--fm); font-size:10px; color:var(--t2); white-space:nowrap }
-/* Chips de filtro tabla */
 .filtro-chips { display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap }
 .filtro-chip { padding:4px 12px; border:1px solid var(--b2); border-radius:999px; font-family:var(--fm); font-size:10px; color:var(--t2); background:transparent; transition:all .15s; cursor:pointer }
 .filtro-chip:hover { color:var(--t1); border-color:var(--b3) }
@@ -335,8 +334,8 @@ tbody tr.fila-hover:hover td{background: rgba(245,166,35,.05); box-shadow: inset
   <div class="sh"><div><div class="sh-t">Seguimiento de Moldes y Cromado</div><div class="sh-s">14 moldes · Peso real vs nominal · Historial de cromados</div></div></div>
   <div class="krow" id="kpi-moldes"></div>
   <div class="g2">
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div><div id="wrap-chart-cromado" style="position:relative;width:100%;height:220px;display:flex;justify-content:center;align-items:center"><canvas id="chart-cromado-estado" style="max-width:200px;max-height:200px"></canvas></div><div class="donut-leyenda" id="leyenda-cromado"></div></div>
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div><div id="wrap-chart-estado-moldes" style="position:relative;width:100%;height:220px;display:flex;justify-content:center;align-items:center"><canvas id="chart-estado-moldes" style="max-width:200px;max-height:200px"></canvas></div><div class="donut-leyenda" id="leyenda-estado-moldes"></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--bl)"></div>Estado de Cromado de Moldes</div><div style="position:relative;width:100%;height:220px;display:flex;justify-content:center;align-items:center"><canvas id="chart-cromado-estado" style="max-width:200px;max-height:200px"></canvas></div><div class="donut-leyenda" id="leyenda-cromado"></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--am)"></div>Estado de Moldes</div><div style="position:relative;width:100%;height:220px;display:flex;justify-content:center;align-items:center"><canvas id="chart-estado-moldes" style="max-width:200px;max-height:200px"></canvas></div><div class="donut-leyenda" id="leyenda-estado-moldes"></div></div>
   </div>
   <div class="g7030">
     <div class="card" style="margin-bottom:0"><div class="ct"><div class="ctd bullet-pulso" style="background:var(--am)"></div>Peso promedio vs nominal por molde</div>
@@ -425,7 +424,78 @@ const LM1210_CONFIG = { originalFabrica: 175, inicioControlLento: 153, inicioCon
 function colorPorVidaRestante(pct){ if(pct >= 50) return '#3dd68c'; if(pct >= 20) return '#f5a623'; return '#f05252'; }
 
 // ══════════════════════════════════════════════════════════════════════════
-// CAMBIO #1 — Animador de contadores (reutilizado en toda la pestaña Moldes)
+// RENDER DEL EJE HORIZONTAL A ESCALA REAL (Laminadoras)
+// ══════════════════════════════════════════════════════════════════════════
+function renderEjeCamisa(nombre, valores, colorVida){
+  const { fin, actual, inicioControl, inicioFabrica } = valores;
+  const rango = inicioFabrica - fin;
+  const pctFin = 0;
+  const pctActual = Math.max(0, Math.min(100, ((actual - fin) / rango) * 100));
+  const pctInicioControl = ((inicioControl - fin) / rango) * 100;
+  const pctInicioFabrica = 100;
+
+  const numFmt = (n) => Number(n).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pctFmt = (n) => n.toFixed(1).replace('.', ',') + '%';
+
+  const colorRayado = colorVida;
+  const colorRayadoSuave = colorVida.replace('#3dd68c', 'rgba(61, 214, 140, .35)')
+                                     .replace('#f5a623', 'rgba(245, 166, 35, .35)')
+                                     .replace('#f05252', 'rgba(240, 82, 82, .35)');
+
+  const idBarra = `barra-eje-${nombre.toLowerCase()}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+
+  return `
+    <div style="margin-bottom:26px">
+      <div style="font-family:var(--fm);font-size:10px;letter-spacing:.14em;color:var(--t2);margin-bottom:12px;text-transform:uppercase">Cilindro ${nombre}</div>
+      <div style="padding:0 60px;position:relative">
+        <div style="position:relative;height:150px">
+          <div style="position:absolute;left:${pctFin}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Fin</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(fin)} mm</div>
+          </div>
+          <div style="position:absolute;left:${pctActual}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Actual</div>
+            <div style="font-family:var(--fm);font-size:13px;color:${colorVida};font-weight:700;margin-top:3px;text-shadow:0 0 12px ${colorVida}aa">${numFmt(actual)} mm</div>
+          </div>
+          <div style="position:absolute;left:${pctInicioControl}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Inicio control</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(inicioControl)} mm</div>
+          </div>
+          <div style="position:absolute;left:${pctInicioFabrica}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Inicio</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(inicioFabrica)} mm</div>
+          </div>
+          <div style="position:absolute;left:0;right:0;top:62px;height:32px;background:var(--bg4);border-radius:4px;overflow:hidden;border:1px solid var(--b1)">
+            <div id="${idBarra}" style="height:100%;width:0%;
+                        background:repeating-linear-gradient(-45deg, ${colorRayado} 0px, ${colorRayado} 5px, transparent 5px, transparent 10px), ${colorRayadoSuave};
+                        transition:width 1.2s cubic-bezier(.22, 1, .36, 1); position:relative">
+              <div class="barra-shimmer-m"></div>
+            </div>
+          </div>
+          <div style="position:absolute;left:${pctFin}%;top:54px;height:48px;width:2px;background:var(--t3);transform:translateX(-1px)"></div>
+          <div class="marker-pulso" style="position:absolute;left:${pctActual}%;top:54px;height:48px;width:2px;background:${colorVida};transform:translateX(-1px);box-shadow:0 0 8px ${colorVida}, 0 0 18px ${colorVida}aa"></div>
+          <div style="position:absolute;left:${pctInicioControl}%;top:54px;height:48px;width:2px;background:var(--am);transform:translateX(-1px);box-shadow:0 0 6px rgba(245,166,35,.5)"></div>
+          <div style="position:absolute;left:${pctInicioFabrica}%;top:54px;height:48px;width:2px;background:var(--t3);transform:translateX(-2px)"></div>
+          <div style="position:absolute;left:${pctFin}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">0%</div>
+          <div style="position:absolute;left:${pctActual}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:11px;color:${colorVida};font-weight:700">${pctFmt(pctActual)}</div>
+          <div style="position:absolute;left:${pctInicioControl}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">${pctFmt(pctInicioControl)}</div>
+          <div style="position:absolute;left:${pctInicioFabrica}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">100%</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function(){
+        setTimeout(function(){
+          var b = document.getElementById("${idBarra}");
+          if(b) b.style.width = "${pctActual}%";
+        }, 60);
+      })();
+    <\/script>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ANIMACIÓN DE CONTADORES
 // ══════════════════════════════════════════════════════════════════════════
 function animarContador(el, valorFinal, duracion = 900, decimales = 0, sufijo = ''){
   if(!el) return;
@@ -444,7 +514,7 @@ function animarContador(el, valorFinal, duracion = 900, decimales = 0, sufijo = 
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// CAMBIO #27 — Sistema de toasts
+// TOAST
 // ══════════════════════════════════════════════════════════════════════════
 function mostrarToast(mensaje, tipo = 'ok'){
   const cont = document.getElementById('toast-container');
@@ -626,13 +696,8 @@ async function cargarDatos(){
   const now = new Date();
   document.getElementById('last-update').textContent = `Últ. act: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
   btn.classList.remove('loading'); ri.classList.remove('spinning');
-  // ⬇️ CAMBIO #27 — Mostrar toast cuando terminan de cargar
   const totalFuentes = fromSheets + fromGithub;
-  if(totalFuentes > 0){
-    mostrarToast(`${totalFuentes} hojas actualizadas · hace unos segundos`, 'ok');
-  } else {
-    mostrarToast('No se pudo conectar a Sheets ni a GitHub', 'warn');
-  }
+  if(totalFuentes > 0){ mostrarToast(`${totalFuentes} hojas actualizadas · hace unos segundos`, 'ok'); } else { mostrarToast('No se pudo conectar a Sheets ni a GitHub', 'warn'); }
   renderAll();
 }
 function recargar(){ cargarDatos(); }
@@ -648,17 +713,11 @@ function renderAll(){
 function switchTab(id, btn){ document.querySelectorAll('.navtab').forEach(t => t.classList.remove('active')); if(btn) btn.classList.add('active'); document.querySelectorAll('.tab-s').forEach(s => s.classList.remove('active')); const tabToShow = document.getElementById('tab-' + id); if(tabToShow) tabToShow.classList.add('active'); STATE.activeTab = id; renderAll(); }
 function switchLam(m, btn){ document.querySelectorAll('.ltb').forEach(b => b.classList.remove('active')); if(btn) btn.classList.add('active'); STATE.activeLam = m; if(STATE.activeTab === 'lam') buildLam(); }
 function setF(f, btn){ STATE.filter = f; document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); if(btn) btn.classList.add('active'); renderAll(); }
-// ⬇️ CAMBIO #24 — Filtro de tabla cromado
-function setFiltroCromado(f, btn){
-  STATE.filtroCromado = f;
-  document.querySelectorAll('#filtro-cromado .filtro-chip').forEach(c => c.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  if(STATE.activeTab === 'moldes') buildMoldes();
-}
+function setFiltroCromado(f, btn){ STATE.filtroCromado = f; document.querySelectorAll('#filtro-cromado .filtro-chip').forEach(c => c.classList.remove('active')); if(btn) btn.classList.add('active'); if(STATE.activeTab === 'moldes') buildMoldes(); }
 function pesoColor(prom, nominal){ if(prom === null || prom === undefined) return '#555a68'; const dif = (prom - nominal) * 1000; if(dif < 0) return '#3dd68c'; if(dif <= 300) return '#f5a623'; return '#f05252'; }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BUILD LAMINADORAS (sin cambios)
+// BUILD LAMINADORAS
 // ══════════════════════════════════════════════════════════════════════════
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
@@ -758,10 +817,9 @@ function buildLam(){
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BUILD MOLDES — CON LAS 27 MEJORAS
+// BUILD MOLDES
 // ══════════════════════════════════════════════════════════════════════════
 function renderPesoBars(filtered){
-  // CAMBIO #7 animación llenado, #8 shimmer, #9 hover tooltip, #10 colores marcados, #11 línea nominal pulsante
   const container = document.getElementById('pesos-bars-container');
   if(!container) return;
   if(!filtered.length){ container.innerHTML = '<div class="al alg">No hay moldes</div>'; return; }
@@ -795,21 +853,11 @@ function renderPesoBars(filtered){
   });
   html += '</div>';
   container.innerHTML = html;
-  // Animar el llenado con cascada (#7)
-  setTimeout(() => {
-    container.querySelectorAll('.barra-fill-anim').forEach((el, i) => {
-      setTimeout(() => { el.style.width = el.dataset.w + '%'; }, i * 40);
-    });
-  }, 50);
-  // Hover highlight (#9)
-  container.querySelectorAll('.barra-peso-row').forEach(row => {
-    row.addEventListener('mouseenter', () => { row.style.background = 'rgba(245,166,35,.06)'; });
-    row.addEventListener('mouseleave', () => { row.style.background = 'transparent'; });
-  });
+  setTimeout(() => { container.querySelectorAll('.barra-fill-anim').forEach((el, i) => { setTimeout(() => { el.style.width = el.dataset.w + '%'; }, i * 40); }); }, 50);
+  container.querySelectorAll('.barra-peso-row').forEach(row => { row.addEventListener('mouseenter', () => { row.style.background = 'rgba(245,166,35,.06)'; }); row.addEventListener('mouseleave', () => { row.style.background = 'transparent'; }); });
 }
 
 function dibujarGraficoEstadoMoldes(){
-  // CAMBIO #4 doughnut rediseñado, #5 colores contrastados, #6 animación
   const data = STATE.data.MOLDES || [];
   const filtered = STATE.filter === 'todos' ? data : data.filter(m => m.id === normID(STATE.filter));
   let operativo=0, noOperativo=0, enCalibracion=0, enFabricacion=0, irrecuperable=0;
@@ -819,7 +867,6 @@ function dibujarGraficoEstadoMoldes(){
   const total = operativo + noOperativo + enCalibracion + enFabricacion + irrecuperable;
   const labels = ['Operativo', 'No Operativo', 'En Calibración', 'En Fabricación', 'Irrecuperable'];
   const values = [operativo, noOperativo, enCalibracion, enFabricacion, irrecuperable];
-  // #5 nueva paleta contrastada
   const colores = ['#22c55e', '#ef4444', '#f59e0b', '#3b82f6', '#fb923c'];
   const leyendaEl = document.getElementById('leyenda-estado-moldes');
   if(total === 0){
@@ -828,12 +875,7 @@ function dibujarGraficoEstadoMoldes(){
     if(leyendaEl) leyendaEl.innerHTML = '';
     return;
   }
-  window.chartEstadoMoldes = new Chart(canvas, {
-    type: 'doughnut',
-    data: { labels: labels, datasets: [{ data: values, backgroundColor: colores, borderColor: '#131720', borderWidth: 2, borderRadius: 6, hoverOffset: 10, hoverBorderColor: '#131720' }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,.96)', borderColor: 'rgba(255,255,255,.16)', borderWidth: 1, padding: 10, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: (ctx) => { const val = ctx.parsed; const pct = total > 0 ? Math.round((val/total)*100) : 0; return ` ${val} · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(leyendaEl){ leyendaEl.querySelectorAll('.donut-leyenda-item').forEach((it, i) => { it.classList.toggle('dim', activeEls.length > 0 && i !== activeEls[0].index); }); } } }
-  });
-  // #4 leyenda compacta
+  window.chartEstadoMoldes = new Chart(canvas, { type: 'doughnut', data: { labels: labels, datasets: [{ data: values, backgroundColor: colores, borderColor: '#131720', borderWidth: 2, borderRadius: 6, hoverOffset: 10, hoverBorderColor: '#131720' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,.96)', borderColor: 'rgba(255,255,255,.16)', borderWidth: 1, padding: 10, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: (ctx) => { const val = ctx.parsed; const pct = total > 0 ? Math.round((val/total)*100) : 0; return ` ${val} · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(leyendaEl){ leyendaEl.querySelectorAll('.donut-leyenda-item').forEach((it, i) => { it.classList.toggle('dim', activeEls.length > 0 && i !== activeEls[0].index); }); } } } });
   if(leyendaEl){
     leyendaEl.innerHTML = labels.map((lbl, i) => {
       const pct = total > 0 ? Math.round((values[i]/total)*100) : 0;
@@ -847,7 +889,6 @@ function dibujarGraficoEstadoMoldes(){
 }
 
 function dibujarGraficoCromado(){
-  // CAMBIO #4 doughnut rediseñado, #5 colores contrastados, #6 animación
   const data = STATE.data.MOLDES || []; if(!data.length) return;
   let cromadoSi = 0, cromadoNo = 0, cromadoProceso = 0;
   data.forEach(molde => { const c = (molde.cromado || '').toString().toLowerCase().trim(); if(c === 'sí' || c === 'si' || c === 's') cromadoSi++; else if(c === 'en proceso' || c === 'proceso') cromadoProceso++; else cromadoNo++; });
@@ -855,15 +896,10 @@ function dibujarGraficoCromado(){
   if(window.chartCromadoEstado) window.chartCromadoEstado.destroy();
   const labels = ['Cromado', 'Sin cromado', 'En proceso'];
   const values = [cromadoSi, cromadoNo, cromadoProceso];
-  // #5 nueva paleta más contrastada
   const colores = ['#22c55e', '#94a3b8', '#3b82f6'];
   const total = cromadoSi + cromadoNo + cromadoProceso;
   const leyendaEl = document.getElementById('leyenda-cromado');
-  window.chartCromadoEstado = new Chart(canvas, {
-    type: 'doughnut',
-    data: { labels: labels, datasets: [{ data: values, backgroundColor: colores, borderColor: '#131720', borderWidth: 2, borderRadius: 6, hoverOffset: 10, hoverBorderColor: '#131720' }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '68%', animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,.96)', borderColor: 'rgba(255,255,255,.16)', borderWidth: 1, padding: 10, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: (ctx) => { const val = ctx.parsed; const pct = total > 0 ? Math.round((val/total)*100) : 0; return ` ${val} · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(leyendaEl){ leyendaEl.querySelectorAll('.donut-leyenda-item').forEach((it, i) => { it.classList.toggle('dim', activeEls.length > 0 && i !== activeEls[0].index); }); } } }
-  });
+  window.chartCromadoEstado = new Chart(canvas, { type: 'doughnut', data: { labels: labels, datasets: [{ data: values, backgroundColor: colores, borderColor: '#131720', borderWidth: 2, borderRadius: 6, hoverOffset: 10, hoverBorderColor: '#131720' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '68%', animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(13,16,23,.96)', borderColor: 'rgba(255,255,255,.16)', borderWidth: 1, padding: 10, cornerRadius: 8, titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' }, bodyFont: { family: 'IBM Plex Mono', size: 11 }, callbacks: { label: (ctx) => { const val = ctx.parsed; const pct = total > 0 ? Math.round((val/total)*100) : 0; return ` ${val} · ${pct}%`; } } } }, onHover: (evt, activeEls) => { if(leyendaEl){ leyendaEl.querySelectorAll('.donut-leyenda-item').forEach((it, i) => { it.classList.toggle('dim', activeEls.length > 0 && i !== activeEls[0].index); }); } } } });
   if(leyendaEl){
     leyendaEl.innerHTML = labels.map((lbl, i) => {
       const pct = total > 0 ? Math.round((values[i]/total)*100) : 0;
@@ -885,7 +921,6 @@ function buildMoldes(){
   const fab = data.filter(m => m.estado === 'En fabricación').length;
   const crom = data.filter(m => m.cromado === 'Sí' || m.cromado === 'En proceso').length;
   const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).length;
-  // CAMBIO #1 contadores animados + #2 glow por color
   document.getElementById('kpi-moldes').innerHTML = `
     <div class="kpi kg kpi-anim" style="animation-delay:0ms"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)" id="kpi-ops">0</div><div class="km">moldes en producción</div></div>
     <div class="kpi kb kpi-anim" style="animation-delay:80ms"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)" id="kpi-cromcal">0</div><div class="km">${crom} cromados · ${cal} en calibración</div></div>
@@ -896,7 +931,6 @@ function buildMoldes(){
   animarContador(document.getElementById('kpi-fab'), fab, 800, 0);
   animarContador(document.getElementById('kpi-exc'), excedidos, 800, 0);
   renderPesoBars(filtered);
-  // CAMBIO #12 pulso alertas, #13 slide-in, #14 icono animado, #15 contador título
   let alHtml = ''; let nCriticas = 0;
   filtered.filter(m => m.estado === 'En fabricación').forEach((m, i) => { nCriticas++; alHtml += `<div class="al alr alerta-anim alerta-slide" style="animation-delay:${i*80}ms"><div class="aico icono-pulso">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
   filtered.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).forEach((m, i) => { const dif = ((m.prom - m.nominal) * 1000).toFixed(0); nCriticas++; alHtml += `<div class="al alr alerta-anim alerta-slide" style="animation-delay:${i*80}ms"><div class="aico icono-pulso">◆</div><div><div class="at">${m.id} #${m.num} — Sobrepeso +${dif} g</div><div class="ad">Real: ${m.prom.toFixed(3)} kg · Nominal: ${m.nominal.toFixed(1)} kg</div></div></div>`; });
@@ -908,14 +942,12 @@ function buildMoldes(){
   function estadoBadge(e) { const m = { 'Operativo': 'bg', 'En calibración': 'bb', 'En laboratorio': 'bb', 'En fabricación': 'br', 'No operativo': 'br' }; return `<span class="badge ${m[e] || 'bgr'}">${e}</span>`; }
   function cromBadge(c) { if (c === 'Sí') return '<span class="badge bg">Cromado</span>'; if (c === 'En proceso') return '<span class="badge ba">En proceso</span>'; return '<span class="badge bgr">Sin cromado</span>'; }
   if(document.getElementById('molde-cards')){
-    // CAMBIO #16 hover elevado glow, #18 badge pulso estado, #19 vías degradado, #20 barra progreso vías
     document.getElementById('molde-cards').innerHTML = filtered.map(m => {
       const col = pesoColor(m.prom, m.nominal);
       const dif = m.prom ? ((m.prom - m.nominal) * 1000).toFixed(0) : null;
       const barPct = m.prom ? Math.min(m.prom / m.nominal * 100, 130) : 0;
       const claseEstado = m.estado === 'Operativo' ? 'mc-op' : (m.estado === 'En fabricación' || m.estado === 'No operativo') ? 'mc-fab' : (m.estado === 'En calibración' || m.estado === 'En laboratorio') ? 'mc-cal' : '';
       const badgeExtra = (m.estado === 'En fabricación' || m.estado === 'No operativo' || m.estado === 'Irrecuperable') ? 'badge-pulso' : '';
-      // #19 vías con color según estado
       const viasHtml = m.vias && m.vias.length > 0
         ? `<div class="vpills">${m.vias.map((v, i) => { const difVia = (v - m.nominal) * 1000; const clase = difVia < 0 ? 'optimo' : difVia > 300 ? 'deficiente' : ''; return `<span class="vp ${clase}" title="${difVia > 0 ? '+' : ''}${difVia.toFixed(0)} g vs nominal">V${i+1}: ${v.toFixed(3)} kg</span>`; }).join('')}</div>`
         : '<div class="mobs" style="color:var(--t3);font-size:9px">⚠️ Sin registros de vías</div>';
@@ -930,24 +962,18 @@ function buildMoldes(){
         <div class="mobs">${m.obs || 'Sin observaciones'}</div>
       </div>`;
     }).join('');
-    // Animar los pfill después de insertarlos
-    setTimeout(() => {
-      document.querySelectorAll('#molde-cards .pfill').forEach((el, i) => { setTimeout(() => { el.style.width = el.dataset.w + '%'; }, i * 30); });
-    }, 50);
+    setTimeout(() => { document.querySelectorAll('#molde-cards .pfill').forEach((el, i) => { setTimeout(() => { el.style.width = el.dataset.w + '%'; }, i * 30); }); }, 50);
   }
   const cromData = STATE.data.CROMADO || [];
   const filtCromBase = F === 'todos' ? cromData : cromData.filter(c => normID(c.molde).includes(normID(F)));
-  // CAMBIO #24 filtro adicional
   let filtCrom = filtCromBase;
   if(STATE.filtroCromado === 'proceso') filtCrom = filtCromBase.filter(c => !c.recep);
   else if(STATE.filtroCromado === 'recibidos') filtCrom = filtCromBase.filter(c => c.recep);
   if(document.getElementById('tbody-cromado')){
-    // CAMBIO #21 pulso fila pendiente, #22 hover elevado, #23 badge días animado, #25 barra progreso días
     document.getElementById('tbody-cromado').innerHTML = [...filtCrom].reverse().map(c => {
       const pend = !c.recep;
       const dias = c.recep ? diasEntre(c.envio, c.recep) : (c.envio ? diasEntre(c.envio, new Date().toLocaleDateString('es-AR')) : null);
       const provBadge = c.prov && c.prov.includes('Cerámica') ? '<span class="badge bb">Cer. Santiago</span>' : '<span class="badge ba">Prados</span>';
-      // Barra de días (#25)
       let barraDiasHtml = '—';
       if(dias !== null){
         const pctDias = Math.min(100, (dias / 30) * 100);
