@@ -12,6 +12,75 @@
 html{font-size:14px}
 body{background:var(--bg0);color:var(--t0);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
 button{cursor:pointer;font-family:inherit;border:none;background:none}
+
+/* ═══ ANIMACIONES NUEVAS ═══ */
+@keyframes pulsoMarker {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: .7; filter: brightness(1.6); }
+}
+@keyframes pulsoDot {
+  0% { transform: scale(1); opacity: .9; }
+  70% { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes shimmer {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(320%) skewX(-20deg); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes alertaPulso {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(240,82,82,.4); }
+  50% { box-shadow: 0 0 0 6px rgba(240,82,82,0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes brilloSuave {
+  0%, 100% { opacity: .55; }
+  50% { opacity: 1; }
+}
+.kpi-num-anim { transition: none; }
+.marker-pulso { animation: pulsoMarker 2.4s ease-in-out infinite; }
+.dot-pulso::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: pulsoDot 2s ease-out infinite;
+}
+.barra-shimmer {
+  position: absolute;
+  top: 0; left: 0; height: 100%; width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  animation: shimmer 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.kpi-anim { animation: fadeInUp .4s ease both; }
+.alerta-anim { animation: alertaPulso 2s ease-in-out infinite; }
+.alerta-slide { animation: slideInRight .35s ease both; }
+.brillo-suave { animation: brilloSuave 3s ease-in-out infinite; }
+
+/* Efecto "eje destacado" */
+.eje-destello {
+  position: relative;
+  overflow: hidden;
+}
+.eje-destello::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
+  animation: shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ═══ ESTILOS ORIGINALES ═══ */
 .topbar{background:var(--bg1);border-bottom:1px solid var(--b1);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-icon{width:32px;height:32px;border-radius:var(--r);object-fit:contain}
@@ -48,15 +117,23 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 .sh{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--b0);flex-wrap:wrap;gap:10px}
 .sh-t{font-family:var(--fh);font-size:20px;font-weight:700;letter-spacing:.04em}
 .sh-s{font-family:var(--fm);font-size:11px;color:var(--t2);margin-top:3px;letter-spacing:.04em}
-.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:17px 20px;transition:border-color .2s;margin-bottom:13px}
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:17px 20px;transition:border-color .2s;margin-bottom:13px;position:relative}
 .card:hover{border-color:var(--b2)}
 .card:last-child{margin-bottom:0}
 .ct{font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:13px;display:flex;align-items:center;gap:7px}
 .ctd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .krow{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-bottom:13px}
-.kpi{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 17px;position:relative;overflow:hidden}
+.kpi{background:linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 17px;position:relative;overflow:hidden;transition:transform .25s ease, box-shadow .25s ease}
+.kpi:hover{transform:translateY(-2px)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--rl) var(--rl) 0 0}
-.ka::before{background:var(--am)}.kg::before{background:var(--gr)}.kr::before{background:var(--re)}.kb::before{background:var(--bl)}
+.ka::before{background:linear-gradient(90deg, var(--am), #f5b84b)}
+.kg::before{background:linear-gradient(90deg, var(--gr), #5eeaaa)}
+.kr::before{background:linear-gradient(90deg, var(--re), #ff7070)}
+.kb::before{background:linear-gradient(90deg, var(--bl), #93c5fd)}
+.ka:hover{box-shadow:0 8px 24px -8px rgba(245,166,35,.5), 0 0 0 1px var(--amb) inset}
+.kg:hover{box-shadow:0 8px 24px -8px rgba(61,214,140,.5), 0 0 0 1px var(--grb) inset}
+.kr:hover{box-shadow:0 8px 24px -8px rgba(240,82,82,.5), 0 0 0 1px var(--reb) inset}
+.kb:hover{box-shadow:0 8px 24px -8px rgba(96,165,250,.5), 0 0 0 1px var(--blb) inset}
 .kl{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:7px}
 .kv{font-family:var(--fh);font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
 .km{font-size:11px;color:var(--t2)}
@@ -264,8 +341,8 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
   <div class="krow" id="kpi-lam"></div>
   <div class="g2">
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--or)"></div>Desgaste acumulado de camisas</div><div id="dsgaste-bars"></div></div>
-    <div class="card"><div class="ct"><div class="ctd" style="background:var(--re)"></div>Estado y alertas</div><div id="lam-alerts"></div><div id="tin-data" style="margin-top:15px;"></div></div>
+    <div class="card eje-destello"><div class="ct"><div class="ctd" style="background:var(--or)"></div>Desgaste acumulado de camisas</div><div id="dsgaste-bars"></div></div>
+    <div class="card"><div class="ct"><div class="ctd" style="background:var(--re)"></div><span id="titulo-alertas">Estado y alertas</span></div><div id="lam-alerts"></div><div id="tin-data" style="margin-top:15px;"></div></div>
   </div>
   <div class="card">
     <div class="ct"><div class="ctd" style="background:var(--am)"></div>mm retirados por rectificación (eje Y en mm)</div>
@@ -365,7 +442,7 @@ tbody tr:hover td{background:var(--bg3)}
 'use strict';
 
 // ══════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN KLB12
+// CONFIGURACIONES
 // ══════════════════════════════════════════════════════════════════════════
 const KLB12_CONFIG = {
   originalFabrica: 175,
@@ -378,9 +455,6 @@ const KLB12_CONFIG = {
   intervencionesBaseRapido: 20
 };
 
-// ══════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN LM1210 — valores fijos para el eje
-// ══════════════════════════════════════════════════════════════════════════
 const LM1210_CONFIG = {
   originalFabrica: 175,
   inicioControlLento: 153,
@@ -389,10 +463,7 @@ const LM1210_CONFIG = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-// COLOR SEGÚN VIDA RESTANTE (3 zonas discretas)
-//   ≥ 50%  → Verde
-//   ≥ 20%  → Ámbar
-//   < 20%  → Rojo
+// COLOR SEGÚN VIDA RESTANTE
 // ══════════════════════════════════════════════════════════════════════════
 function colorPorVidaRestante(pct){
   if(pct >= 50) return '#3dd68c';
@@ -401,7 +472,27 @@ function colorPorVidaRestante(pct){
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// ANIMACIÓN DE CONTADORES — los números de los KPIs suben desde 0
+// ══════════════════════════════════════════════════════════════════════════
+function animarContador(el, valorFinal, duracion = 900, decimales = 0, sufijo = ''){
+  if(!el) return;
+  const valorInicial = 0;
+  const inicio = performance.now();
+  const fmt = (v) => v.toLocaleString('es-AR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales }) + sufijo;
+  function frame(t){
+    const p = Math.min(1, (t - inicio) / duracion);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const valorActual = valorInicial + (valorFinal - valorInicial) * eased;
+    el.textContent = fmt(valorActual);
+    if(p < 1) requestAnimationFrame(frame);
+    else el.textContent = fmt(valorFinal);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // RENDER DEL EJE HORIZONTAL A ESCALA REAL
+// Con: animación de entrada, pulso en marca Actual, shimmer en la barra
 // ══════════════════════════════════════════════════════════════════════════
 function renderEjeCamisa(nombre, valores, colorVida){
   const { fin, actual, inicioControl, inicioFabrica } = valores;
@@ -419,6 +510,9 @@ function renderEjeCamisa(nombre, valores, colorVida){
                                      .replace('#f5a623', 'rgba(245, 166, 35, .35)')
                                      .replace('#f05252', 'rgba(240, 82, 82, .35)');
 
+  // ID único para la barra rayada (para animarla individualmente)
+  const idBarra = `barra-eje-${nombre.toLowerCase()}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+
   return `
     <div style="margin-bottom:26px">
       <div style="font-family:var(--fm);font-size:10px;letter-spacing:.14em;color:var(--t2);margin-bottom:12px;text-transform:uppercase">Cilindro ${nombre}</div>
@@ -430,7 +524,7 @@ function renderEjeCamisa(nombre, valores, colorVida){
           </div>
           <div style="position:absolute;left:${pctActual}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
             <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Actual</div>
-            <div style="font-family:var(--fm);font-size:13px;color:${colorVida};font-weight:700;margin-top:3px">${numFmt(actual)} mm</div>
+            <div style="font-family:var(--fm);font-size:13px;color:${colorVida};font-weight:700;margin-top:3px;text-shadow:0 0 12px ${colorVida}aa">${numFmt(actual)} mm</div>
           </div>
           <div style="position:absolute;left:${pctInicioControl}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
             <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Inicio control</div>
@@ -441,12 +535,14 @@ function renderEjeCamisa(nombre, valores, colorVida){
             <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(inicioFabrica)} mm</div>
           </div>
           <div style="position:absolute;left:0;right:0;top:62px;height:32px;background:var(--bg4);border-radius:4px;overflow:hidden;border:1px solid var(--b1)">
-            <div style="height:100%;width:${pctActual}%;
+            <div id="${idBarra}" style="height:100%;width:0%;
                         background:repeating-linear-gradient(-45deg, ${colorRayado} 0px, ${colorRayado} 5px, transparent 5px, transparent 10px), ${colorRayadoSuave};
-                        transition:width .5s ease"></div>
+                        transition:width 1.2s cubic-bezier(.22, 1, .36, 1); position:relative">
+              <div class="barra-shimmer"></div>
+            </div>
           </div>
           <div style="position:absolute;left:${pctFin}%;top:54px;height:48px;width:2px;background:var(--t3);transform:translateX(-1px)"></div>
-          <div style="position:absolute;left:${pctActual}%;top:54px;height:48px;width:2px;background:${colorVida};transform:translateX(-1px);box-shadow:0 0 8px ${colorVida}aa"></div>
+          <div class="marker-pulso" style="position:absolute;left:${pctActual}%;top:54px;height:48px;width:2px;background:${colorVida};transform:translateX(-1px);box-shadow:0 0 8px ${colorVida}, 0 0 18px ${colorVida}aa;color:${colorVida}"></div>
           <div style="position:absolute;left:${pctInicioControl}%;top:54px;height:48px;width:2px;background:var(--am);transform:translateX(-1px);box-shadow:0 0 6px rgba(245,166,35,.5)"></div>
           <div style="position:absolute;left:${pctInicioFabrica}%;top:54px;height:48px;width:2px;background:var(--t3);transform:translateX(-2px)"></div>
           <div style="position:absolute;left:${pctFin}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">0%</div>
@@ -456,6 +552,14 @@ function renderEjeCamisa(nombre, valores, colorVida){
         </div>
       </div>
     </div>
+    <script>
+      (function(){
+        setTimeout(function(){
+          var b = document.getElementById("${idBarra}");
+          if(b) b.style.width = "${pctActual}%";
+        }, 60);
+      })();
+    <\/script>
   `;
 }
 
@@ -643,9 +747,7 @@ function setF(f, btn){ STATE.filter = f; document.querySelectorAll('.chip').forE
 function pesoColor(prom, nominal){ if(prom === null || prom === undefined) return '#555a68'; const dif = (prom - nominal) * 1000; if(dif < 0) return '#3dd68c'; if(dif <= 300) return '#f5a623'; return '#f05252'; }
 
 // ══════════════════════════════════════════════════════════════════════════
-// BUILD LAMINADORAS
-// KLB12: base fija + descuento por filas nuevas
-// LM1210: Actual leído directo del Sheet · inicio control 153/143 fijos
+// BUILD LAMINADORAS (con animaciones)
 // ══════════════════════════════════════════════════════════════════════════
 function buildLam(){
   const D = STATE.data[STATE.activeLam];
@@ -659,9 +761,6 @@ function buildLam(){
   let desgL, desgR, pctL, pctR, cL, cR;
 
   if(STATE.activeLam === 'KLB12'){
-    // ══════════════════════════════════════════════════════════════════
-    // KLB12 — Actual calculado (base − mm de filas nuevas del Sheet)
-    // ══════════════════════════════════════════════════════════════════
     const ini = KLB12_CONFIG.inicioControlLento;
     const iniR = KLB12_CONFIG.inicioControlRapido;
     const orig = KLB12_CONFIG.originalFabrica;
@@ -676,12 +775,6 @@ function buildLam(){
     const actualLento = Math.max(fin, +(KLB12_CONFIG.actualBaseLento - nuevaRectLento).toFixed(2));
     const actualRapido = Math.max(fin, +(KLB12_CONFIG.actualBaseRapido - nuevaRectRapido).toFixed(2));
 
-    console.log('═══════════════════════════════════════════════════════════');
-    console.log('📊 KLB12 — Actual dinámico');
-    console.log(`LENTO:  Base ${KLB12_CONFIG.actualBaseLento} mm − nuevas rect ${nuevaRectLento.toFixed(2)} mm = ${actualLento} mm`);
-    console.log(`RÁPIDO: Base ${KLB12_CONFIG.actualBaseRapido} mm − nuevas rect ${nuevaRectRapido.toFixed(2)} mm = ${actualRapido} mm`);
-    console.log('═══════════════════════════════════════════════════════════');
-
     const rangoUtilLento = ini - fin;
     const rangoUtilRapido = iniR - fin;
     const pctVidaRestanteLento = Math.max(0, Math.min(100, ((actualLento - fin) / rangoUtilLento) * 100));
@@ -698,39 +791,33 @@ function buildLam(){
     cL = colorVidaLento; cR = colorVidaRapido;
 
     document.getElementById('kpi-lam').innerHTML = `
-      <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
-      <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
-      <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
-      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
+      <div class="kpi ka kpi-anim" style="animation-delay:0ms"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)" id="kpi-rects">0</div><div class="km">eventos</div></div>
+      <div class="kpi kb kpi-anim" style="animation-delay:80ms"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)" id="kpi-mml">0</div><div class="km">máx: ${maxEvL} mm</div></div>
+      <div class="kpi kb kpi-anim" style="animation-delay:160ms"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)" id="kpi-mmr">0</div><div class="km">máx: ${maxEvR} mm</div></div>
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'} kpi-anim" style="animation-delay:240ms"><div class="kl">Vida consumida</div><div class="kv" id="kpi-vida">0%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
+    // Animar los contadores
+    animarContador(document.getElementById('kpi-rects'), totalRects, 900, 0);
+    animarContador(document.getElementById('kpi-mml'), totalL, 900, 1);
+    animarContador(document.getElementById('kpi-mmr'), totalR, 900, 1);
+    animarContador(document.getElementById('kpi-vida'), Math.max(pctL,pctR), 900, 0, '%');
 
     document.getElementById('dsgaste-bars').innerHTML =
       renderEjeCamisa('Lento', { fin, actual: actualLento, inicioControl: ini, inicioFabrica: orig }, colorVidaLento) +
       renderEjeCamisa('Rápido', { fin, actual: actualRapido, inicioControl: iniR, inicioFabrica: orig }, colorVidaRapido);
   } else {
-    // ══════════════════════════════════════════════════════════════════
-    // LM1210 — Actual leído DIRECTO del Sheet
-    // Inicio control 153/143 fijos · Fábrica 175 · Fin 20
-    // ══════════════════════════════════════════════════════════════════
     const orig = LM1210_CONFIG.originalFabrica;
     const fin = LM1210_CONFIG.finVida;
     const ini = LM1210_CONFIG.inicioControlLento;
     const iniR = LM1210_CONFIG.inicioControlRapido;
 
-    const actualLento = D.act.lento;   // del Sheet
-    const actualRapido = D.act.rapido; // del Sheet
+    const actualLento = D.act.lento;
+    const actualRapido = D.act.rapido;
 
-    console.log('═══════════════════════════════════════════════════════════');
-    console.log('📊 LM1210 — Actual desde Sheet');
-    console.log(`LENTO:  ${actualLento} mm · RÁPIDO: ${actualRapido} mm`);
-    console.log('═══════════════════════════════════════════════════════════');
-
-    // Desgaste para KPIs/alertas (referencia = inicio control 153/143)
     const rangoUtilLento = ini - fin;
     const rangoUtilRapido = iniR - fin;
     const pctVidaRestanteLento = Math.max(0, Math.min(100, ((actualLento - fin) / rangoUtilLento) * 100));
     const pctVidaRestanteRapido = Math.max(0, Math.min(100, ((actualRapido - fin) / rangoUtilRapido) * 100));
 
-    // Color y posición sobre el eje completo (175 → 20)
     const rangoEje = orig - fin;
     const pctEjeLento = ((actualLento - fin) / rangoEje) * 100;
     const pctEjeRapido = ((actualRapido - fin) / rangoEje) * 100;
@@ -742,48 +829,93 @@ function buildLam(){
     cL = colorVidaLento; cR = colorVidaRapido;
 
     document.getElementById('kpi-lam').innerHTML = `
-      <div class="kpi ka"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)">${totalRects}</div><div class="km">eventos</div></div>
-      <div class="kpi kb"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)">${totalL.toFixed(1)}</div><div class="km">máx: ${maxEvL} mm</div></div>
-      <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
-      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
+      <div class="kpi ka kpi-anim" style="animation-delay:0ms"><div class="kl">Rectificaciones totales</div><div class="kv" style="color:var(--am)" id="kpi-rects">0</div><div class="km">eventos</div></div>
+      <div class="kpi kb kpi-anim" style="animation-delay:80ms"><div class="kl">Total mm Lento</div><div class="kv" style="color:var(--bl)" id="kpi-mml">0</div><div class="km">máx: ${maxEvL} mm</div></div>
+      <div class="kpi kb kpi-anim" style="animation-delay:160ms"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)" id="kpi-mmr">0</div><div class="km">máx: ${maxEvR} mm</div></div>
+      <div class="kpi ${pctL>70||pctR>70?'kr':'kg'} kpi-anim" style="animation-delay:240ms"><div class="kl">Vida consumida</div><div class="kv" id="kpi-vida">0%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
+    animarContador(document.getElementById('kpi-rects'), totalRects, 900, 0);
+    animarContador(document.getElementById('kpi-mml'), totalL, 900, 1);
+    animarContador(document.getElementById('kpi-mmr'), totalR, 900, 1);
+    animarContador(document.getElementById('kpi-vida'), Math.max(pctL,pctR), 900, 0, '%');
 
     document.getElementById('dsgaste-bars').innerHTML =
       renderEjeCamisa('Lento', { fin, actual: actualLento, inicioControl: ini, inicioFabrica: orig }, colorVidaLento) +
       renderEjeCamisa('Rápido', { fin, actual: actualRapido, inicioControl: iniR, inicioFabrica: orig }, colorVidaRapido);
   }
 
+  // Alertas con contador en el título
   let alHtml = '';
-  if(pctL>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm (${pctL.toFixed(1)}%)</div></div></div>`;
-  if(pctR>70) alHtml+=`<div class="al alr"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm (${pctR.toFixed(1)}%)</div></div></div>`;
+  let nCriticas = 0;
+  if(pctL>70){ nCriticas++; alHtml+=`<div class="al alr alerta-anim alerta-slide"><div class="aico">⚠</div><div><div class="at">Cilindro Lento — Desgaste crítico</div><div class="ad">${desgL.toFixed(1)} mm (${pctL.toFixed(1)}%)</div></div></div>`; }
+  if(pctR>70){ nCriticas++; alHtml+=`<div class="al alr alerta-anim alerta-slide" style="animation-delay:.1s"><div class="aico">⚠</div><div><div class="at">Cilindro Rápido — Desgaste crítico</div><div class="ad">${desgR.toFixed(1)} mm (${pctR.toFixed(1)}%)</div></div></div>`; }
   if(!alHtml) alHtml=`<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('lam-alerts').innerHTML = alHtml;
+  document.getElementById('titulo-alertas').innerHTML = nCriticas > 0
+    ? `Estado y alertas <span style="background:var(--red);color:var(--re);border:1px solid var(--reb);border-radius:999px;padding:1px 7px;font-family:var(--fm);font-size:10px;margin-left:6px">${nCriticas}</span>`
+    : `Estado y alertas`;
 
+  // Estaño — versión con gauge circular
   const tinData = STATE.data.ESTAÑO;
   const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
     const reg = tinData.ultimo;
-    let colorEstado = '', mensaje = '';
+    let colorEstado = '', mensaje = '', colorHex = '';
     const idealMin = 1.2, idealMax = 1.5;
-    if(reg.diferencia >= 6){ colorEstado = 'var(--re)'; mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm'; }
-    else if(reg.esquina < idealMin || reg.esquina > idealMax){ colorEstado = 'var(--am)'; mensaje = '⚠ ACERCAR: Esquina fuera del rango (1.2–1.5 mm)'; }
-    else { colorEstado = 'var(--gr)'; mensaje = '✓ Correcto'; }
+    if(reg.diferencia >= 6){ colorEstado = 'var(--re)'; colorHex = '#f05252'; mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm'; }
+    else if(reg.esquina < idealMin || reg.esquina > idealMax){ colorEstado = 'var(--am)'; colorHex = '#f5a623'; mensaje = '⚠ ACERCAR: Esquina fuera del rango (1.2–1.5 mm)'; }
+    else { colorEstado = 'var(--gr)'; colorHex = '#3dd68c'; mensaje = '✓ Correcto'; }
     let vueltasNecesarias = '';
     if(reg.esquina > idealMax){ vueltasNecesarias = `🔧 ≈ ${((reg.esquina-idealMax)*6).toFixed(1)} vueltas para ${idealMax} mm.`; }
     else if(reg.esquina < idealMin){ vueltasNecesarias = `⚠ Esquina bajo ${idealMin} mm.`; }
     else { vueltasNecesarias = `✓ Dentro del rango.`; }
+
+    // Gauge circular para "diferencia" (rango 0 a 6 mm)
+    const pctDiferencia = Math.max(0, Math.min(100, (reg.diferencia / 6) * 100));
+    const rGauge = 50;
+    const circ = 2 * Math.PI * rGauge;
+    const dashGauge = circ * (pctDiferencia / 100);
+
     tinContainer.innerHTML = `
-      <div style="margin-top:12px;border-top:1px solid var(--b1);padding-top:12px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px">📏</span><span style="font-family:var(--fh);font-size:13px;letter-spacing:.1em">CONTROL ESTAÑO · ${reg.fecha}</span></div>
-        <div style="display:flex;justify-content:space-around;gap:15px;background:var(--bg3);padding:10px;border-radius:var(--r)">
-          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">CENTRO</div><div style="font-size:20px;font-weight:700">${reg.centro.toFixed(2)} mm</div></div>
-          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">ESQUINA</div><div style="font-size:20px;font-weight:700;color:${colorEstado}">${reg.esquina.toFixed(2)} mm</div></div>
-          <div style="text-align:center"><div style="font-size:10px;color:var(--t2)">DIFERENCIA</div><div style="font-size:20px;font-weight:700">${reg.diferencia.toFixed(2)} mm</div></div>
+      <div style="margin-top:12px;border-top:1px solid var(--b1);padding-top:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:16px">📏</span><span style="font-family:var(--fh);font-size:13px;letter-spacing:.1em">CONTROL ESTAÑO · ${reg.fecha}</span></div>
+
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <!-- Gauge circular -->
+          <div style="position:relative;width:130px;height:130px;flex-shrink:0">
+            <svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="60" cy="60" r="${rGauge}" fill="none" stroke="var(--bg4)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="${rGauge}" fill="none" stroke="${colorHex}" stroke-width="10" stroke-linecap="round"
+                      stroke-dasharray="${dashGauge} ${circ}"
+                      style="transition:stroke-dasharray 1s ease, stroke .3s; filter:drop-shadow(0 0 6px ${colorHex}aa)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+              <div style="font-family:var(--fh);font-size:26px;font-weight:700;line-height:1;color:${colorHex}">${reg.diferencia.toFixed(2)}</div>
+              <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;margin-top:4px">DIFERENCIA</div>
+              <div style="font-family:var(--fm);font-size:9px;color:var(--t3);margin-top:2px">mm</div>
+            </div>
+          </div>
+
+          <!-- Detalle a la derecha -->
+          <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border-radius:var(--r)">
+              <span style="font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">CENTRO</span>
+              <span style="font-family:var(--fm);font-size:15px;font-weight:600;color:var(--t0)">${reg.centro.toFixed(2)} mm</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border-radius:var(--r)">
+              <span style="font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">ESQUINA</span>
+              <span style="font-family:var(--fm);font-size:15px;font-weight:600;color:${colorEstado};text-shadow:0 0 10px ${colorHex}88">${reg.esquina.toFixed(2)} mm</span>
+            </div>
+          </div>
         </div>
-        <div style="text-align:center;margin:10px 0"><div style="background:${colorEstado}20;color:${colorEstado};border:1px solid ${colorEstado}40;padding:5px 10px;border-radius:999px;display:inline-block;font-size:11px">${mensaje}</div></div>
-        <div style="font-size:11px;color:var(--t1);background:var(--bg4);padding:8px;border-radius:var(--r);margin-top:5px">
+
+        <div style="text-align:center;margin:14px 0 10px">
+          <div style="background:${colorHex}22;color:${colorHex};border:1px solid ${colorHex}55;padding:6px 14px;border-radius:999px;display:inline-block;font-size:11px;font-family:var(--fm)">${mensaje}</div>
+        </div>
+
+        <div style="font-size:11px;color:var(--t1);background:var(--bg4);padding:10px 12px;border-radius:var(--r);margin-top:5px;line-height:1.6">
           <div><strong>📝 Observación:</strong> ${reg.observaciones || 'Sin observaciones'}</div>
-          <div style="margin-top:5px"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div>
-          <div style="margin-top:5px"><strong>📐 Guía:</strong> ${tinData.guia}</div>
+          <div style="margin-top:6px"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div>
+          <div style="margin-top:6px"><strong>📐 Guía:</strong> ${tinData.guia}</div>
         </div>
       </div>`;
   } else { tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px">⚠️ No se encontraron datos de Control de Estaño.</div>`; }
@@ -791,13 +923,110 @@ function buildLam(){
   const colProx = document.getElementById('col-prox');
   if(colProx) colProx.style.display = STATE.activeLam==='LM1210'?'':'none';
 
+  // ═══ Gráfico de barras CON CASCADA Y COLORES POR UMBRAL ═══
   if(window.chartCamisa) window.chartCamisa.destroy();
-  window.chartCamisa = new Chart(document.getElementById('ch-camisa'),{ type:'bar', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento',data:rows.map(r=>r.l),backgroundColor:'rgba(96,165,250,.7)'},{label:'Rápido',data:rows.map(r=>r.r),backgroundColor:'rgba(245,166,35,.7)'}] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0 } } } });
+  const coloresBarrasLento = rows.map(r => r.l <= 1 ? 'rgba(61,214,140,.85)' : r.l <= 2.5 ? 'rgba(245,166,35,.85)' : 'rgba(240,82,82,.85)');
+  const coloresBarrasRapido = rows.map(r => r.r <= 1 ? 'rgba(61,214,140,.85)' : r.r <= 2.5 ? 'rgba(245,166,35,.85)' : 'rgba(240,82,82,.85)');
+  const promL = totalL / (rows.length || 1);
+  const promR = totalR / (rows.length || 1);
+  window.chartCamisa = new Chart(document.getElementById('ch-camisa'), {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r.f),
+      datasets: [
+        { label: 'Lento', data: rows.map(r=>r.l), backgroundColor: coloresBarrasLento, borderRadius: 4, borderSkipped: false },
+        { label: 'Rápido', data: rows.map(r=>r.r), backgroundColor: coloresBarrasRapido, borderRadius: 4, borderSkipped: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 900,
+        easing: 'easeOutQuart',
+        delay: (ctx) => ctx.dataIndex * 50
+      },
+      scales: { y: { min: 0 } },
+      plugins: {
+        legend: { labels: { color: '#b8c4d8', font: { family: 'IBM Plex Sans Condensed' } } },
+        tooltip: {
+          backgroundColor: 'rgba(13,16,23,.96)',
+          borderColor: 'rgba(255,255,255,.16)',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8,
+          titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' },
+          bodyFont: { family: 'IBM Plex Mono', size: 11 },
+          callbacks: {
+            afterBody: (items) => {
+              const idx = items[0].dataIndex;
+              const r = rows[idx];
+              return [`Total: ${(r.l + r.r).toFixed(2)} mm`, `Resp: ${r.resp || '—'}`];
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // ═══ Gráfico acumulado CON GRADIENTE Y PUNTO PULSANTE ═══
   let acumL=0,acumR=0, acumLArr=[],acumRArr=[];
   rows.forEach(r=>{ acumL+=r.l; acumR+=r.r; acumLArr.push(acumL); acumRArr.push(acumR); });
   if(window.chartAcum) window.chartAcum.destroy();
-  window.chartAcum = new Chart(document.getElementById('ch-acum'),{ type:'line', data:{ labels:rows.map(r=>r.f), datasets:[{label:'Lento acum.',data:acumLArr,borderColor:'#60a5fa'},{label:'Rápido acum.',data:acumRArr,borderColor:'#f5a623'}] }, options:{ responsive:true, maintainAspectRatio:false } });
-  document.getElementById('tbody-lam').innerHTML = rows.map(r=>`<tr><td class="tg">${r.f}</td><td class="tr">${r.l.toFixed(2)}</td><td class="tr">${r.r.toFixed(2)}</td><td class="tr">${(r.l+r.r).toFixed(2)}</td><td>${r.obs||'—'}</td><td style="font-size:11px">${r.resp}</td>${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}</tr>`).join('');
+  const canvasAcum = document.getElementById('ch-acum');
+  const ctxAcum = canvasAcum.getContext('2d');
+  const gradL = ctxAcum.createLinearGradient(0, 0, 0, 200);
+  gradL.addColorStop(0, 'rgba(96,165,250,.35)');
+  gradL.addColorStop(1, 'rgba(96,165,250,0)');
+  const gradR = ctxAcum.createLinearGradient(0, 0, 0, 200);
+  gradR.addColorStop(0, 'rgba(245,166,35,.35)');
+  gradR.addColorStop(1, 'rgba(245,166,35,0)');
+  window.chartAcum = new Chart(canvasAcum, {
+    type: 'line',
+    data: {
+      labels: rows.map(r => r.f),
+      datasets: [
+        { label: 'Lento acum.', data: acumLArr, borderColor: '#60a5fa', backgroundColor: gradL, fill: true, tension: .35, pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#60a5fa', borderWidth: 2 },
+        { label: 'Rápido acum.', data: acumRArr, borderColor: '#f5a623', backgroundColor: gradR, fill: true, tension: .35, pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: '#f5a623', borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 1100, easing: 'easeOutQuart' },
+      scales: { y: { min: 0 } },
+      plugins: {
+        legend: { labels: { color: '#b8c4d8', font: { family: 'IBM Plex Sans Condensed' } } },
+        tooltip: {
+          backgroundColor: 'rgba(13,16,23,.96)',
+          borderColor: 'rgba(255,255,255,.16)',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8,
+          titleFont: { family: 'IBM Plex Sans Condensed', size: 12, weight: '700' },
+          bodyFont: { family: 'IBM Plex Mono', size: 11 }
+        }
+      }
+    }
+  });
+
+  // Tabla con mini-barras y "más recientes destacadas"
+  const totalDatosTabla = rows.length;
+  document.getElementById('tbody-lam').innerHTML = rows.map((r,i) => {
+    const maxTotal = Math.max(...rows.map(x => x.l + x.r));
+    const pctBarraL = (r.l / maxTotal) * 100;
+    const pctBarraR = (r.r / maxTotal) * 100;
+    const esReciente = i >= totalDatosTabla - 3;
+    return `<tr style="${esReciente ? 'background:rgba(245,166,35,.03)' : ''}">
+      <td class="tg">${r.f}</td>
+      <td class="tr"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="flex:1;max-width:40px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pctBarraL}%;background:#60a5fa;border-radius:2px"></div></div><span style="min-width:36px">${r.l.toFixed(2)}</span></div></td>
+      <td class="tr"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="flex:1;max-width:40px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pctBarraR}%;background:#f5a623;border-radius:2px"></div></div><span style="min-width:36px">${r.r.toFixed(2)}</span></div></td>
+      <td class="tr" style="font-weight:600">${(r.l+r.r).toFixed(2)}</td>
+      <td>${r.obs||'—'}</td>
+      <td style="font-size:11px">${r.resp}</td>
+      ${STATE.activeLam==='LM1210'?`<td class="tg">${r.prox||'—'}</td>`:''}
+    </tr>`;
+  }).join('');
 }
 
 // ========== BUILD MOLDES ==========
@@ -810,7 +1039,7 @@ function renderPesoBars(filtered){
     const tieneDatos = (real !== null && !isNaN(real) && nominal > 0);
     let barWidthPercent = 0, barColor = '#6e7d96', valueText = '';
     if(tieneDatos){ barWidthPercent = Math.min((real/nominal)*100, 200); const diffG = (real - nominal) * 1000; if(diffG < 0) barColor = '#3dd68c'; else if(diffG <= 300) barColor = '#f5a623'; else barColor = '#f05252'; valueText = `${real.toFixed(3)} / ${nominal.toFixed(1)} kg`; } else { valueText = 'S/D'; }
-    html += `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="min-width:90px;font-family:var(--fh);font-weight:600;font-size:13px;color:var(--t0)">${m.id} #${m.num}</div><div style="flex:1;min-width:200px"><div style="position:relative;width:100%;max-width:350px;height:24px;background:var(--bg4);border-radius:12px;overflow:visible"><div style="position:absolute;left:0;top:0;height:100%;width:${barWidthPercent}%;background:${barColor};border-radius:12px;transition:width .2s ease"></div><div style="position:absolute;left:100%;top:0;height:100%;width:2px;background:white;transform:translateX(-1px);box-shadow:0 0 3px rgba(0,0,0,.5);z-index:2"></div></div></div><div style="min-width:100px;text-align:right;font-family:var(--fm);font-size:11px;color:var(--t1)">${valueText}</div></div>`;
+    html += `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="min-width:90px;font-family:var(--fh);font-weight:600;font-size:13px;color:var(--t0)">${m.id} #${m.num}</div><div style="flex:1;min-width:200px"><div style="position:relative;width:100%;max-width:350px;height:24px;background:var(--bg4);border-radius:12px;overflow:visible"><div style="position:absolute;left:0;top:0;height:100%;width:${barWidthPercent}%;background:${barColor};border-radius:12px;transition:width .6s ease"></div><div style="position:absolute;left:100%;top:0;height:100%;width:2px;background:white;transform:translateX(-1px);box-shadow:0 0 3px rgba(0,0,0,.5);z-index:2"></div></div></div><div style="min-width:100px;text-align:right;font-family:var(--fm);font-size:11px;color:var(--t1)">${valueText}</div></div>`;
   });
   html += '</div>'; container.innerHTML = html;
 }
@@ -833,12 +1062,16 @@ function buildMoldes(){
   const fab = data.filter(m => m.estado === 'En fabricación').length;
   const crom = data.filter(m => m.cromado === 'Sí' || m.cromado === 'En proceso').length;
   const excedidos = data.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).length;
-  document.getElementById('kpi-moldes').innerHTML = `<div class="kpi kg"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)">${ops}</div><div class="km">moldes en producción</div></div><div class="kpi kb"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)">${crom + cal}</div><div class="km">${crom} cromados · ${cal} en calibración</div></div><div class="kpi kr"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)">${fab}</div><div class="km">fuera de línea</div></div><div class="kpi ka"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)">${excedidos}</div><div class="km">moldes con sobrepeso crítico</div></div>`;
+  document.getElementById('kpi-moldes').innerHTML = `<div class="kpi kg kpi-anim"><div class="kl">Operativos</div><div class="kv" style="color:var(--gr)" id="kpi-ops">0</div><div class="km">moldes en producción</div></div><div class="kpi kb kpi-anim" style="animation-delay:80ms"><div class="kl">En cromado / calibración</div><div class="kv" style="color:var(--bl)" id="kpi-cromcal">0</div><div class="km">${crom} cromados · ${cal} en calibración</div></div><div class="kpi kr kpi-anim" style="animation-delay:160ms"><div class="kl">En fabricación</div><div class="kv" style="color:var(--re)" id="kpi-fab">0</div><div class="km">fuera de línea</div></div><div class="kpi ka kpi-anim" style="animation-delay:240ms"><div class="kl">Exceden +300g nominal</div><div class="kv" style="color:var(--am)" id="kpi-exc">0</div><div class="km">moldes con sobrepeso crítico</div></div>`;
+  animarContador(document.getElementById('kpi-ops'), ops, 800, 0);
+  animarContador(document.getElementById('kpi-cromcal'), crom + cal, 800, 0);
+  animarContador(document.getElementById('kpi-fab'), fab, 800, 0);
+  animarContador(document.getElementById('kpi-exc'), excedidos, 800, 0);
   renderPesoBars(filtered);
   let alHtml = '';
-  filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
-  filtered.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).forEach(m => { const dif = ((m.prom - m.nominal) * 1000).toFixed(0); alHtml += `<div class="al alr"><div class="aico">◆</div><div><div class="at">${m.id} #${m.num} — Sobrepeso +${dif} g</div><div class="ad">Real: ${m.prom.toFixed(3)} kg · Nominal: ${m.nominal.toFixed(1)} kg</div></div></div>`; });
-  filtered.filter(m => m.estado === 'Operativo' && m.cromado === 'No').forEach(m => { alHtml += `<div class="al ala"><div class="aico">◇</div><div><div class="at">${m.id} #${m.num} — Cromado pendiente</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
+  filtered.filter(m => m.estado === 'En fabricación').forEach(m => { alHtml += `<div class="al alr alerta-slide"><div class="aico">⚠</div><div><div class="at">${m.id} #${m.num} — En fabricación</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
+  filtered.filter(m => m.prom && (m.prom - m.nominal) * 1000 > 300).forEach(m => { const dif = ((m.prom - m.nominal) * 1000).toFixed(0); alHtml += `<div class="al alr alerta-slide"><div class="aico">◆</div><div><div class="at">${m.id} #${m.num} — Sobrepeso +${dif} g</div><div class="ad">Real: ${m.prom.toFixed(3)} kg · Nominal: ${m.nominal.toFixed(1)} kg</div></div></div>`; });
+  filtered.filter(m => m.estado === 'Operativo' && m.cromado === 'No').forEach(m => { alHtml += `<div class="al ala alerta-slide"><div class="aico">◇</div><div><div class="at">${m.id} #${m.num} — Cromado pendiente</div><div class="ad">${m.obs || 'Sin observaciones'}</div></div></div>`; });
   if (!alHtml) alHtml = `<div class="al alg"><div class="aico">✓</div><div><div class="at">Sin alertas críticas</div></div></div>`;
   document.getElementById('alerts-moldes').innerHTML = alHtml;
   function estadoBadge(e) { const m = { 'Operativo': 'bg', 'En calibración': 'bb', 'En laboratorio': 'bb', 'En fabricación': 'br', 'No operativo': 'br' }; return `<span class="badge ${m[e] || 'bgr'}">${e}</span>`; }
@@ -886,7 +1119,11 @@ function buildStock(){
   const F = STATE.filter; const data = STATE.data.STOCK || [];
   STOCK_FILTERED = F==='todos'?data:data.filter(s=>normID(s.molde).includes(normID(F)));
   const total=data.length, sinStock=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, parcial=data.filter(s=>[s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].some(v=>v===0)&&![s.boquillas,s.aranas,s.dados,s.placaBase,s.frenos].every(v=>v===0)).length, completo=total-sinStock-parcial;
-  document.getElementById('kpi-stock').innerHTML = `<div class="kpi ka"><div class="kl">Tipos</div><div class="kv">${total}</div></div><div class="kpi kg"><div class="kl">Completo</div><div class="kv">${completo}</div></div><div class="kpi ka"><div class="kl">Parcial</div><div class="kv">${parcial}</div></div><div class="kpi kr"><div class="kl">Sin stock</div><div class="kv">${sinStock}</div></div>`;
+  document.getElementById('kpi-stock').innerHTML = `<div class="kpi ka kpi-anim"><div class="kl">Tipos</div><div class="kv" id="kpi-tipos">0</div></div><div class="kpi kg kpi-anim" style="animation-delay:80ms"><div class="kl">Completo</div><div class="kv" id="kpi-comp">0</div></div><div class="kpi ka kpi-anim" style="animation-delay:160ms"><div class="kl">Parcial</div><div class="kv" id="kpi-parc">0</div></div><div class="kpi kr kpi-anim" style="animation-delay:240ms"><div class="kl">Sin stock</div><div class="kv" id="kpi-sinstock">0</div></div>`;
+  animarContador(document.getElementById('kpi-tipos'), total, 800, 0);
+  animarContador(document.getElementById('kpi-comp'), completo, 800, 0);
+  animarContador(document.getElementById('kpi-parc'), parcial, 800, 0);
+  animarContador(document.getElementById('kpi-sinstock'), sinStock, 800, 0);
   const tbody = document.getElementById('tbody-stock'); if(!tbody) return;
   tbody.innerHTML = STOCK_FILTERED.map(s => { const crit = [s.boquillas, s.aranas, s.dados, s.placaBase, s.frenos].every(v=>v===0); return `<tr class="${crit ? 'crit-row' : ''}"><td style="font-weight:700">${s.molde}</td><td class="tr"><span class="${stockCls(s.boquillas)}">${s.boquillas}</span></td><td class="tr"><span class="${stockCls(s.aranas)}">${s.aranas}</span></td><td class="tr"><span class="${stockCls(s.dados)}">${s.dados}</span></td><td class="tr"><span class="${stockCls(s.placaBase)}">${s.placaBase}</span></td><td class="tr"><span class="${stockCls(s.frenos)}">${s.frenos}</span></td><td class="tg">${s.rev || '—'}</td><td>${stockEstado(s)}</td></tr>`; }).join('');
   document.getElementById('stock-count').textContent = `${STOCK_FILTERED.length} de ${total} moldes`;
@@ -926,14 +1163,14 @@ function buildMantenimiento(){
     const tipos = {}; data.forEach(r => { const tipo = r.tipoTarea || 'Otros'; tipos[tipo] = (tipos[tipo] || 0) + 1; });
     const maxTareas = Math.max(...Object.values(tipos));
     const colores = ['#3dd68c', '#f5a623', '#60a5fa', '#f05252', '#2dd4bf', '#fb923c', '#a855f7', '#ec489a', '#06b6d4', '#84cc16'];
-    containerTipo.innerHTML = `<div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => { const porcentaje = (cantidad / maxTareas) * 100; const color = colores[idx % colores.length]; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span><span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span></div><div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden"><div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div></div></div>`; }).join('');
+    containerTipo.innerHTML = `<div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">📊 TAREAS POR TIPO</div>` + Object.entries(tipos).sort((a,b) => b[1] - a[1]).map(([tipo, cantidad], idx) => { const porcentaje = (cantidad / maxTareas) * 100; const color = colores[idx % colores.length]; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${tipo}</span><span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span></div><div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden"><div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;transition:width .8s ease"></div></div></div>`; }).join('');
   }
   if(containerResp){
     const responsables = {}; data.forEach(r => { const resp = r.responsable || 'Desconocido'; responsables[resp] = (responsables[resp] || 0) + 1; });
     const topResp = Object.entries(responsables).sort((a,b) => b[1] - a[1]).slice(0, 6);
     const maxResp = topResp[0]?.[1] || 1;
     const coloresResp = ['#60a5fa', '#3dd68c', '#f5a623', '#f05252', '#2dd4bf', '#fb923c'];
-    containerResp.innerHTML = `<div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES</div>` + topResp.map(([responsable, cantidad], idx) => { const porcentaje = (cantidad / maxResp) * 100; const color = coloresResp[idx % coloresResp.length]; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span><span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span></div><div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden"><div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px"></div></div></div>`; }).join('');
+    containerResp.innerHTML = `<div style="margin-bottom:12px;font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">👥 TOP RESPONSABLES</div>` + topResp.map(([responsable, cantidad], idx) => { const porcentaje = (cantidad / maxResp) * 100; const color = coloresResp[idx % coloresResp.length]; return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-family:var(--fm);font-size:11px;color:var(--t1)">${responsable}</span><span style="font-family:var(--fm);font-size:11px;font-weight:600;color:${color}">${cantidad} tareas</span></div><div style="background:var(--bg4);border-radius:4px;height:24px;overflow:hidden"><div style="width:${porcentaje}%;height:100%;background:${color};border-radius:4px;transition:width .8s ease"></div></div></div>`; }).join('');
   }
 }
 
@@ -983,7 +1220,7 @@ function drawDoughnut(canvasId, displayPercent, realPercent, color, esInfinito =
   const startAngle = -Math.PI / 2;
   const endAngle = startAngle + (displayPercent / 200) * 2 * Math.PI;
   ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI); ctx.fillStyle = '#2d3a50'; ctx.fill();
-  if(displayPercent > 0){ ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, endAngle); ctx.lineWidth = radius - innerRadius; ctx.strokeStyle = color; ctx.stroke(); }
+  if(displayPercent > 0){ ctx.beginPath(); ctx.arc(centerX, centerY, radius, startAngle, endAngle); ctx.lineWidth = radius - innerRadius; ctx.strokeStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 12; ctx.stroke(); ctx.shadowBlur = 0; }
   ctx.beginPath(); ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI); ctx.fillStyle = 'var(--bg3)'; ctx.fill();
   ctx.font = 'bold 32px "IBM Plex Mono", monospace'; ctx.fillStyle = '#f0f4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(`${Math.round(realPercent)}%`, centerX, centerY - 5);
@@ -1057,7 +1294,12 @@ function buildEstadoPiezas(){
   const conAccion = filtered.filter(p => p.accion && p.accion.trim() !== '').length;
   const cromadoReacond = filtered.filter(p => p.estado.toLowerCase().includes('cromado') || p.estado.toLowerCase().includes('reacondicionado')).length;
   const moldesUnicos = new Set(filtered.map(p => `${p.molde} ${p.numero}`)).size;
-  document.getElementById('kpi-estado').innerHTML = `<div class="kpi kg"><div class="kl">Total piezas</div><div class="kv">${totalPiezas}</div><div class="km">registros</div></div><div class="kpi kb"><div class="kl">Buen estado</div><div class="kv" style="color:var(--gr)">${buenEstado}</div><div class="km">piezas</div></div><div class="kpi ka"><div class="kl">Con acción requerida</div><div class="kv" style="color:var(--am)">${conAccion}</div><div class="km">pendientes</div></div><div class="kpi kr"><div class="kl">Cromado / Reacond.</div><div class="kv" style="color:var(--or)">${cromadoReacond}</div><div class="km">necesitan atención</div></div><div class="kpi ${moldesUnicos>0?'kg':'bgr'}"><div class="kl">Moldes distintos</div><div class="kv">${moldesUnicos}</div><div class="km">con piezas</div></div>`;
+  document.getElementById('kpi-estado').innerHTML = `<div class="kpi kg kpi-anim"><div class="kl">Total piezas</div><div class="kv" id="kpi-totp">0</div><div class="km">registros</div></div><div class="kpi kb kpi-anim" style="animation-delay:80ms"><div class="kl">Buen estado</div><div class="kv" style="color:var(--gr)" id="kpi-buen">0</div><div class="km">piezas</div></div><div class="kpi ka kpi-anim" style="animation-delay:160ms"><div class="kl">Con acción requerida</div><div class="kv" style="color:var(--am)" id="kpi-accion">0</div><div class="km">pendientes</div></div><div class="kpi kr kpi-anim" style="animation-delay:240ms"><div class="kl">Cromado / Reacond.</div><div class="kv" style="color:var(--or)" id="kpi-cr">0</div><div class="km">necesitan atención</div></div><div class="kpi ${moldesUnicos>0?'kg':'bgr'} kpi-anim" style="animation-delay:320ms"><div class="kl">Moldes distintos</div><div class="kv" id="kpi-moldes">0</div><div class="km">con piezas</div></div>`;
+  animarContador(document.getElementById('kpi-totp'), totalPiezas, 800, 0);
+  animarContador(document.getElementById('kpi-buen'), buenEstado, 800, 0);
+  animarContador(document.getElementById('kpi-accion'), conAccion, 800, 0);
+  animarContador(document.getElementById('kpi-cr'), cromadoReacond, 800, 0);
+  animarContador(document.getElementById('kpi-moldes'), moldesUnicos, 800, 0);
   const estadosCount = { 'Buen estado':0, 'Cromado':0, 'Reacondicionado':0, 'Otro':0 };
   filtered.forEach(p => { const e = p.estado.toLowerCase(); if(e.includes('buen')) estadosCount['Buen estado']++; else if(e.includes('cromado')) estadosCount['Cromado']++; else if(e.includes('reacondicionado')) estadosCount['Reacondicionado']++; else estadosCount['Otro']++; });
   renderDistribucionEstados(estadosCount, totalPiezas);
