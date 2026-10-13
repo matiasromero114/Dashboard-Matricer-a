@@ -374,39 +374,19 @@ const KLB12_CONFIG = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-// COLOR GRADUAL SEGÚN VIDA RESTANTE
-//   100% → verde · 70% → ámbar · 20% → rojo · <20% → rojo
+// COLOR SEGÚN VIDA RESTANTE (3 zonas discretas)
+//   ≥ 50%  → Verde   (barra verde)
+//   ≥ 20%  → Ámbar   (barra amarilla)
+//   < 20%  → Rojo    (barra roja)
 // ══════════════════════════════════════════════════════════════════════════
-function interpColor(c1, c2, t){
-  return [
-    Math.round(c1[0] + (c2[0]-c1[0])*t),
-    Math.round(c1[1] + (c2[1]-c1[1])*t),
-    Math.round(c1[2] + (c2[2]-c1[2])*t)
-  ];
-}
 function colorPorVidaRestante(pct){
-  const verde = [61, 214, 140];
-  const ambar = [245, 166, 35];
-  const rojo  = [240, 82, 82];
-  let rgb;
-  if(pct >= 70){
-    const t = Math.min(1, (pct - 70) / 30);
-    rgb = interpColor(ambar, verde, t);
-  } else if(pct >= 20){
-    const t = (pct - 20) / 50;
-    rgb = interpColor(rojo, ambar, t);
-  } else {
-    rgb = rojo;
-  }
-  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+  if(pct >= 50) return '#3dd68c';   // verde
+  if(pct >= 20) return '#f5a623';   // ámbar
+  return '#f05252';                 // rojo
 }
 
 // ══════════════════════════════════════════════════════════════════════════
 // RENDER DEL EJE HORIZONTAL A ESCALA REAL
-//   - Fin (20 mm) a la izquierda (0%)
-//   - Inicio fábrica (175 mm) a la derecha (100%)
-//   - Marcas proporcionales para Actual e Inicio control
-//   - Rayado desde Fin hasta Actual (vida restante)
 // ══════════════════════════════════════════════════════════════════════════
 function renderEjeCamisa(nombre, valores, colorVida){
   const { fin, actual, inicioControl, inicioFabrica } = valores;
@@ -421,7 +401,9 @@ function renderEjeCamisa(nombre, valores, colorVida){
 
   // Colores del rayado: base + variante translúcida
   const colorRayado = colorVida;
-  const colorRayadoSuave = colorVida.replace('rgb(', 'rgba(').replace(')', ', .35)');
+  const colorRayadoSuave = colorVida.replace('#3dd68c', 'rgba(61, 214, 140, .35)')
+                                     .replace('#f5a623', 'rgba(245, 166, 35, .35)')
+                                     .replace('#f05252', 'rgba(240, 82, 82, .35)');
 
   return `
     <div style="margin-bottom:26px">
@@ -711,7 +693,6 @@ function buildLam(){
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
       <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
 
-    // ⬇️ NUEVO: ejes horizontales a escala real
     document.getElementById('dsgaste-bars').innerHTML =
       renderEjeCamisa('Lento', {
         fin: fin,
