@@ -114,11 +114,6 @@ tbody tr:hover td{background:var(--bg3)}
 .low{color:var(--am)!important;font-weight:600}
 .ok-stock{color:var(--gr)!important;font-weight:600}
 .crit-row{background:rgba(240,82,82,.04)!important}
-.dbar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.db-lbl{font-family:var(--fm);font-size:11px;color:var(--t2);width:110px;flex-shrink:0;line-height:1.3}
-.db-trk{flex:1;background:var(--bg4);border-radius:3px;height:10px;overflow:hidden}
-.db-fill{height:10px;border-radius:3px;transition:width .4s}
-.db-val{font-family:var(--fm);font-size:11px;color:var(--t1);width:80px;text-align:right;flex-shrink:0}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-family:var(--fh);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;cursor:pointer}
 .btn-a{background:var(--am);color:var(--bg0);border:none}
 .btn-a:hover{background:#f5b84b;transform:translateY(-1px);box-shadow:0 4px 14px rgba(245,166,35,.3)}
@@ -406,6 +401,76 @@ function colorPorVidaRestante(pct){
   return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// RENDER DEL EJE HORIZONTAL A ESCALA REAL
+//   - Fin (20 mm) a la izquierda (0%)
+//   - Inicio fábrica (175 mm) a la derecha (100%)
+//   - Marcas proporcionales para Actual e Inicio control
+//   - Rayado desde Fin hasta Actual (vida restante)
+// ══════════════════════════════════════════════════════════════════════════
+function renderEjeCamisa(nombre, valores, colorVida){
+  const { fin, actual, inicioControl, inicioFabrica } = valores;
+  const rango = inicioFabrica - fin;
+  const pctFin = 0;
+  const pctActual = ((actual - fin) / rango) * 100;
+  const pctInicioControl = ((inicioControl - fin) / rango) * 100;
+  const pctInicioFabrica = 100;
+
+  const numFmt = (n) => Number(n).toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pctFmt = (n) => n.toFixed(1).replace('.', ',') + '%';
+
+  // Colores del rayado: base + variante translúcida
+  const colorRayado = colorVida;
+  const colorRayadoSuave = colorVida.replace('rgb(', 'rgba(').replace(')', ', .35)');
+
+  return `
+    <div style="margin-bottom:26px">
+      <div style="font-family:var(--fm);font-size:10px;letter-spacing:.14em;color:var(--t2);margin-bottom:12px;text-transform:uppercase">Cilindro ${nombre}</div>
+      <div style="padding:0 60px;position:relative">
+        <div style="position:relative;height:150px">
+
+          <!-- Etiquetas superiores -->
+          <div style="position:absolute;left:${pctFin}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Fin</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(fin)} mm</div>
+          </div>
+          <div style="position:absolute;left:${pctActual}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Actual</div>
+            <div style="font-family:var(--fm);font-size:13px;color:${colorVida};font-weight:700;margin-top:3px">${numFmt(actual)} mm</div>
+          </div>
+          <div style="position:absolute;left:${pctInicioControl}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Inicio control</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(inicioControl)} mm</div>
+          </div>
+          <div style="position:absolute;left:${pctInicioFabrica}%;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap">
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">Inicio</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--t1);font-weight:600;margin-top:3px">${numFmt(inicioFabrica)} mm</div>
+          </div>
+
+          <!-- Barra (eje) -->
+          <div style="position:absolute;left:0;right:0;top:62px;height:32px;background:var(--bg4);border-radius:4px;overflow:hidden;border:1px solid var(--b1)">
+            <div style="height:100%;width:${pctActual}%;
+                        background:repeating-linear-gradient(-45deg, ${colorRayado} 0px, ${colorRayado} 5px, transparent 5px, transparent 10px), ${colorRayadoSuave};
+                        transition:width .5s ease"></div>
+          </div>
+
+          <!-- Marcas verticales sobre la barra -->
+          <div style="position:absolute;left:${pctFin}%;top:54px;height:48px;width:2px;background:var(--t3);transform:translateX(-1px)"></div>
+          <div style="position:absolute;left:${pctActual}%;top:54px;height:48px;width:2px;background:${colorVida};transform:translateX(-1px);box-shadow:0 0 8px ${colorVida}aa"></div>
+          <div style="position:absolute;left:${pctInicioControl}%;top:54px;height:48px;width:2px;background:var(--am);transform:translateX(-1px);box-shadow:0 0 6px rgba(245,166,35,.5)"></div>
+          <div style="position:absolute;left:${pctInicioFabrica}%;top:54px;height:48px;width:2px;background:var(--t3);transform:translateX(-2px)"></div>
+
+          <!-- Etiquetas inferiores (porcentajes) -->
+          <div style="position:absolute;left:${pctFin}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">0%</div>
+          <div style="position:absolute;left:${pctActual}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:11px;color:${colorVida};font-weight:700">${pctFmt(pctActual)}</div>
+          <div style="position:absolute;left:${pctInicioControl}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">${pctFmt(pctInicioControl)}</div>
+          <div style="position:absolute;left:${pctInicioFabrica}%;top:110px;transform:translateX(-50%);font-family:var(--fm);font-size:10px;color:var(--t3)">100%</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 const SHEET_ID_LAM = '1PPCbU-YJnOq_csqG2tPC1xNBf1tbKXFKxCqFUYMvps0';
 const SHEET_ID_SEG = '1jq92kYHwBciMS8CK8DMtlCiw1mIuCVVY-syB52G-rV0';
 function sheetCSV(sheetId, gid){ return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&id=${sheetId}&gid=${gid}`; }
@@ -631,7 +696,6 @@ function buildLam(){
     const pctDesgasteLento = 100 - pctVidaRestanteLento;
     const pctDesgasteRapido = 100 - pctVidaRestanteRapido;
 
-    // ⬇️ Color gradual según vida restante
     const colorVidaLento = colorPorVidaRestante(pctVidaRestanteLento);
     const colorVidaRapido = colorPorVidaRestante(pctVidaRestanteRapido);
     const colorDesgasteLento = colorPorVidaRestante(pctVidaRestanteLento);
@@ -647,21 +711,20 @@ function buildLam(){
       <div class="kpi kb"><div class="kl">Total mm Rápido</div><div class="kv" style="color:var(--or)">${totalR.toFixed(1)}</div><div class="km">máx: ${maxEvR} mm</div></div>
       <div class="kpi ${pctL>70||pctR>70?'kr':'kg'}"><div class="kl">Vida consumida</div><div class="kv">${Math.max(pctL,pctR).toFixed(0)}%</div><div class="km">del rango útil (hasta ${fin} mm)</div></div>`;
 
-    document.getElementById('dsgaste-bars').innerHTML = `
-      <div>
-        <div style="font-size:10px;margin-bottom:10px;font-family:var(--fm);letter-spacing:.08em;color:var(--t2)">CILINDRO LENTO</div>
-        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${orig} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteLento}%;background:${colorVidaLento}"></div></div><span class="db-val">${ini} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${pctDesgasteLento}%;background:${colorDesgasteLento}"></div></div><span class="db-val">${actualLento} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${fin} mm</span></div>
-      </div>
-      <div style="margin-top:18px">
-        <div style="font-size:10px;margin-bottom:10px;font-family:var(--fm);letter-spacing:.08em;color:var(--t2)">CILINDRO RÁPIDO</div>
-        <div class="dbar"><span class="db-lbl">Original fábrica</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${orig} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Inicio control</span><div class="db-trk"><div class="db-fill" style="width:${pctVidaRestanteRapido}%;background:${colorVidaRapido}"></div></div><span class="db-val">${iniR} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Actual</span><div class="db-trk"><div class="db-fill" style="width:${pctDesgasteRapido}%;background:${colorDesgasteRapido}"></div></div><span class="db-val">${actualRapido} mm</span></div>
-        <div class="dbar"><span class="db-lbl">Fin de vida</span><div class="db-trk" style="background:transparent"></div><span class="db-val">${fin} mm</span></div>
-      </div>`;
+    // ⬇️ NUEVO: ejes horizontales a escala real
+    document.getElementById('dsgaste-bars').innerHTML =
+      renderEjeCamisa('Lento', {
+        fin: fin,
+        actual: actualLento,
+        inicioControl: ini,
+        inicioFabrica: orig
+      }, colorVidaLento) +
+      renderEjeCamisa('Rápido', {
+        fin: fin,
+        actual: actualRapido,
+        inicioControl: iniR,
+        inicioFabrica: orig
+      }, colorVidaRapido);
   } else {
     desgL = D.ini.lento - D.act.lento;
     desgR = D.ini.rapido - D.act.rapido;
