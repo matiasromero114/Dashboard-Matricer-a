@@ -420,6 +420,40 @@ const LM1210_CONFIG = { originalFabrica: 175, inicioControlLento: 153, inicioCon
 
 function colorPorVidaRestante(pct){ if(pct >= 50) return '#3dd68c'; if(pct >= 20) return '#f5a623'; return '#f05252'; }
 
+// ══════════════════════════════════════════════════════════════════════════
+// NUEVO: COLOR GRADUAL PARA CONTROL ESTAÑO SEGÚN DIFERENCIA
+//   0-2 mm → verde puro
+//   2-4 mm → degradado verde → amarillo
+//   4-6 mm → degradado amarillo → rojo
+//   ≥6 mm  → rojo puro
+// ══════════════════════════════════════════════════════════════════════════
+function colorEstañoPorDiferencia(dif){
+  const verde = [61,214,140];
+  const amarillo = [245,166,35];
+  const rojo = [240,82,82];
+  let rgb;
+  if(dif <= 2){ rgb = verde; }
+  else if(dif <= 4){
+    const t = (dif - 2) / 2;
+    rgb = [
+      Math.round(verde[0] + (amarillo[0]-verde[0])*t),
+      Math.round(verde[1] + (amarillo[1]-verde[1])*t),
+      Math.round(verde[2] + (amarillo[2]-verde[2])*t)
+    ];
+  } else if(dif <= 6){
+    const t = (dif - 4) / 2;
+    rgb = [
+      Math.round(amarillo[0] + (rojo[0]-amarillo[0])*t),
+      Math.round(amarillo[1] + (rojo[1]-amarillo[1])*t),
+      Math.round(amarillo[2] + (rojo[2]-amarillo[2])*t)
+    ];
+  } else {
+    rgb = rojo;
+  }
+  const h = (n) => Math.max(0, Math.min(255, n)).toString(16).padStart(2,'0');
+  return `#${h(rgb[0])}${h(rgb[1])}${h(rgb[2])}`;
+}
+
 function renderEjeCamisa(nombre, valores, colorVida){
   const { fin, actual, inicioControl, inicioFabrica } = valores;
   const rango = inicioFabrica - fin;
@@ -710,7 +744,6 @@ function buildLam(){
     const pctEjeRapido = ((actualRapido - fin) / rangoEje) * 100;
     const colorVidaLento = colorPorVidaRestante(pctEjeLento);
     const colorVidaRapido = colorPorVidaRestante(pctEjeRapido);
-    // CAMBIO: % de vida consumida ahora usa la misma referencia que la barra rayada (175 → 20)
     pctL = 100 - pctEjeLento; pctR = 100 - pctEjeRapido;
     desgL = ini - actualLento; desgR = iniR - actualRapido;
     cL = colorVidaLento; cR = colorVidaRapido;
@@ -728,7 +761,6 @@ function buildLam(){
     const pctEjeRapido = ((actualRapido - fin) / rangoEje) * 100;
     const colorVidaLento = colorPorVidaRestante(pctEjeLento);
     const colorVidaRapido = colorPorVidaRestante(pctEjeRapido);
-    // CAMBIO: % de vida consumida ahora usa la misma referencia que la barra rayada (175 → 20)
     pctL = 100 - pctEjeLento; pctR = 100 - pctEjeRapido;
     desgL = ini - actualLento; desgR = iniR - actualRapido;
     cL = colorVidaLento; cR = colorVidaRapido;
@@ -744,13 +776,21 @@ function buildLam(){
   document.getElementById('lam-alerts').innerHTML = alHtml;
   document.getElementById('titulo-alertas').innerHTML = nCriticas > 0 ? `Estado y alertas <span style="background:var(--red);color:var(--re);border:1px solid var(--reb);border-radius:999px;padding:1px 7px;font-family:var(--fm);font-size:10px;margin-left:6px">${nCriticas}</span>` : `Estado y alertas`;
 
+  // ══════════════════════════════════════════════════════════════════════
+  // CONTROL ESTAÑO — CAMBIO: color gradual por diferencia (2/4/6)
+  // ══════════════════════════════════════════════════════════════════════
   const tinData = STATE.data.ESTAÑO; const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
-    const reg = tinData.ultimo; let colorEstado = '', mensaje = '', colorHex = '';
+    const reg = tinData.ultimo;
     const idealMin = 1.2, idealMax = 1.5;
-    if(reg.diferencia >= 6){ colorEstado = 'var(--re)'; colorHex = '#f05252'; mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm'; }
-    else if(reg.esquina < idealMin || reg.esquina > idealMax){ colorEstado = 'var(--am)'; colorHex = '#f5a623'; mensaje = '⚠ ACERCAR: Esquina fuera del rango (1.2–1.5 mm)'; }
-    else { colorEstado = 'var(--gr)'; colorHex = '#3dd68c'; mensaje = '✓ Correcto'; }
+    const colorHex = colorEstañoPorDiferencia(reg.diferencia);
+    const colorEstado = colorHex;
+    let mensaje = '';
+    if(reg.diferencia >= 6){ mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm'; }
+    else if(reg.diferencia >= 4){ mensaje = '⚠ PELIGRO: cerca del límite (6 mm)'; }
+    else if(reg.diferencia >= 2){ mensaje = '⚠ PRECAUCIÓN: revisar ajuste'; }
+    else if(reg.esquina < idealMin || reg.esquina > idealMax){ mensaje = '⚠ ACERCAR: Esquina fuera del rango (1.2–1.5 mm)'; }
+    else { mensaje = '✓ Correcto: dentro de parámetros'; }
     let vueltasNecesarias = '';
     if(reg.esquina > idealMax){ vueltasNecesarias = `🔧 ≈ ${((reg.esquina-idealMax)*6).toFixed(1)} vueltas para ${idealMax} mm.`; }
     else if(reg.esquina < idealMin){ vueltasNecesarias = `⚠ Esquina bajo ${idealMin} mm.`; }
