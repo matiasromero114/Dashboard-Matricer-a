@@ -421,37 +421,17 @@ const LM1210_CONFIG = { originalFabrica: 175, inicioControlLento: 153, inicioCon
 function colorPorVidaRestante(pct){ if(pct >= 50) return '#3dd68c'; if(pct >= 20) return '#f5a623'; return '#f05252'; }
 
 // ══════════════════════════════════════════════════════════════════════════
-// NUEVO: COLOR GRADUAL PARA CONTROL ESTAÑO SEGÚN DIFERENCIA
-//   0-2 mm → verde puro
-//   2-4 mm → degradado verde → amarillo
-//   4-6 mm → degradado amarillo → rojo
-//   ≥6 mm  → rojo puro
+// COLOR ESTAÑO SEGÚN DIFERENCIA (escala 0–0.6 mm)
+//   0 – 0.2 mm  → verde
+//   0.2 – 0.4 mm → amarillo
+//   0.4 – 0.5 mm → naranja
+//   ≥ 0.5 mm    → rojo
 // ══════════════════════════════════════════════════════════════════════════
 function colorEstañoPorDiferencia(dif){
-  const verde = [61,214,140];
-  const amarillo = [245,166,35];
-  const rojo = [240,82,82];
-  let rgb;
-  if(dif <= 2){ rgb = verde; }
-  else if(dif <= 4){
-    const t = (dif - 2) / 2;
-    rgb = [
-      Math.round(verde[0] + (amarillo[0]-verde[0])*t),
-      Math.round(verde[1] + (amarillo[1]-verde[1])*t),
-      Math.round(verde[2] + (amarillo[2]-verde[2])*t)
-    ];
-  } else if(dif <= 6){
-    const t = (dif - 4) / 2;
-    rgb = [
-      Math.round(amarillo[0] + (rojo[0]-amarillo[0])*t),
-      Math.round(amarillo[1] + (rojo[1]-amarillo[1])*t),
-      Math.round(amarillo[2] + (rojo[2]-amarillo[2])*t)
-    ];
-  } else {
-    rgb = rojo;
-  }
-  const h = (n) => Math.max(0, Math.min(255, n)).toString(16).padStart(2,'0');
-  return `#${h(rgb[0])}${h(rgb[1])}${h(rgb[2])}`;
+  if(dif < 0.2) return '#3dd68c';
+  if(dif < 0.4) return '#f5a623';
+  if(dif < 0.5) return '#fb923c';
+  return '#f05252';
 }
 
 function renderEjeCamisa(nombre, valores, colorVida){
@@ -628,7 +608,7 @@ function parseStock(rows){
 }
 function parseVidaUtil(rows){ if(!rows) return null; const hi = rows.findIndex(r => (r[0]||'').trim() === 'Molde'); if(hi < 0) return null; return rows.slice(hi+1).filter(r => (r[0]||'').trim() && (r[0]||'').trim() !== 'Molde').map(r => ({ molde: (r[0]||'').trim(), numero: (r[1]||'').toString().trim(), clave: (r[2]||'').trim(), inicio: (r[3]||'').trim(), fin: (r[4]||'').trim() || null, tnProducidas: parseFloat(String(r[5]||'0').replace(/[^\d.-]/g, '')) || 0, horas: (r[6]||'').trim(), pallets: (r[7]||'').trim() || null })); }
 function parseMantenimiento(rows){ if(!rows || rows.length < 2) return []; const datos = []; for(let i = 0; i < rows.length; i++){ const row = rows[i]; if(!row || row.length < 3) continue; const primeraCol = (row[0] || '').trim(); if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(primeraCol)) datos.push({ fecha: primeraCol, responsable: (row[1] || '').trim(), moldeEquipo: (row[2] || '').trim(), tipoTarea: (row[3] || '').trim(), descripcion: (row[4] || '').trim() }); } return datos; }
-function parseEstano(rows){ if(!rows || rows.length < 3) return null; let guia = ''; if(rows[0] && rows[0][5]) guia = rows[0][5].trim(); if(!guia) guia = 'Diferencia crítica: 6 mm entre centro y esquinas. 6 vueltas = 1 mm.'; let ultimoRegistro = null; for(let i = rows.length-1; i >= 1; i--){ const row = rows[i]; if(!row || row.length < 6) continue; const fecha = row[0] ? row[0].trim() : ''; const centro = parseFloat(String(row[1]).replace(',', '.')); const esquina = parseFloat(String(row[2]).replace(',', '.')); const diferencia = parseFloat(String(row[3]).replace(',', '.')); const vueltas = row[4] ? parseFloat(String(row[4]).replace(',', '.')) : null; const observaciones = row[5] ? row[5].trim() : ''; if(fecha && !isNaN(centro) && !isNaN(esquina)){ ultimoRegistro = { fecha, centro, esquina, diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia, vueltas, observaciones }; break; } } if(!ultimoRegistro) return null; return { guia, ultimo: ultimoRegistro }; }
+function parseEstano(rows){ if(!rows || rows.length < 3) return null; let guia = ''; if(rows[0] && rows[0][5]) guia = rows[0][5].trim(); if(!guia) guia = 'Diferencia crítica: 0.6 mm entre centro y esquinas. 6 vueltas = 1 mm.'; let ultimoRegistro = null; for(let i = rows.length-1; i >= 1; i--){ const row = rows[i]; if(!row || row.length < 6) continue; const fecha = row[0] ? row[0].trim() : ''; const centro = parseFloat(String(row[1]).replace(',', '.')); const esquina = parseFloat(String(row[2]).replace(',', '.')); const diferencia = parseFloat(String(row[3]).replace(',', '.')); const vueltas = row[4] ? parseFloat(String(row[4]).replace(',', '.')) : null; const observaciones = row[5] ? row[5].trim() : ''; if(fecha && !isNaN(centro) && !isNaN(esquina)){ ultimoRegistro = { fecha, centro, esquina, diferencia: isNaN(diferencia) ? Math.abs(centro - esquina) : diferencia, vueltas, observaciones }; break; } } if(!ultimoRegistro) return null; return { guia, ultimo: ultimoRegistro }; }
 function parseEstadoPiezas(rows){
   if(!rows || rows.length < 2) return [];
   let headerIndex = -1; let idxMolde = -1, idxNumero = -1, idxComponente = -1, idxEstado = -1, idxAccion = -1, idxObservacion = -1, idxFecha = -1;
@@ -777,7 +757,7 @@ function buildLam(){
   document.getElementById('titulo-alertas').innerHTML = nCriticas > 0 ? `Estado y alertas <span style="background:var(--red);color:var(--re);border:1px solid var(--reb);border-radius:999px;padding:1px 7px;font-family:var(--fm);font-size:10px;margin-left:6px">${nCriticas}</span>` : `Estado y alertas`;
 
   // ══════════════════════════════════════════════════════════════════════
-  // CONTROL ESTAÑO — CAMBIO: color gradual por diferencia (2/4/6)
+  // CONTROL ESTAÑO — escala 0–0.6 mm (0.2/0.4/0.5)
   // ══════════════════════════════════════════════════════════════════════
   const tinData = STATE.data.ESTAÑO; const tinContainer = document.getElementById('tin-data');
   if(tinData && tinData.ultimo){
@@ -786,16 +766,17 @@ function buildLam(){
     const colorHex = colorEstañoPorDiferencia(reg.diferencia);
     const colorEstado = colorHex;
     let mensaje = '';
-    if(reg.diferencia >= 6){ mensaje = '⚠ RECTIFICAR: Diferencia ≥ 6 mm'; }
-    else if(reg.diferencia >= 4){ mensaje = '⚠ PELIGRO: cerca del límite (6 mm)'; }
-    else if(reg.diferencia >= 2){ mensaje = '⚠ PRECAUCIÓN: revisar ajuste'; }
+    if(reg.diferencia >= 0.6){ mensaje = '⚠ RECTIFICAR: Diferencia ≥ 0.6 mm'; }
+    else if(reg.diferencia >= 0.5){ mensaje = '⚠ PELIGRO: cerca del límite (0.6 mm)'; }
+    else if(reg.diferencia >= 0.4){ mensaje = '⚠ PRECAUCIÓN: revisar ajuste'; }
+    else if(reg.diferencia >= 0.2){ mensaje = '✓ Aceptable: controlar en próximo registro'; }
     else if(reg.esquina < idealMin || reg.esquina > idealMax){ mensaje = '⚠ ACERCAR: Esquina fuera del rango (1.2–1.5 mm)'; }
     else { mensaje = '✓ Correcto: dentro de parámetros'; }
     let vueltasNecesarias = '';
     if(reg.esquina > idealMax){ vueltasNecesarias = `🔧 ≈ ${((reg.esquina-idealMax)*6).toFixed(1)} vueltas para ${idealMax} mm.`; }
     else if(reg.esquina < idealMin){ vueltasNecesarias = `⚠ Esquina bajo ${idealMin} mm.`; }
     else { vueltasNecesarias = `✓ Dentro del rango.`; }
-    const pctDiferencia = Math.max(0, Math.min(100, (reg.diferencia / 6) * 100)); const rGauge = 50;
+    const pctDiferencia = Math.max(0, Math.min(100, (reg.diferencia / 0.6) * 100)); const rGauge = 50;
     const circ = 2 * Math.PI * rGauge; const dashGauge = circ * (pctDiferencia / 100);
     tinContainer.innerHTML = `<div style="margin-top:12px;border-top:1px solid var(--b1);padding-top:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:16px">📏</span><span style="font-family:var(--fh);font-size:13px;letter-spacing:.1em">CONTROL ESTAÑO · ${reg.fecha}</span></div><div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap"><div style="position:relative;width:130px;height:130px;flex-shrink:0"><svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)"><circle cx="60" cy="60" r="${rGauge}" fill="none" stroke="var(--bg4)" stroke-width="10"/><circle cx="60" cy="60" r="${rGauge}" fill="none" stroke="${colorHex}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${dashGauge} ${circ}" style="transition:stroke-dasharray 1s ease, stroke .3s; filter:drop-shadow(0 0 6px ${colorHex}aa)"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center"><div style="font-family:var(--fh);font-size:26px;font-weight:700;line-height:1;color:${colorHex}">${reg.diferencia.toFixed(2)}</div><div style="font-family:var(--fm);font-size:9px;color:var(--t2);letter-spacing:.08em;margin-top:4px">DIFERENCIA</div><div style="font-family:var(--fm);font-size:9px;color:var(--t3);margin-top:2px">mm</div></div></div><div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border-radius:var(--r)"><span style="font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">CENTRO</span><span style="font-family:var(--fm);font-size:15px;font-weight:600;color:var(--t0)">${reg.centro.toFixed(2)} mm</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border-radius:var(--r)"><span style="font-family:var(--fm);font-size:10px;color:var(--t2);letter-spacing:.08em">ESQUINA</span><span style="font-family:var(--fm);font-size:15px;font-weight:600;color:${colorEstado};text-shadow:0 0 10px ${colorHex}88">${reg.esquina.toFixed(2)} mm</span></div></div></div><div style="text-align:center;margin:14px 0 10px"><div style="background:${colorHex}22;color:${colorHex};border:1px solid ${colorHex}55;padding:6px 14px;border-radius:999px;display:inline-block;font-size:11px;font-family:var(--fm)">${mensaje}</div></div><div style="font-size:11px;color:var(--t1);background:var(--bg4);padding:10px 12px;border-radius:var(--r);margin-top:5px;line-height:1.6"><div><strong>📝 Observación:</strong> ${reg.observaciones || 'Sin observaciones'}</div><div style="margin-top:6px"><strong>🔄 Vueltas:</strong> ${vueltasNecesarias}</div><div style="margin-top:6px"><strong>📐 Guía:</strong> ${tinData.guia}</div></div></div>`;
   } else { tinContainer.innerHTML = `<div class="al alb" style="margin-top:12px">⚠️ No se encontraron datos de Control de Estaño.</div>`; }
